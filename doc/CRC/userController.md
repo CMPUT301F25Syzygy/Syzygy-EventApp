@@ -1,13 +1,13 @@
-# EntrantController
+# UserController
 ## responsibility
 - Create/update profile
 - Delete profile
 - Receive/opt out of notifications
 - Accept/decline invitations
-- Open view to scan QR code
+- Transform users into different types (Organizer/Administrator)
 ## collaborators
 - User
-- Entrant
+- UserView
 - EventView
 - EventListView
 - Notification
