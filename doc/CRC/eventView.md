@@ -7,6 +7,8 @@
 - Display location
 - Open location in map software (google maps or whatever is the OS default is)
 - Join/leave waiting list
+- Open QRGeneratorView with event info to get a QR code
 ## collaborators
 - Event
 - EventController
+- QRGeneratorView
