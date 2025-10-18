@@ -1,4 +1,4 @@
-# OrganizerView
+# OrganizeFragment
 ## responsibility
 - Display a button to create a new event
 - Display a list of owned events
@@ -6,3 +6,5 @@
 ## collaborators
 - Organizer
 - OrganizerController
+- OrganizerEventSummaryListView
+- MainActivity

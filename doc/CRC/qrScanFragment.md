@@ -1,4 +1,4 @@
-# QRScanView
+# QRScanFragment
 ## responsibility
 - Get permission to use the camera
 - Scan for QR codes

@@ -1,7 +1,10 @@
 # NotificationListView
 ## responsibility
-- Display a list of all notifications in the database, and what organizer sent the notification
-- Allow administrators to browse and delete notifications from the database
+- Display the title of the list
+- Display a count of how many notifications
+- Allow user to minimize list (like an accordion menu)
+- Display a list of `NotificationView`s for each notification
 ## collaborators
 - Notification
-- NotificationListController
+- NotificationView
+- NotificationController

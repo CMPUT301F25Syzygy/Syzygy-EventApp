@@ -1,11 +1,12 @@
 # UserView
 ## responsibility
-- Button to display a list of owned events
-- Provide personal information/create profile
-- Display notifications
-- Option to opt out of notifications
-- Option to accept/decline invitations
-- Open view to scan QR code
+- Display role Entrant/Organizer/Admin
+- Display name
+- Display email/phone number
+- Display promote button (if on a admin device demoted)
+- Display demote button (if on a admin device demoted)
+- Display disable banner button (if on a admin device demoted)
+- Display ban button (if on a admin device demoted)
 ## collaborators
 - User
-- UserView
+- UserController
