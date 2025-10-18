@@ -5,3 +5,4 @@
 ## collaborators
 - EventController
 - EventSummaryListView
+- MainActivity

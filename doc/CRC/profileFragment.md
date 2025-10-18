@@ -9,3 +9,4 @@
 ## collaborators
 - User
 - UserController
+- MainActivity

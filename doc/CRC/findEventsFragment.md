@@ -9,3 +9,4 @@
 - Event
 - EventSummaryListView
 - QRScanFragment
+- MainActivity

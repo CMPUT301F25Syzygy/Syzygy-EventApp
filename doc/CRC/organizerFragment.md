@@ -7,3 +7,4 @@
 - Organizer
 - OrganizerController
 - OrganizerEventSummaryListView
+- MainActivity

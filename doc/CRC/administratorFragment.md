@@ -7,3 +7,4 @@
 - EventSummaryListView
 - UserListView
 - NotificationListView
+- MainActivity
