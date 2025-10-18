@@ -1,7 +1,9 @@
 # UserListView
 ## responsibility
-- Display a list of all users in the database
-- Allow administrators to browse and delete users from the database
+- Display a list title
+- Display the number of `User`s are in the list
+- Allow user to minimize list (like an accordion menu)
+- Display a list of `UserView`s for each `User` in the list
 ## collaborators
 - User
-- UserListController
+- UserView
