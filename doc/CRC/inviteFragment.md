@@ -7,4 +7,7 @@
 - Display an accept and reject button
 ## collaborators
 - InvitationController
+- Invitation
+- User
+- Event
 - MainActivity
