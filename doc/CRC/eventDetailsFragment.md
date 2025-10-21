@@ -1,7 +1,7 @@
 # EventDetailsFragment
 ## responsibility
 - Display button to join/leave the waitlist
-- Display button to export a QR code
+- Display button to open the `QRGenerateView`
 - Display `Event` title
 - Display `Event` location
 - Display `Event` lottery time
@@ -18,4 +18,4 @@
 - Event
 - Organizer
 - EventOrganizerController
-- QRGenerator
+- QRGenerateView

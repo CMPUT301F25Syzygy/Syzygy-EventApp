@@ -10,7 +10,7 @@
 - Display button to send invites early or again
 - Display button to cancel pending invites
 - Display button to send notifications to users (in a pop-up)
-- Display button to export a QR code
+- Display button to open the `QRGenerateView`
 - Display button to export users with accepted invites to CSV
 - Display 'UserListView' of users on the waitlist
 - Display 'UserListView' of users with pending invites
@@ -19,5 +19,6 @@
 - Event
 - Organizer
 - EventController
-- QRGenerator
+- QRGenerateView
 - CSVGenerator
+- SendNotificationsView
