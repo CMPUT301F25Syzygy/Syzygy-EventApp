@@ -21,3 +21,4 @@
 - EventController
 - QRGenerator
 - CSVGenerator
+- SendNotificationsView
