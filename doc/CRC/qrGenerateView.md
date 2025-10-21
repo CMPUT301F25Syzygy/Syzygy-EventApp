@@ -1,7 +1,8 @@
-#QRGenerator
+#QRGenerateView
 ## responsibility
 - Generate QR codes
-- Open pop-up to export QR codes
+- Display a view of the QR code
+- Export button
 ## collaborators
 - EventDetailsView
 - EventOrganizerDetailsView
