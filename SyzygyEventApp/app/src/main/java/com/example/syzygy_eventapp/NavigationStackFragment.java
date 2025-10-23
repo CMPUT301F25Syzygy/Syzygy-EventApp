@@ -19,7 +19,7 @@ import java.util.Stack;
 /**
  * Manages a stack of different screens (fragments) that can be pushed and popped.
  * This allows one screen to open a sub screen and then return back.
- * Allows displays a bottom navigation bar which screens can customize and then listen to.
+ * Displays a bottom navigation bar which screens can customize and then listen to.
  */
 public class NavigationStackFragment extends Fragment implements OnItemSelectedListener {
     private static class Screen {
