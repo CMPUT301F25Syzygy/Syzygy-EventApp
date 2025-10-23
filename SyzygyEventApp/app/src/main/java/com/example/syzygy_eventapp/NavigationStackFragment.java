@@ -32,21 +32,23 @@ public class NavigationStackFragment extends Fragment implements OnItemSelectedL
         }
     }
 
-    final private Stack<Screen> screenStack = new Stack<>();
+    final private Stack<Screen> screenStack;
     private BottomNavigationView navBar;
     private Screen displayedScreen = null;
 
+    NavigationStackFragment() {
+        screenStack = new Stack<Screen>();
+        screenStack.push(new Screen(null));
+    }
+
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_navigation_stack, container, false);
 
         navBar = view.findViewById(R.id.bottom_nav_bar);
-
-        refreshNavBar();
-
         navBar.setOnItemSelectedListener(this);
+        refreshNavBar();
 
         return view;
     }
@@ -74,8 +76,13 @@ public class NavigationStackFragment extends Fragment implements OnItemSelectedL
         manager.beginTransaction()
                 .replace(R.id.fragment_frame, fragment)
                 .commit();
-        
-        screenStack.push(new Screen(fragment));
+
+        if(isEmpty()) {
+            screenStack.get(0).fragment = fragment;
+        } else {
+            screenStack.push(new Screen(fragment));
+        }
+
         refreshNavBar();
     }
 
@@ -83,11 +90,21 @@ public class NavigationStackFragment extends Fragment implements OnItemSelectedL
      * Remove the screen on the top of the stack. Goes back to a previous screen.
      */
     public void popScreen() {
-        Screen screen = screenStack.pop();
+        Fragment fragment;
+
+        if (isEmpty()) {
+            throw new IllegalStateException("Can't pop with no screens left");
+        } else if (screenStack.size() == 1) {
+            screenStack.get(0).fragment = null;
+            fragment = new Fragment(); // blank screen
+        } else {
+            screenStack.pop();
+            fragment = screenStack.peek().fragment;
+        }
 
         FragmentManager manager = getParentFragmentManager();
         manager.beginTransaction()
-                .replace(R.id.fragment_frame, screen.fragment)
+                .replace(R.id.fragment_frame, fragment)
                 .commit();
 
         refreshNavBar();
@@ -124,7 +141,7 @@ public class NavigationStackFragment extends Fragment implements OnItemSelectedL
     /**
      * Sets the navigation menu for a screen.
      * Any screens above it without their own navigation menu will use the first menu below them in the stack.
-     * Using index 0 will change the main menu.
+     * Using index 0 will change the main menu, which is guaranteed to work even if there is no screen.
      * @param index index into the stack where the menu is being added
      * @param menuResId the resource ID of the menu
      * @param listener a listener to respond to onNavigationItemSelected calls
@@ -138,6 +155,24 @@ public class NavigationStackFragment extends Fragment implements OnItemSelectedL
     }
 
     /**
+     * Set which button in the nav bar is visually selected.
+     * @param itemId the id of the button to select
+     * @throws IllegalStateException when no nav menu has been set
+     */
+    public void selectNavItem(int itemId) {
+        if (navBar != null) {
+            navBar.setSelectedItemId(itemId);
+        }
+
+        Screen menuScreen = getCurrentMenuScreen();
+        if (menuScreen != null) {
+            menuScreen.menuSelectedItemId = itemId;
+        } else {
+            throw new IllegalStateException("A nav menu must be set before selection an item on it");
+        }
+    }
+
+    /**
      * Refreshing the nav menu with any changes that have happened
      */
     private void refreshNavBar() {
@@ -147,7 +182,6 @@ public class NavigationStackFragment extends Fragment implements OnItemSelectedL
             if (menuScreen == null) {
                 clearNavBar();
             } else if (displayedScreen == null || !displayedScreen.equals(menuScreen)) {
-                System.out.println(displayedScreen);
                 inflateIntoNavBar(menuScreen);
             }
         }
@@ -167,7 +201,9 @@ public class NavigationStackFragment extends Fragment implements OnItemSelectedL
                 navBar.setSelectedItemId(screen.menuSelectedItemId);
             });
         } else {
-            screen.menuSelectedItemId = navBar.getSelectedItemId();
+            // clear selection
+            MenuItem currentlySelected = navBar.getMenu().findItem(navBar.getSelectedItemId());
+            currentlySelected.setChecked(false);
         }
     }
 
@@ -177,6 +213,14 @@ public class NavigationStackFragment extends Fragment implements OnItemSelectedL
     private void clearNavBar() {
         navBar.getMenu().clear();
         displayedScreen = null;
+    }
+
+    /**
+     * Checks if there are no screen fragments
+     * @return if there are no screen fragments
+     */
+    public boolean isEmpty() {
+        return screenStack.size() <= 1 && screenStack.get(0).fragment == null;
     }
 
     /**
