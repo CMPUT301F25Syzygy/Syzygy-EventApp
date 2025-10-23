@@ -35,9 +35,9 @@ public class MainActivity extends AppCompatActivity implements OnItemSelectedLis
         organizerFragment = new OrganizerFragment();
         adminFragment = new AdministratorFragment();
 
-        navStack.setScreenNavMenu(0, R.menu.entrant_nav_menu, this);
-        // navStack.setScreenNavMenu(0, R.menu.organizer_nav_menu, this);
-        // navStack.setScreenNavMenu(0, R.menu.admin_nav_menu, this);
+        navStack.setMainNavMenu(R.menu.entrant_nav_menu, this);
+        // navStack.setMainNavMenu(R.menu.organizer_nav_menu, this);
+        // navStack.setMainNavMenu(R.menu.admin_nav_menu, this);
 
         navStack.selectNavItem(R.id.profile_nav_button);
     }
