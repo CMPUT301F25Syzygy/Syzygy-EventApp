@@ -1,24 +1,64 @@
 package com.example.syzygy_eventapp;
 
 import android.os.Bundle;
+import android.view.MenuItem;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
-public class MainActivity extends AppCompatActivity {
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import com.google.android.material.navigation.NavigationBarView.OnItemSelectedListener;
+
+public class MainActivity extends AppCompatActivity implements OnItemSelectedListener {
+    private NavigationStackFragment navStack;
+    private Fragment profileFragment;
+    private Fragment findFragment;
+    private Fragment joinedFragment;
+    private Fragment organizerFragment;
+    private Fragment adminFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
+
+        navStack = new NavigationStackFragment();
+
+        FragmentManager manager = getSupportFragmentManager();
+        manager.beginTransaction()
+                .replace(R.id.activity_main, navStack)
+                .commit();
+
+        profileFragment = new ProfileFragment();
+        findFragment = new FindEventsFragment(navStack);
+        joinedFragment = new JoinedEventsFragment();
+        organizerFragment = new OrganizerFragment();
+        adminFragment = new AdministratorFragment();
+
+        navStack.setMainNavMenu(R.menu.entrant_nav_menu, this);
+        // navStack.setMainNavMenu(R.menu.organizer_nav_menu, this);
+        // navStack.setMainNavMenu(R.menu.admin_nav_menu, this);
+
+        navStack.selectNavItem(R.id.profile_nav_button);
+    }
+
+    public boolean onNavigationItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.profile_nav_button) {
+            navStack.replaceScreen(profileFragment);
+        } else if (id == R.id.find_nav_button) {
+            navStack.replaceScreen(findFragment);
+        } else if (id == R.id.events_nav_button) {
+            navStack.replaceScreen(joinedFragment);
+        } else if (id == R.id.organize_nav_button) {
+            navStack.replaceScreen(organizerFragment);
+        } else if (id == R.id.admin_nav_button) {
+            navStack.replaceScreen(adminFragment);
+        } else {
+            return false;
+        }
+
+        return true;
     }
 }
