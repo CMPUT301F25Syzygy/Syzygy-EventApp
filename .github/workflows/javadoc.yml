@@ -1,0 +1,95 @@
+name: Generate Javadoc and Deploy to Pages
+
+on:
+  push:
+    branches: [ "**" ]
+    paths-ignore:
+      - 'SyzygyEventApp/doc/**'
+
+env:
+  DOCS_SUBDIR: ${{ github.ref_name }}
+  TEMP_DOCS_PATH: /tmp/stashed_javadocs
+
+jobs:
+  generate_and_deploy_javadoc:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+
+    steps:
+      # Checkout source code
+      - name: Checkout Source Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # Build javadoc
+      - name: Set up JDK 21
+        uses: actions/setup-java@v3
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: gradle
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+        working-directory: SyzygyEventApp
+
+      - name: Generate Dokka Documentation
+        run: |
+          echo "File tree before generating Javadoc:"
+          find . | sed -e "s/[^-][^\/]*\// |/g" -e "s/|\([^ ]\)/|-\1/"
+          echo "Generating Javadoc..."
+          ./gradlew :app:dokkaJavadoc
+          echo "File tree after generating Javadoc:"
+          find . | sed -e "s/[^-][^\/]*\// |/g" -e "s/|\([^ ]\)/|-\1/"
+        working-directory: SyzygyEventApp
+
+      # Stash generated Javadoc
+      - name: Stage and Stash Newly Generated Javadoc
+        run: |
+          find . | sed -e "s/[^-][^\/]*\// |/g" -e "s/|\([^ ]\)/|-\1/"
+          SOURCE_DIR="./SyzygyEventApp/doc/javadoc"
+          STAGING_DIR="${{ env.TEMP_DOCS_PATH }}/${{ env.DOCS_SUBDIR }}"
+          mkdir -p "$STAGING_DIR"
+          cp -r "$SOURCE_DIR"/* "$STAGING_DIR"/
+          echo "Stashed Javadoc for branch '${{ env.DOCS_SUBDIR }}' at $STAGING_DIR"
+
+      # Checkout existing gh-pages content
+      - name: Checkout Existing gh-pages Content (If Exists)
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          path: .
+          token: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
+
+      # Delete old docs for current branch
+      - name: Delete Old Javadoc Folder for Current Branch
+        run: |
+          TARGET_DIR="${{ env.DOCS_SUBDIR }}"
+          if [ -d "$TARGET_DIR" ]; then
+            echo "Deleting existing docs for branch '$TARGET_DIR'..."
+            rm -rf "$TARGET_DIR"
+          else
+            echo "No existing docs found for branch '$TARGET_DIR'."
+          fi
+
+      # Copy new docs into place
+      - name: Copy New Javadoc to Deployment Directory
+        run: |
+          STASHED_DIR="${{ env.TEMP_DOCS_PATH }}/${{ env.DOCS_SUBDIR }}"
+          echo "Copying new docs for branch '${{ env.DOCS_SUBDIR }}'..."
+          cp -r "$STASHED_DIR" "./${{ env.DOCS_SUBDIR }}/"
+          rm -rf "${{ env.TEMP_DOCS_PATH }}"
+
+      # Deploy to GitHub Pages
+      - name: Deploy Javadoc to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: .
+          publish_branch: gh-pages
+          force_orphan: false
