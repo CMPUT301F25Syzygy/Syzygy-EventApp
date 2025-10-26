@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "333696112407",
+    "project_id": "syzygy-eventapp-e8369",
+    "storage_bucket": "syzygy-eventapp-e8369.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:333696112407:android:3c9383ee81521eba994952",
+        "android_client_info": {
+          "package_name": "com.example.syzygy_eventapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCQ_ItihQA3CxQGdyovLnIsRxN83GzJeXs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

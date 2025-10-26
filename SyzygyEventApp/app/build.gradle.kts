@@ -3,6 +3,9 @@ plugins {
 
     // For Dokka docs generation (modern Javadoc alternative)
     id("org.jetbrains.dokka") version "1.9.20"
+
+    // For Firebase
+    id("com.google.gms.google-services")
 }
 
 // Dokka docs generation configuration
@@ -70,4 +73,8 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
+
+    // Import the Firebase BoM
+    implementation(platform("com.google.firebase:firebase-bom:34.4.0"))
+    implementation("com.google.firebase:firebase-firestore")
 }
