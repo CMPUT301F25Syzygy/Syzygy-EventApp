@@ -9,7 +9,7 @@ on:
     branches: [ "**" ]
 
 jobs:
-  test:
+  instrumentation-test:
     runs-on: ubuntu-latest
     strategy:
       matrix: # In case we want to test on multiple API levels in the future
@@ -52,7 +52,7 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
         working-directory: SyzygyEventApp
-        
+
       - name: Build debug APK and test APK
         run: |
           ./gradlew assembleDebug assembleAndroidTest
