@@ -30,7 +30,7 @@ public class UserTest {
                 "https://testphoto.com/test.jpg",
                 false,
                 false,
-                Arrays.asList(Role.ENTRANT, Role.ORGANIZER), // ✅ List instead of HashSet
+                Arrays.asList(Role.ENTRANT, Role.ORGANIZER),
                 Role.ORGANIZER
         );
 
