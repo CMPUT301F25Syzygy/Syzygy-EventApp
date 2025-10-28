@@ -14,6 +14,7 @@ local.properties
 .signing/
 
 # User-specific configurations
+echo ".idea/" >> .gitignore
 .idea/libraries/
 .idea/workspace.xml
 .idea/tasks.xml
@@ -35,3 +36,4 @@ local.properties
 .Trashes
 ehthumbs.db
 Thumbs.db
+
