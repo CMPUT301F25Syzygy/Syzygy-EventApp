@@ -4,7 +4,7 @@ import com.google.firebase.Timestamp;
 
 /**
  * Invitation Model representing an organizer's invite sent to a user/entrant for a specific event.
- * Synced with Firestore.
+ * Synced with DB. Other classes are responsible for initializing values upon creation.
  */
 public class Invitation {
 
@@ -13,6 +13,7 @@ public class Invitation {
     private String organizerID;
     private String recipientID;
 
+    /** The Boolean "accepted" equals true if the invite has been accepted, false if rejected, and null if pending. */
     private Boolean accepted;
 
     private Timestamp sendTime;
