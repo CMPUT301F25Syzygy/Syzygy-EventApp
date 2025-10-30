@@ -1,6 +1,7 @@
 package com.example.syzygy_eventapp;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -21,6 +22,12 @@ public class MainActivity extends AppCompatActivity implements OnItemSelectedLis
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // Log the current AppInstallationId each time
+        // the app starts.
+        Log.i("AppInstallationId", "The current AppInstallationId is: "
+                + AppInstallationId.get(this.getApplicationContext())
+        );
 
         navStack = new NavigationStackFragment();
 
