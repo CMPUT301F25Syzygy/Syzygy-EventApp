@@ -15,16 +15,18 @@ public class Invitation {
 
     /** The Boolean "accepted" equals true if the invite has been accepted, false if rejected, and null if pending. */
     private Boolean accepted;
+    private Boolean cancelled;
 
     private Timestamp sendTime;
     private Timestamp responseTime;
+    private Timestamp cancelTime;
 
     /** Default Constructor used for creating invitations normally. */
     public Invitation() {
     }
 
     /** Constructor with all values, used mostly for testing. */
-    public Invitation(String invitation, String event, String organizerID, String recipientID, Boolean accepted, Timestamp sendTime, Timestamp responseTime) {
+    public Invitation(String invitation, String event, String organizerID, String recipientID, Boolean accepted, Timestamp sendTime, Timestamp responseTime, Boolean cancelled, Timestamp cancelTime) {
         this.invitation = invitation;
         this.event = event;
         this.organizerID = organizerID;
@@ -32,6 +34,8 @@ public class Invitation {
         this.accepted = accepted;
         this.sendTime = sendTime;
         this.responseTime = responseTime;
+        this.cancelled = cancelled;
+        this.cancelTime = cancelTime;
     }
 
     public String getInvitation() {
@@ -88,5 +92,21 @@ public class Invitation {
 
     public void setResponseTime(Timestamp responseTime) {
         this.responseTime = responseTime;
+    }
+
+    public Boolean getCancelled() {
+        return cancelled;
+    }
+
+    public void setCancelled(Boolean cancelled) {
+        this.cancelled = cancelled;
+    }
+
+    public Timestamp getCancelTime() {
+        return cancelTime;
+    }
+
+    public void setCancelTime(Timestamp cancelTime) {
+        this.cancelTime = cancelTime;
     }
 }

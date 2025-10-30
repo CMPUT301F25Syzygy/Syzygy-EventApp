@@ -20,8 +20,9 @@ public class InvitationTest {
     public void testConstructorAndGetters() {
         Timestamp sendTime = new Timestamp(100L, 0);
         Timestamp responseTime = new Timestamp(200L, 0);
+        Timestamp cancelTime = new Timestamp(300L, 0);
 
-        Invitation invite = new Invitation("testInvite", "testEvent", "user001", "user002", true, sendTime, responseTime);
+        Invitation invite = new Invitation("testInvite", "testEvent", "user001", "user002", true, sendTime, responseTime, false, cancelTime);
 
         assertEquals("testInvite", invite.getInvitation());
         assertEquals("testEvent", invite.getEvent());
@@ -30,6 +31,8 @@ public class InvitationTest {
         assertTrue(invite.getAccepted());
         assertEquals(sendTime, invite.getSendTime());
         assertEquals(responseTime, invite.getResponseTime());
+        assertFalse(invite.getCancelled());
+        assertEquals(cancelTime, invite.getCancelTime());
     }
 
     /**
@@ -39,6 +42,7 @@ public class InvitationTest {
     public void testSetters() {
         Timestamp sendTime = new Timestamp(0L, 123);
         Timestamp responseTime = new Timestamp(1L, 456);
+        Timestamp cancelTime = new Timestamp(2L, 789);
 
         Invitation invite = new Invitation();
 
@@ -49,6 +53,8 @@ public class InvitationTest {
         invite.setAccepted(false);
         invite.setSendTime(sendTime);
         invite.setResponseTime(responseTime);
+        invite.setCancelled(true);
+        invite.setCancelTime(cancelTime);
 
         assertEquals("testInvite2", invite.getInvitation());
         assertEquals("testEvent2", invite.getEvent());
@@ -57,10 +63,12 @@ public class InvitationTest {
         assertFalse(invite.getAccepted());
         assertEquals(sendTime, invite.getSendTime());
         assertEquals(responseTime, invite.getResponseTime());
+        assertTrue(invite.getCancelled());
+        assertEquals(cancelTime, invite.getCancelTime());
     }
 
     /**
-     * Tests that the accepted field supports null (pending), true (accepted), and false (rejected).
+     * Tests that the accepted variable supports null (pending), true (accepted), and false (rejected).
      */
     @Test
     public void testAccepted() {
