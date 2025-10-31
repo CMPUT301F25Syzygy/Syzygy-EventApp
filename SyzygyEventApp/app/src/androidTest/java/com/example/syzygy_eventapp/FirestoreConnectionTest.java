@@ -5,6 +5,7 @@ import androidx.test.platform.app.InstrumentationRegistry;
 
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.FirebaseApp;
+import com.google.firebase.FirebaseOptions;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
@@ -34,6 +35,9 @@ import static org.junit.Assert.fail;
 @RunWith(AndroidJUnit4.class)
 public class FirestoreConnectionTest {
 
+    /// The object representing the Firebase application
+    private FirebaseApp app;
+
     /// The object representing the Firestore database.
     private FirebaseFirestore firestore;
 
@@ -54,11 +58,16 @@ public class FirestoreConnectionTest {
         // Initialize Firebase if not already initialized
         try {
             // Initialize Firebase
-            FirebaseApp.initializeApp(InstrumentationRegistry.getInstrumentation().getTargetContext());
-            firestore = FirebaseFirestore.getInstance();
+            app = FirebaseApp.initializeApp(InstrumentationRegistry.getInstrumentation().getTargetContext());
         } catch (IllegalStateException e) {
             // Firebase might already be initialized
-            firestore = FirebaseFirestore.getInstance();
+        }
+
+        firestore = FirebaseFirestore.getInstance();
+
+        FirebaseOptions options = app.getOptions();
+        if (!options.getProjectId().equals("syzygy-eventapp-development")) {
+            throw new IllegalStateException("Connected to the wrong database for testing!");
         }
     }
 
