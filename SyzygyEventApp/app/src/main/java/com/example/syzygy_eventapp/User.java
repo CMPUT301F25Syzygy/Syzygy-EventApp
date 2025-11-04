@@ -1,6 +1,10 @@
 package com.example.syzygy_eventapp;
 
-import java.util.List;
+import static com.example.syzygy_eventapp.Role.ENTRANT;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * User Model containing user profile data and active role. Should match and be synced with Firebase DB.
@@ -8,29 +12,55 @@ import java.util.List;
  */
 public class User {
 
-    /** Unique identifier ID for the user. */
-    private String userID;
-    /** Users name and contact info. */
+    /**
+     * Unique identifier ID for the user.
+     */
+    final private String userID;
+    /**
+     * Users name and contact info.
+     */
     private String name;
     private String email;
     private String phone;
-    /** Users profile picture URL. */
+    /**
+     * Users profile picture URL.
+     */
     private String photoURL;
-    /** True if the profile picture is disabled or hidden. */
-    private boolean photoHidden;
-    /** True if the user has ever been demoted. */
+    /**
+     * True if the profile picture is disabled or hidden.
+     */
+    private boolean photoHidden = false;
+    /**
+     * True if the user has ever been demoted.
+     */
     private boolean demoted = false;
-    /** Role of the user, including the functionality of all of it's subroles implicitly
+    /**
+     * Role of the user, including the functionality of all of it's subroles implicitly
      * For example, all organizers are also entrants, so we don't need to store that separately
      * All admins are also organizers and entrants.
-     * */
-    private Role role;
+     */
+    private Role role = ENTRANT;
 
-    /** Default Constructor used for creating users normally. */
-    public User() {
+    /**
+     * Default Constructor used for creating users normally.
+     * Starts with these default fields.
+     * <ul>
+     *   <li>role = ENTRANT</li>
+     *   <li>photoHidden = false</li>
+     *   <li>demoted = false</li>
+     *   <li>name = "Untitled_0000" (random number ever time)</li>
+     *   <li>all other fields left blank (null)</li>
+     * </ul>
+     */
+    public User(String userID) {
+        this.userID = userID;
+        int randomNumber = ThreadLocalRandom.current().nextInt(1000, 10000);
+        this.name = "Untitled_" + randomNumber;
     }
 
-    /** Constructor with all values, used mostly for testing. */
+    /**
+     * Constructor with all values, used mostly for testing.
+     */
     public User(String userID, String name, String email, String phone, String photoURL, boolean photoHidden, boolean demoted, Role role) {
         this.userID = userID;
         this.name = name;
@@ -39,15 +69,11 @@ public class User {
         this.photoURL = photoURL;
         this.photoHidden = photoHidden;
         this.demoted = demoted;
-        this.role=role;
+        this.role = role;
     }
 
     public String getUserID() {
         return userID;
-    }
-
-    public void setUserID(String userID) {
-        this.userID = userID;
     }
 
     public String getName() {
@@ -92,6 +118,7 @@ public class User {
 
     /**
      * Tests if the user has the abilities of another role
+     *
      * @param role the role to test
      * @return if the user has the abilities of the role
      */
@@ -110,6 +137,7 @@ public class User {
 
     /**
      * Changes the user's role, and detects if they have been demoted
+     *
      * @param role the role to change the user to
      */
     public void setRole(Role role) {
