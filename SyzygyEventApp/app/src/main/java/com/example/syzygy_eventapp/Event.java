@@ -5,7 +5,7 @@ import com.google.firebase.firestore.GeoPoint;
 import java.util.List;
 
 /**
- * Event (model) -
+ * Event (model)
  *
  * Responsibilities:
  *  - Store name, description, and organizer info

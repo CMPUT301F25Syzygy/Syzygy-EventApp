@@ -12,7 +12,7 @@ import java.util.Date;
 
 
 /**
- * Unit tests for Event class -
+ * Unit tests for Event class
  */
 public class EventModelTest {
 
