@@ -53,7 +53,7 @@ public class OrganizerController {
             organizer.setUserID(organizerID);
             organizer.setName(name);
             organizer.setEmail(email);
-            organizer.setOwnedEvents(new ArrayList<>());
+            organizer.setOwnedEventIDs(new ArrayList<>());
 
             // initial write
             return doc.set(organizer);
@@ -93,7 +93,7 @@ public class OrganizerController {
         // Step 1: add event to "events" collection
         return eventDoc.set(event).onSuccessTask(aVoid ->
                 // Step 2: add event ID to organizer's ownedEvents array
-                organizerDoc.update("ownedEvents", FieldValue.arrayUnion(event.getEventID()))
+                organizerDoc.update("ownedEventIDs", FieldValue.arrayUnion(event.getEventID()))
         );
     }
 
@@ -144,7 +144,7 @@ public class OrganizerController {
         Timestamp end = event.getRegistrationEnd();
         if (start != null && end != null) {
             if (end.compareTo(start) < 0) {
-
+                return "Registration end must be after start.";
             }
         }
         // waiting list limits
@@ -164,6 +164,45 @@ public class OrganizerController {
         }
         // valid
         return null;
+    }
+
+    /**
+     * Gets all Event objects owned by the given organizer. Loads the organizer’s list of event IDs, then gets each Event from Firestore.
+     * @param organizerID The ID of the organizer
+     * @return Task that resolves to a list of Event objects (possibly empty if none)
+     */
+    public Task<List<Event>> getOwnedEvents(String organizerID) {
+        DocumentReference organizerDoc = organizersRef.document(organizerID);
+
+        return organizerDoc.get().continueWithTask(task -> {
+            DocumentSnapshot snap = task.getResult();
+
+            if (snap == null || !snap.exists()) {
+                return Tasks.forException(new IllegalStateException("Organizer not found: " + organizerID));
+            }
+
+            Organizer organizer = snap.toObject(Organizer.class);
+            if (organizer == null || organizer.getOwnedEventIDs() == null || organizer.getOwnedEventIDs().isEmpty()) {
+                return Tasks.forResult(new ArrayList<>());
+            }
+
+            List<Task<DocumentSnapshot>> fetchTasks = new ArrayList<>();
+            for (String eventID : organizer.getOwnedEventIDs()) {
+                fetchTasks.add(eventsRef.document(eventID).get());
+            }
+
+            return Tasks.whenAllSuccess(fetchTasks).continueWith(allTask -> {
+                List<Event> events = new ArrayList<>();
+                for (Object obj : allTask.getResult()) {
+                    DocumentSnapshot doc = (DocumentSnapshot) obj;
+                    Event event = doc.toObject(Event.class);
+                    if (event != null) {
+                        events.add(event);
+                    }
+                }
+                return events;
+            });
+        });
     }
 
 }

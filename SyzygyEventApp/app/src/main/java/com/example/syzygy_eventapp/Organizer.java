@@ -10,13 +10,15 @@ import java.util.List;
  */
 public class Organizer extends User {
 
-    /** List of events owned by this organizer. */
-    private List<Event> ownedEvents;
+    /** List of events IDs owned by this organizer (not storing whole Event objects). */
+    // Full Event objects are already stored in Events
+    // Organizer owns list of EventIDs, Event has organizerID
+    private List<String> ownedEventIDs;
 
     /** Default constructor */
     public Organizer() {
         super();
-        this.ownedEvents = new ArrayList<>();
+        this.ownedEventIDs = new ArrayList<>();
     }
 
     /** Constructor with all values. */
@@ -32,17 +34,22 @@ public class Organizer extends User {
                 baseUser.getRoles(),
                 baseUser.getActiveRole()
         );
-        this.ownedEvents = new ArrayList<>();
+        this.ownedEventIDs = new ArrayList<>();
     }
 
-    public List<Event> getOwnedEvents() { return ownedEvents; }
+    public List<String> getOwnedEventIDs() { return ownedEventIDs; }
 
-    public void setOwnedEvents(List<Event> ownedEvents) { this.ownedEvents = ownedEvents; }
+    public void setOwnedEventIDs(List<String> ownedEventIDs) { this.ownedEventIDs = ownedEventIDs; }
 
-    /** Add a new event to the organizer's owned list (LOCAL MODEL ONLY). */
-    public void addOwnedEvent(Event event) {
-        if (event != null && !ownedEvents.contains(event)) {
-            ownedEvents.add(event);
+    /** Add a new event ID to the organizer's owned list (LOCAL MODEL ONLY). */
+    public void addOwnedEventID(String eventID) {
+        if (eventID != null && !eventID.trim().isEmpty() && !ownedEventIDs.contains(eventID)) {
+            ownedEventIDs.add(eventID);
         }
+    }
+
+    /** Remove an event ID from the owned list (LOCAL MODEL ONLY). */
+    public void removeOwnedEventID(String eventID) {
+        ownedEventIDs.remove(eventID);
     }
 }
