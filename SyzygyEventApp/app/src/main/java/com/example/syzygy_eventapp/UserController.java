@@ -90,23 +90,27 @@ public class UserController {
     }
 
     /**
-     * Observes users{userID} and pushes the current {@link User} on each change.
+     * Observes userID and pushes the current {@link User} on each change. <u>This should never be used outside of {@link User}.</u>
      * @param userID Document ID to observe
-     * @param onUser Callback for changed versions of the {@link User}
-     * @param onError Callback for Firestore errors during listening
+     * @param onUpdate Callback for changed versions of the {@link User}
+     * @param onDelete Callback for when the user is deleted
      * @return ListenerRegistration for stopping the observation
      */
-    public ListenerRegistration observeUser(String userID, Consumer<User> onUser, Consumer<Exception> onError) {
+    public ListenerRegistration observeUser(String userID, Consumer<User> onUpdate, Runnable onDelete) {
         DocumentReference doc = usersRef.document(userID);
 
         return doc.addSnapshotListener((snap, error) -> {
+           if (snap != null) {
+               if (snap.exists()) {
+                   User user = snap.toObject(User.class);
+                   onUpdate.accept(user);
+               } else {
+                   onDelete.run();
+               }
+           }
+
            if (error != null) {
-               onError.accept(error);
-           } else {
-               // EventListener guarantees one argument will be non-null
-               assert snap != null;
-               User user = snap.toObject(User.class);
-               onUser.accept(user);
+               System.err.println("Error on user snapshot listener: " + error.toString());
            }
         });
     }
