@@ -55,6 +55,10 @@ public class OrganizerController {
             organizer.setEmail(email);
             organizer.setOwnedEventIDs(new ArrayList<>());
 
+            // ensure roles are initialized
+            organizer.setRoles(Arrays.asList(Role.ORGANIZER));
+            organizer.setActiveRole(Role.ORGANIZER);
+
             // initial write
             return doc.set(organizer);
         });
