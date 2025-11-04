@@ -275,6 +275,14 @@ public class <span class="typeNameLabel"><a href=OrganizerController.html>Organi
                                             <td class="colLast">Observes changes to a specific organizer document.</td>
                                         </tr>
                                         
+                                        <tr id="i3" class="rowColor">
+                                            <td class="colFirst"><code>Task&lt;List&lt;Event&gt;&gt;</code>
+                                            </td>
+                                            <th class="colSecond" scope="row"><code><a href=OrganizerController.html#getOwnedEvents(java.lang.String)>getOwnedEvents</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> organizerID) </code>
+                                            </th>
+                                            <td class="colLast">Gets all Event objects owned by the given organizer.</td>
+                                        </tr>
+                                        
                                         </tbody>
                                     </table>
                                 </div>
@@ -411,7 +419,7 @@ public class <span class="typeNameLabel"><a href=OrganizerController.html>Organi
                                     <!--   -->
                                 </a>
                                 <ul class=
-                                              "blockListLast"
+                                              "blockList"
                                           >
                                     <li class="blockList">
                                         <h4>observeOrganizer</h4>
@@ -440,6 +448,39 @@ public class <span class="typeNameLabel"><a href=OrganizerController.html>Organi
                                         
                                             <dt><span class="returnLabel">Returns:</span></dt>
                                             <dd><p>ListenerRegistration for stopping observation</p></dd>
+                                        
+
+                                        
+
+                                        </dl>
+                                    </li>
+                                </ul>
+                                
+                                <a id="getOwnedEvents(java.lang.String)">
+                                    <!--   -->
+                                </a>
+                                <ul class=
+                                              "blockListLast"
+                                          >
+                                    <li class="blockList">
+                                        <h4>getOwnedEvents</h4>
+                                        <pre class="methodSignature"> Task&lt;List&lt;Event&gt;&gt; <a href=OrganizerController.html#getOwnedEvents(java.lang.String)>getOwnedEvents</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> organizerID)</pre>
+                                        <div class="block"><p>Gets all Event objects owned by the given organizer. Loads the organizer’s list of event IDs, then gets each Event from Firestore.</p></div>
+
+                                        <dl>
+
+                                        
+                                            <dt><span class="paramLabel">Parameters:</span></dt>
+                                            
+                                            
+                                            <dd><code>organizerID</code> - The ID of the organizer</dd>
+                                            
+                                            
+                                        
+
+                                        
+                                            <dt><span class="returnLabel">Returns:</span></dt>
+                                            <dd><p>Task that resolves to a list of Event objects (possibly empty if none)</p></dd>
                                         
 
                                         
