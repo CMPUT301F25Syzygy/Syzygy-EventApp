@@ -17,10 +17,10 @@ import java.util.function.Consumer;
  *     Firestore has the true data, and snapshots are converted to {@link User} and delivered back to the UserView.
  * </p>
  */
-public class UserController {
 
+public class UserController implements UserControllerInterface {
     // A single global instance shared by the whole program
-    public static UserController singletonInstance = null;
+    private static UserControllerInterface singletonInstance = null;
 
     private final CollectionReference usersRef;
 
@@ -33,7 +33,7 @@ public class UserController {
      * Gets a single global instance of the UserController
      * @return a UserController singleton
      */
-    public static UserController getInstance() {
+    public static UserControllerInterface getInstance() {
         if (singletonInstance == null)
             singletonInstance = new UserController();
 
@@ -41,11 +41,20 @@ public class UserController {
     }
 
     /**
+     * Override singleton with an external instance, likely for testing
+     * @param instance the external instance
+     */
+
+    protected static void overrideInstance(UserControllerInterface instance) {
+        singletonInstance = instance;
+    }
+
+    /**
      * Creates a new {@link User}, and checks it's ID doesn't collide in the database.
      * The user will have the default fields.
      * @return Task that completes when the document is created or if it already exists
      */
-    public Task<Void> createUser() {
+    public Task<User> createUser() {
         String userID = String.valueOf(UUID.randomUUID());
         DocumentReference doc = usersRef.document(userID);
 
@@ -60,7 +69,9 @@ public class UserController {
             User user = new User(userID);
 
             // Initial write
-            return doc.set(user);
+            return doc.set(user).onSuccessTask((nothing) -> {
+                return Tasks.forResult(user);
+            });
         });
     }
 
