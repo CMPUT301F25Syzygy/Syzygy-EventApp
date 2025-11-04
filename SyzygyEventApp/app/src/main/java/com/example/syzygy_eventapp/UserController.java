@@ -7,7 +7,6 @@ import com.google.firebase.firestore.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -21,12 +20,26 @@ import java.util.function.Consumer;
  */
 public class UserController {
 
+    // A single global instance shared by the whole program
+    public static UserController singletonInstance = null;
+
     private final FirebaseFirestore db;
     private final CollectionReference usersRef;
 
-    public UserController() {
+    private UserController() {
         this.db = FirebaseFirestore.getInstance();
         this.usersRef = db.collection("users");
+    }
+
+    /**
+     * Gets a single global instance of the UserController
+     * @return a UserController singleton
+     */
+    public static UserController getInstance() {
+        if (singletonInstance == null)
+            singletonInstance = new UserController();
+
+        return singletonInstance;
     }
 
     /**
