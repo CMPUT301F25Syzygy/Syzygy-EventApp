@@ -97,4 +97,8 @@ public class QRScanFragment extends Fragment {
             }
         }, ContextCompat.getMainExecutor(requireContext()));
     }
+
+    private void bindCameraUseCases(@NonNull ProcessCameraProvider cameraProvider) {
+        
+    }
 }
