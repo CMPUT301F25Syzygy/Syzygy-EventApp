@@ -4,8 +4,10 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.*;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.function.Consumer;
 
 /**
@@ -39,36 +41,23 @@ public class UserController {
     }
 
     /**
-     * If users{userID} is missing, create it with defaults.
-     * <ul>
-     *   <li>roles = {ENTRANT}</li>
-     *   <li>activeRole = ENTRANT</li>
-     *   <li>photoHidden = false</li>
-     *   <li>demoted = false</li>
-     *   <li>name/email set if provided</li>
-     * </ul>
-     * @param userID Unique user ID
-     * @param name Display name to set on creation
-     * @param email Email to set on creation
+     * Creates a new {@link User}, and checks it's ID doesn't collide in the database.
+     * The user will have the default fields.
      * @return Task that completes when the document is created or if it already exists
      */
-    public Task<Void> createIfMissing(String userID, String name, String email) {
+    public Task<Void> createUser() {
+        String userID = String.valueOf(UUID.randomUUID());
         DocumentReference doc = usersRef.document(userID);
 
         return doc.get().continueWithTask(task -> {
             DocumentSnapshot snap = task.getResult();
-            if (snap != null && snap.exists()) {
-                // it already exists, do nothing
-                return Tasks.forResult(null);
+            if (snap.exists()) {
+                // the UUID collided, let's try again with a new one
+                return createUser();
             }
 
             // create user with defaults
-            User user = new User();
-            user.setUserID(userID);
-            user.setName(name);
-            user.setEmail(email);
-            user.setRole(Role.ENTRANT);
-            user.setPhotoHidden(false);
+            User user = new User(userID);
 
             // Initial write
             return doc.set(user);
@@ -76,73 +65,64 @@ public class UserController {
     }
 
     /**
+     * Retrieves a user from the database
+     * Results in a IllegalArgumentException if the userID isn't in the database
+     * @param userID the userID to get a {@link User} for
+     * @return the {@link User} found in the database
+     */
+    public Task<User> getUser(String userID) {
+        DocumentReference doc = usersRef.document(userID);
+
+        return doc.get().continueWithTask(task -> {
+            // snap can't be null because none of it's implementations can return null
+            DocumentSnapshot snap = task.getResult();
+
+            if (!snap.exists()) {
+                return Tasks.forException(
+                        new IllegalArgumentException("User: " + userID + " not found.")
+                );
+            }
+
+            User user = snap.toObject(User.class);
+
+            return Tasks.forResult(user);
+        });
+    }
+
+    /**
      * Observes users{userID} and pushes the current {@link User} on each change.
      * @param userID Document ID to observe
-     * @param onUser Callback for parsed {@link User} objects
+     * @param onUser Callback for changed versions of the {@link User}
      * @param onError Callback for Firestore errors during listening
      * @return ListenerRegistration for stopping the observation
      */
     public ListenerRegistration observeUser(String userID, Consumer<User> onUser, Consumer<Exception> onError) {
         DocumentReference doc = usersRef.document(userID);
+
         return doc.addSnapshotListener((snap, error) -> {
            if (error != null) {
                onError.accept(error);
-               return;
-           }
-
-           // If doc doesn't exist yet, createMissing will handle it
-           if (snap == null || !snap.exists()) {
-               return;
-           }
-
-           User user = snap.toObject(User.class);
-
-           if (user != null) {
+           } else {
+               // EventListener guarantees one argument will be non-null
+               assert snap != null;
+               User user = snap.toObject(User.class);
                onUser.accept(user);
            }
         });
     }
 
     /**
-     * Partially update profile fields. Pass null to leave a field unchanged.
+     * Partially update a user's fields. <u>This should never be used outside of {@link User}.</u>
      * @param userID Document ID
-     * @param name New name or null to ignore
-     * @param email New email or null to ignore
-     * @param photoHidden New flag or null to ignore
-     * @param photoURL New photo URL or null to ignore
+     * @param fields A map of field names and new values
      * @return Task that completes when the merge is written
      */
-    public Task<Void> updateProfile(String userID, String name, String email, Boolean photoHidden, String photoURL) {
-        Map<String, Object> updates = new HashMap<>();
-
-        if (name != null) {
-            updates.put("name", name);
-        }
-        if (email != null) {
-            updates.put("email", email);
-        }
-        if (photoHidden != null) {
-            updates.put("photoHidden", photoHidden);
-        }
-        if (photoURL != null) {
-            updates.put("photoURL", photoURL);
-        }
-        if (updates.isEmpty()) {
+    public Task<Void> updateFields(String userID, HashMap<String, Object> fields) {
+        if (fields.isEmpty()) {
             // nothing to update
             return Tasks.forResult(null);
         }
 
-        // merge so only fields with new values are touched
-        return usersRef.document(userID).set(updates, SetOptions.merge());
-    }
-
-    /**
-     * Overwrite the user's {@code role} and updates the database.
-     * @param userID The user document ID
-     * @param newRole New role
-     * @return Task that completes when roles are written
-     */
-    public Task<Void> setRole(String userID, Role newRole) {
         DocumentReference doc = usersRef.document(userID);
 
         return doc.get().continueWithTask(task -> {
@@ -155,18 +135,7 @@ public class UserController {
                 );
             }
 
-            // can't be null since we already checked the document exists
-            User user = snap.toObject(User.class);
-            assert user != null;
-
-            // Update roles on the model
-            user.setRole(newRole);
-
-            Map<String, Object> updates = new HashMap<>();
-            updates.put("role", newRole);
-            updates.put("demoted", user.isDemoted());
-
-            return doc.set(updates, SetOptions.merge());
+            return doc.set(fields, SetOptions.merge());
         });
     }
 
@@ -175,7 +144,7 @@ public class UserController {
      * @param userID The user document ID
      * @return Task that completes when the document is deleted
      */
-    public Task<Void> deleteProfile(String userID) {
+    public Task<Void> deleteUser(String userID) {
         return usersRef.document(userID).delete();
     }
 }
