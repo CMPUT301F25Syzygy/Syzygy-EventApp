@@ -27,7 +27,7 @@ public class InvitationControllerTest {
     private static final int TIMEOUT_SEC = 10;
 
     private FirebaseFirestore db;
-    private InvitationController controller;
+    private InvitationControllerInterface controller;
 
     // Unique values per run to avoid collisions across CI jobs
     private String event;
