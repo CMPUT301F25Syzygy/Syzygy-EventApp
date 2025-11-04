@@ -30,7 +30,6 @@ public class UserTest {
                 "https://testphoto.com/test.jpg",
                 false,
                 false,
-                Arrays.asList(Role.ENTRANT, Role.ORGANIZER),
                 Role.ORGANIZER
         );
 
@@ -41,9 +40,7 @@ public class UserTest {
         assertEquals("https://testphoto.com/test.jpg", user.getPhotoURL());
         assertFalse(user.isPhotoHidden());
         assertFalse(user.isDemoted());
-        assertTrue(user.getRoles().contains(Role.ENTRANT));
-        assertTrue(user.getRoles().contains(Role.ORGANIZER));
-        assertEquals(Role.ORGANIZER, user.getActiveRole());
+        assertEquals(Role.ORGANIZER, user.getRole());
     }
 
     /**
@@ -59,9 +56,7 @@ public class UserTest {
         user.setPhone("(980) 765-4321");
         user.setPhotoURL(null);
         user.setPhotoHidden(true);
-        user.setDemoted(true);
-        user.setRoles(Collections.singletonList(Role.ENTRANT));
-        user.setActiveRole(Role.ENTRANT);
+        user.setRole(Role.ENTRANT);
 
         assertEquals("user1", user.getUserID());
         assertEquals("Alice", user.getName());
@@ -70,67 +65,86 @@ public class UserTest {
         assertNull(user.getPhotoURL());
         assertTrue(user.isPhotoHidden());
         assertTrue(user.isDemoted());
-        assertTrue(user.getRoles().contains(Role.ENTRANT));
-        assertEquals(Role.ENTRANT, user.getActiveRole());
+        assertEquals(Role.ENTRANT, user.getRole());
     }
 
     /**
-     * Tests that {@link User#hasValidActiveRole()} returns true when the user's active role is included in their assigned roles.
+     * Tests that roles can be added and removed properly.
      */
     @Test
-    public void testValidActiveRole() {
+    public void testSetRole() {
         User user = new User();
-        user.setRoles(Arrays.asList(Role.ENTRANT, Role.ORGANIZER));
-        user.setActiveRole(Role.ORGANIZER);
+        user.setRole(Role.ENTRANT);
+        assertEquals(Role.ENTRANT, user.getRole());
+        assertFalse(user.isDemoted());
 
-        assertTrue(user.hasValidActiveRole());
-    }
-
-    /**
-     * Tests that {@link User#hasValidActiveRole()} returns false when the active role is not part of the user's assigned roles.
-     */
-    @Test
-    public void testInvalidActiveRole() {
-        User user = new User();
-        user.setRoles(Collections.singletonList(Role.ENTRANT));
-        user.setActiveRole(Role.ADMIN);
-
-        assertFalse(user.hasValidActiveRole());
-    }
-
-    /**
-     * Tests that roles can be added and removed properly from the user's role set.
-     */
-    @Test
-    public void testAddDeleteRoles() {
-        User user = new User();
-        List<Role> roles = new ArrayList<>();
-        roles.add(Role.ENTRANT);
-        user.setRoles(roles);
-
-        // add new role
-        user.getRoles().add(Role.ORGANIZER);
-        assertTrue(user.getRoles().contains(Role.ORGANIZER));
+        // promote role
+        user.setRole(Role.ORGANIZER);
+        assertEquals(Role.ORGANIZER, user.getRole());
+        assertFalse(user.isDemoted());
 
         // demote
-        boolean removed = user.getRoles().remove(Role.ORGANIZER);
-        assertTrue("remove(Role.ORGANIZER) should return true", removed);
-        assertFalse(user.getRoles().contains(Role.ORGANIZER));
+        user.setRole(Role.ENTRANT);
+        assertEquals(Role.ENTRANT, user.getRole());
+        assertTrue(user.isDemoted());
     }
 
     /**
-     * Tests that the {@code photoHidden} and {@code demoted} flags can be toggled and retrieved correctly.
+     * Tests that users have the abilities of all their inferior roles.
+     * ie, organizers can do everything entrants can do
      */
     @Test
-    public void testHiddenAndDemotedFlags() {
+    public void testHasAbilitiesOfRole() {
+        User user = new User();
+        user.setRole(Role.ENTRANT);
+        assertTrue(user.hasAbilitiesOfRole(Role.ENTRANT));
+        assertFalse(user.hasAbilitiesOfRole(Role.ORGANIZER));
+
+        // promote role
+        user.promote();
+        assertTrue(user.hasAbilitiesOfRole(Role.ENTRANT));
+        assertTrue(user.hasAbilitiesOfRole(Role.ORGANIZER));
+        assertFalse(user.hasAbilitiesOfRole(Role.ADMIN));
+
+        // demote
+        user.demote();
+        assertTrue(user.hasAbilitiesOfRole(Role.ENTRANT));
+        assertFalse(user.hasAbilitiesOfRole(Role.ORGANIZER));
+    }
+
+    /**
+     * Tests that roles can be promoted and demoted properly.
+     */
+    @Test
+    public void testPromoteDemoteRole() {
+        User user = new User();
+        user.setRole(Role.ENTRANT);
+        assertEquals(Role.ENTRANT, user.getRole());
+        assertFalse(user.isDemoted());
+
+        // promote role
+        user.promote();
+        assertEquals(Role.ORGANIZER, user.getRole());
+        assertFalse(user.isDemoted());
+
+        // demote
+        user.demote();
+        assertEquals(Role.ENTRANT, user.getRole());
+        assertTrue(user.isDemoted());
+    }
+
+    /**
+     * Tests that the {@code photoHidden} flag can be toggled and retrieved correctly.
+     */
+    @Test
+    public void testHiddenFlag() {
         User user = new User();
         user.setPhotoHidden(false);
-        user.setDemoted(false);
+
+        assertFalse(user.isPhotoHidden());
 
         user.setPhotoHidden(true);
-        user.setDemoted(true);
 
         assertTrue(user.isPhotoHidden());
-        assertTrue(user.isDemoted());
     }
 }

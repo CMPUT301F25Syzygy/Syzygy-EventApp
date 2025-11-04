@@ -79,9 +79,8 @@ public class UserControllerTest {
         assertEquals("tester@example.com", user.getEmail());
         assertFalse(user.isPhotoHidden());
         assertFalse(user.isDemoted());
-        assertNotNull(user.getRoles());
-        assertTrue(user.getRoles().contains(Role.ENTRANT));
-        assertEquals(Role.ENTRANT, user.getActiveRole());
+        assertNotNull(user.getRole());
+        assertEquals(Role.ENTRANT, user.getRole());
     }
 
     /**
@@ -124,13 +123,12 @@ public class UserControllerTest {
         // Confirm unchanged fields
         assertEquals("tester@example.com", user.getEmail());
         assertFalse(user.isDemoted());
-        assertNotNull(user.getRoles());
-        assertTrue(user.getRoles().contains(Role.ENTRANT));
-        assertEquals(Role.ENTRANT, user.getActiveRole());
+        assertNotNull(user.getRole());
+        assertEquals(Role.ENTRANT, user.getRole());
     }
 
     /**
-     * Verify that {@link UserController#setActiveRole(String, Role)} correctly updates the user's active role only if it is already one of their assigned roles.
+     * Verify that {@link UserController#setRole(String, Role)} correctly updates the user's role only.
      * <p>
      *     This ensures that a user cannot switch to an invalid or unassigned role,
      *     and that Firestore properly reflects the new activeRole after update.
@@ -138,7 +136,7 @@ public class UserControllerTest {
      * @throws Exception if Firestore operations fail or timeout
      */
     @Test
-    public void testSetActiveRole() throws Exception {
+    public void testSetRole() throws Exception {
         // Create user with default role ENTRANT
         Tasks.await(controller.createIfMissing(testUserId, "Tester", "tester@example.com"),
                 TIMEOUT_SEC, TimeUnit.SECONDS);
@@ -148,18 +146,18 @@ public class UserControllerTest {
                 TIMEOUT_SEC, TimeUnit.SECONDS);
 
         // Set activeRole to ORGANIZER (a valid role for this user)
-        Tasks.await(controller.setActiveRole(testUserId, Role.ORGANIZER),
+        Tasks.await(controller.setRole(testUserId, Role.ORGANIZER),
                 TIMEOUT_SEC, TimeUnit.SECONDS);
 
         // Firestore should now store ORGANIZER as the active role
         DocumentSnapshot updatedSnap = Tasks.await(userDoc.get(), TIMEOUT_SEC, TimeUnit.SECONDS);
         User user = updatedSnap.toObject(User.class);
         assertNotNull(user);
-        assertEquals(Role.ORGANIZER, user.getActiveRole());
+        assertEquals(Role.ORGANIZER, user.getRole());
 
         // Try setting an invalid role not assigned to the user (ADMIN)
         Exception ex = assertThrows(Exception.class, () -> {
-            Tasks.await(controller.setActiveRole(testUserId, Role.ADMIN),
+            Tasks.await(controller.setRole(testUserId, Role.ADMIN),
                     TIMEOUT_SEC, TimeUnit.SECONDS);
         });
 
@@ -167,58 +165,7 @@ public class UserControllerTest {
         DocumentSnapshot unchangedSnap = Tasks.await(userDoc.get(), TIMEOUT_SEC, TimeUnit.SECONDS);
         User unchangedUser = unchangedSnap.toObject(User.class);
         assertNotNull(unchangedUser);
-        assertEquals(Role.ORGANIZER, unchangedUser.getActiveRole());
-    }
-
-    /**
-     * Verify that setRoles overwrites the roles set and keeps {@code activeRole} valid:
-     * <ul>
-     *   <li>If current activeRole is removed, it falls back to ENTRANT if present, otherwise the first role in the new set.</li>
-     *   <li>Rejects empty role sets.</li>
-     * </ul>
-     * @throws Exception if Firestore operations fail or timeout
-     */
-    @Test
-    public void testSetRoles() throws Exception {
-        // Create user with defaults (roles={ENTRANT}, activeRole=ENTRANT)
-        Tasks.await(controller.createIfMissing(testUserId, "Tester", "tester@example.com"),
-                TIMEOUT_SEC, TimeUnit.SECONDS);
-
-        // Remove ENTRANT and set roles to {ORGANIZER, ADMIN}
-        // EnumSet gives deterministic iteration order based on enum declaration.
-        Tasks.await(controller.setRoles(testUserId,
-                        java.util.EnumSet.of(Role.ORGANIZER, Role.ADMIN)),
-                TIMEOUT_SEC, TimeUnit.SECONDS);
-
-        // Roles overwritten, activeRole falls back to first available (ORGANIZER)
-        DocumentSnapshot snap1 = Tasks.await(userDoc.get(), TIMEOUT_SEC, TimeUnit.SECONDS);
-        User user1 = snap1.toObject(User.class);
-        assertNotNull(user1);
-        assertTrue(user1.getRoles().contains(Role.ORGANIZER));
-        assertTrue(user1.getRoles().contains(Role.ADMIN));
-        assertFalse(user1.getRoles().contains(Role.ENTRANT));
-        assertEquals(Role.ORGANIZER, user1.getActiveRole()); // fallback chosen
-
-        // Set roles to {ENTRANT, ADMIN} — activeRole ORGANIZER is now invalid, should fall back to ENTRANT
-        Tasks.await(controller.setRoles(testUserId,
-                        java.util.EnumSet.of(Role.ENTRANT, Role.ADMIN)),
-                TIMEOUT_SEC, TimeUnit.SECONDS);
-
-        // Roles updated and activeRole set to ENTRANT
-        DocumentSnapshot snap2 = Tasks.await(userDoc.get(), TIMEOUT_SEC, TimeUnit.SECONDS);
-        User user2 = snap2.toObject(User.class);
-        assertNotNull(user2);
-        assertTrue(user2.getRoles().contains(Role.ENTRANT));
-        assertTrue(user2.getRoles().contains(Role.ADMIN));
-        assertFalse(user2.getRoles().contains(Role.ORGANIZER));
-        assertEquals(Role.ENTRANT, user2.getActiveRole());
-
-        // Attempt to set an empty role set, should throw
-        Exception ex = assertThrows(Exception.class, () -> {
-            Tasks.await(controller.setRoles(testUserId, java.util.Collections.emptySet()),
-                    TIMEOUT_SEC, TimeUnit.SECONDS);
-        });
-        assertNotNull(ex);
+        assertEquals(Role.ORGANIZER, unchangedUser.getRole());
     }
 
     /**

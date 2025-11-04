@@ -19,21 +19,19 @@ public class User {
     /** True if the profile picture is disabled or hidden. */
     private boolean photoHidden;
     /** True if the user has ever been demoted. */
-    private boolean demoted;
-    /** List of assigned roles for the user. */
-    private List<Role> roles;
-    /**
-     * The users active role determines their current nav bar, views, privileges, etc.
-     * Should be present in the "roles" list.
-     */
-    private Role activeRole;
+    private boolean demoted = false;
+    /** Role of the user, including the functionality of all of it's subroles implicitly
+     * For example, all organizers are also entrants, so we don't need to store that separately
+     * All admins are also organizers and entrants.
+     * */
+    private Role role;
 
     /** Default Constructor used for creating users normally. */
     public User() {
     }
 
     /** Constructor with all values, used mostly for testing. */
-    public User(String userID, String name, String email, String phone, String photoURL, boolean photoHidden, boolean demoted, List<Role> roles, Role activeRole) {
+    public User(String userID, String name, String email, String phone, String photoURL, boolean photoHidden, boolean demoted, Role role) {
         this.userID = userID;
         this.name = name;
         this.email = email;
@@ -41,8 +39,7 @@ public class User {
         this.photoURL = photoURL;
         this.photoHidden = photoHidden;
         this.demoted = demoted;
-        this.roles = roles;
-        this.activeRole = activeRole;
+        this.role=role;
     }
 
     public String getUserID() {
@@ -89,24 +86,37 @@ public class User {
         return demoted;
     }
 
-    public void setDemoted(boolean demoted) {
-        this.demoted = demoted;
+    public Role getRole() {
+        return role;
     }
 
-    public List<Role> getRoles() {
-        return roles;
+    /**
+     * Tests if the user has the abilities of another role
+     * @param role the role to test
+     * @return if the user has the abilities of the role
+     */
+    public boolean hasAbilitiesOfRole(Role role) {
+        return !role.hasHigherAuthority(this.role);
     }
 
-    public void setRoles(List<Role> roles) {
-        this.roles = roles;
+    public void promote() {
+        this.role = role.promote();
     }
 
-    public Role getActiveRole() {
-        return activeRole;
+    public void demote() {
+        this.role = role.demote();
+        this.demoted = true;
     }
 
-    public void setActiveRole(Role activeRole) {
-        this.activeRole = activeRole;
+    /**
+     * Changes the user's role, and detects if they have been demoted
+     * @param role the role to change the user to
+     */
+    public void setRole(Role role) {
+        if (this.role != null && this.role.hasHigherAuthority(role)) {
+            this.demoted = true;
+        }
+        this.role = role;
     }
 
     public String getPhone() {
@@ -115,13 +125,5 @@ public class User {
 
     public void setPhone(String phone) {
         this.phone = phone;
-    }
-
-    /**
-     * Ensures the users active role is actually one of their assigned roles.
-     * @return true if activeRole and roles are not null and roles has the active role in the list.
-     */
-    public boolean hasValidActiveRole() {
-        return activeRole != null && roles != null && roles.contains(activeRole);
     }
 }

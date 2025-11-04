@@ -4,10 +4,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.*;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
@@ -23,11 +20,10 @@ public class UserController {
     // A single global instance shared by the whole program
     public static UserController singletonInstance = null;
 
-    private final FirebaseFirestore db;
     private final CollectionReference usersRef;
 
     private UserController() {
-        this.db = FirebaseFirestore.getInstance();
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
         this.usersRef = db.collection("users");
     }
 
@@ -71,10 +67,8 @@ public class UserController {
             user.setUserID(userID);
             user.setName(name);
             user.setEmail(email);
-            user.setRoles(java.util.Arrays.asList(Role.ENTRANT));
-            user.setActiveRole(Role.ENTRANT);
+            user.setRole(Role.ENTRANT);
             user.setPhotoHidden(false);
-            user.setDemoted(false);
 
             // Initial write
             return doc.set(user);
@@ -143,85 +137,34 @@ public class UserController {
     }
 
     /**
-     * Set {@code activeRole} if and only if the user has that role assigned already.
+     * Overwrite the user's {@code role} and updates the database.
      * @param userID The user document ID
-     * @param newActiveRole The role to activate
-     * @return Task that completes when activeRole is updated, or fails
-     */
-    public Task<Void> setActiveRole(String userID, Role newActiveRole) {
-        DocumentReference doc = usersRef.document(userID);
-        return doc.get().continueWithTask(task -> {
-            DocumentSnapshot snap = task.getResult();
-
-            if (snap == null || !snap.exists()) {
-                return Tasks.forException(
-                        new IllegalStateException("User: " + userID + " not found."));
-            }
-
-            User user = snap.toObject(User.class);
-            if (user == null) {
-                return Tasks.forException(
-                        new IllegalStateException("Failed to load user data from Firestore."));
-            }
-
-            // Try setting and validating the role.
-            user.setActiveRole(newActiveRole);
-            if (!user.hasValidActiveRole()) {
-                return Tasks.forException(
-                        new IllegalArgumentException("activeRole must be one of the user's assigned roles."));
-            }
-
-            // Only update the single field.
-            return doc.update("activeRole", newActiveRole.name());
-        });
-    }
-
-    /**
-     * Overwrite the user's role set and keep {@code activeRole} valid.
-     * <p>
-     *     If the current active role is removed (demoted), it falls back to ENTRANT, otherwise next available.
-     * </p>
-     * @param userID The user document ID
-     * @param newRoles New role set
+     * @param newRole New role
      * @return Task that completes when roles are written
      */
-    public Task<Void> setRoles(String userID, Collection<Role> newRoles) {
+    public Task<Void> setRole(String userID, Role newRole) {
         DocumentReference doc = usersRef.document(userID);
+
         return doc.get().continueWithTask(task -> {
+            // snap can't be null because none of it's implementations can return null
             DocumentSnapshot snap = task.getResult();
-            if (snap == null || !snap.exists()) {
+
+            if (!snap.exists()) {
                 return Tasks.forException(
                         new IllegalStateException("User: " + userID + " not found.")
                 );
             }
+
+            // can't be null since we already checked the document exists
             User user = snap.toObject(User.class);
-            if (user == null) {
-                return Tasks.forException(
-                        new IllegalStateException("Failed to load user data from Firestore.")
-                );
-            }
-            if (newRoles == null || newRoles.isEmpty()) {
-                return Tasks.forException(
-                        new IllegalArgumentException("newRoles must not be empty.")
-                );
-            }
+            assert user != null;
 
             // Update roles on the model
-            List<Role> rolesList = new ArrayList<>(newRoles);
-            user.setRoles(rolesList);
-
-
-            Role active = user.getActiveRole();
-            if (!user.hasValidActiveRole()) {
-                Role fallback = newRoles.contains(Role.ENTRANT)
-                        ? Role.ENTRANT
-                        : newRoles.iterator().next();
-                user.setActiveRole(fallback);
-            }
+            user.setRole(newRole);
 
             Map<String, Object> updates = new HashMap<>();
-            updates.put("roles", rolesList);
-            updates.put("activeRole", user.getActiveRole()); // enum is fine
+            updates.put("role", newRole);
+            updates.put("demoted", user.isDemoted());
 
             return doc.set(updates, SetOptions.merge());
         });
