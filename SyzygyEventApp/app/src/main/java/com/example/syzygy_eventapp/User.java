@@ -52,6 +52,14 @@ public class User {
     private Role role = Role.ENTRANT;
 
     /**
+     * No-argument constructor to allow deserialization from Firebase, not useful otherwise
+     */
+    public User() {
+        this.userID = "";
+        this.name = "";
+    }
+
+    /**
      * Default Constructor used for creating users normally.
      * Starts with these default fields.
      * <ul>
