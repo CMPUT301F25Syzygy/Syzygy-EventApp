@@ -6,7 +6,7 @@
     android:padding="12dp"
     android:background="#FFFFFF">
 
-    <!-- Use the strong resources to change num for upcoming and history-->
+    <!-- Use the strong resources to change num for upcoming and history aa-->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
