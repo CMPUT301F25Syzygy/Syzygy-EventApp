@@ -2,13 +2,12 @@ package com.example.syzygy_eventapp;
 
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
+import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.*;
 
 import java.util.*;
 import java.util.function.Consumer;
 
-// WIP: Needs to be updated when Event and EventController is actually implemented
-// I'm "giving myself" certain functions and assuming Events exist
 
 /**
  * Controller for reading and writing {@link Organizer} data in Firestore DB.
@@ -84,6 +83,10 @@ public class OrganizerController {
             return Tasks.forException(new IllegalArgumentException(validationError));
         }
 
+        // Set timestamps for when the event was created
+        event.setCreatedAt(Timestamp.now());
+        event.setUpdatedAt(Timestamp.now());
+
         DocumentReference eventDoc = eventsRef.document(event.getEventID());
         DocumentReference organizerDoc = organizersRef.document(organizerID);
 
@@ -129,16 +132,35 @@ public class OrganizerController {
      */
     private String validateEvent(Event event) {
         // no name
-        if (event.getTitle() == null || event.getTitle().trim().isEmpty()) {
-            return "Event title cannot be empty.";
+        if (event.getName() == null || event.getName().trim().isEmpty()) {
+            return "Event name cannot be empty.";
         }
         // no desc.
         if (event.getDescription() == null || event.getDescription().trim().isEmpty()) {
             return "Event description cannot be empty.";
         }
-        // no date
-        if (event.getDate() == null) {
-            return "Event date is required.";
+        // check the registration period
+        Timestamp start = event.getRegistrationStart();
+        Timestamp end = event.getRegistrationEnd();
+        if (start != null && end != null) {
+            if (end.compareTo(start) < 0) {
+
+            }
+        }
+        // waiting list limits
+        if (event.getMaxWaitingList() != null && event.getMaxWaitingList() < 0) {
+            return "Max waiting list size cannot be negative.";
+        }
+        // attendee limit
+        if (event.getMaxAttendees() != null && event.getMaxAttendees() < 0) {
+            return "Max attendees cannot be negative.";
+        }
+        // geolocation (IF REQUIRED)
+        if (event.isGeolocationRequired()) {
+            if (event.getLocationCoordinates() == null &&
+                    (event.getLocationName() == null || event.getLocationName().trim().isEmpty())) {
+                return "Location is required for this event.";
+            }
         }
         // valid
         return null;
