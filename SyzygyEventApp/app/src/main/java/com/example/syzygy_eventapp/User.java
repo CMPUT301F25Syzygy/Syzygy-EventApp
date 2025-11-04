@@ -1,7 +1,5 @@
 package com.example.syzygy_eventapp;
 
-import static com.example.syzygy_eventapp.Role.ENTRANT;
-
 import androidx.annotation.NonNull;
 
 import com.google.android.gms.tasks.Task;
@@ -51,7 +49,7 @@ public class User {
      * For example, all organizers are also entrants, so we don't need to store that separately
      * All admins are also organizers and entrants.
      */
-    private Role role = ENTRANT;
+    private Role role = Role.ENTRANT;
 
     /**
      * Default Constructor used for creating users normally.
@@ -86,6 +84,11 @@ public class User {
 
             return Tasks.forResult(null);
         });
+    }
+
+    @NonNull
+    public String getUserID() {
+        return userID;
     }
 
     public @NonNull String getName() {
