@@ -39,7 +39,7 @@ public class UserControllerTest {
         } catch (IllegalStateException ignore) {}
 
         db = FirebaseFirestore.getInstance();
-        controller = new UserController();
+        controller = UserController.getInstance();
 
         // unique ID so test runs don't conflict
         testUserId = "uc_test_" + UUID.randomUUID();
