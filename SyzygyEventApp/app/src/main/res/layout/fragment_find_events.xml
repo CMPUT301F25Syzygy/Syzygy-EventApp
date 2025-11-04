@@ -24,10 +24,9 @@
 
         <EditText
             android:id="@+id/searchEvents"
-            android:layout_width="253dp"
+            android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:background=""
             android:hint="Search events..."
             android:padding="8dp"
             tools:layout_editor_absoluteX="12dp"
