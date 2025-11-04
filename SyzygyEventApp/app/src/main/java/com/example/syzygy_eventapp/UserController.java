@@ -4,9 +4,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.*;
 
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 import java.util.function.Consumer;
 
@@ -146,7 +144,7 @@ public class UserController implements UserControllerInterface {
 
             if (!snap.exists()) {
                 return Tasks.forException(
-                        new IllegalStateException("User: " + userID + " not found.")
+                        new IllegalArgumentException("User: " + userID + " not found.")
                 );
             }
 

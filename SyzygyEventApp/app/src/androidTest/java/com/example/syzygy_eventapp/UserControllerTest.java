@@ -4,16 +4,14 @@ import static org.junit.Assert.*;
 
 import androidx.test.platform.app.InstrumentationRegistry;
 
+import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.FirebaseApp;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.HashMap;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -22,174 +20,196 @@ import java.util.concurrent.TimeUnit;
  * These tests run against Firestore and verify database interactions.
  */
 public class UserControllerTest {
-
     private static final int TIMEOUT_SEC = 10;
 
-    private FirebaseFirestore db;
-    private UserController controller;
-    private String testUserId;
-    private DocumentReference userDoc;
+    private UserControllerInterface controller;
 
     @Before
-    public void setUp() throws Exception {
+    public void setup() throws Exception {
         // Initialize Firebase app
         try {
             FirebaseApp.initializeApp(
                     InstrumentationRegistry.getInstrumentation().getTargetContext());
-        } catch (IllegalStateException ignore) {}
+        } catch (IllegalStateException ignore) {
+        }
 
-        db = FirebaseFirestore.getInstance();
         controller = UserController.getInstance();
-
-        // unique ID so test runs don't conflict
-        testUserId = "uc_test_" + UUID.randomUUID();
-        userDoc = db.collection("users").document(testUserId);
-
-        // ensure a clean slate
-        Tasks.await(userDoc.delete(), TIMEOUT_SEC, TimeUnit.SECONDS);
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        // cleanup after each test
-        Tasks.await(userDoc.delete(), TIMEOUT_SEC, TimeUnit.SECONDS);
     }
 
     /**
-     * Verify createIfMissing creates a new user with default values when the document doesn't exist.
+     * Verify createUser() creates a new user with default values
      */
     @Test
-    public void testCreateIfMissing() throws Exception {
-        // Ensure it doesn’t exist before
-        DocumentSnapshot before = Tasks.await(userDoc.get(), TIMEOUT_SEC, TimeUnit.SECONDS);
-        assertFalse(before.exists());
+    public void testCreateUser() throws Exception {
+        User user = Tasks.await(controller.createUser(), TIMEOUT_SEC, TimeUnit.SECONDS);
 
-        Tasks.await(controller.createIfMissing(testUserId, "Tester", "tester@example.com"),
-                TIMEOUT_SEC, TimeUnit.SECONDS);
-
-        DocumentSnapshot after = Tasks.await(userDoc.get(), TIMEOUT_SEC, TimeUnit.SECONDS);
-        assertTrue(after.exists());
-
-        User user = after.toObject(User.class);
         assertNotNull(user);
 
         // Verify user data
-        assertEquals(testUserId, user.getUserID());
-        assertEquals("Tester", user.getName());
-        assertEquals("tester@example.com", user.getEmail());
+        assertNotNull(user.getName());
+        assertTrue(user.getName().length() >= 8);
+        assertNull(user.getEmail());
+        assertNull(user.getPhone());
+        assertNull(user.getPhotoURL());
         assertFalse(user.isPhotoHidden());
         assertFalse(user.isDemoted());
-        assertNotNull(user.getRole());
         assertEquals(Role.ENTRANT, user.getRole());
     }
 
     /**
-     * Verify that {@link UserController#updateProfile(String, String, String, Boolean, String)} correctly performs a partial merge update on existing user data.
-     * <p>
-     *     Only non-null parameters should be updated. Fields passed as {@code null}
-     *     should remain unchanged in Firestore. This test ensures selective updates
-     *     are applied without overwriting other data.
-     * </p>
-     * @throws Exception if Firestore operations fail or timeout
+     * Make sure getUser() retrieves the same user from the database
      */
     @Test
-    public void testUpdateProfile() throws Exception {
-        // Create a fresh user with default data
-        Tasks.await(controller.createIfMissing(testUserId, "Tester", "tester@example.com"),
-                TIMEOUT_SEC, TimeUnit.SECONDS);
+    public void testGetUser() throws Exception {
+        // create user and set fields
+        User user = Tasks.await(controller.createUser(), TIMEOUT_SEC, TimeUnit.SECONDS);
+        String userID = user.getUserID();
 
-        // Update only 'name' and 'photoHidden'
-        // Other fields remain null and should be ignored
-        Tasks.await(controller.updateProfile(
-                        testUserId,
-                        "Tester Renamed",   // new name
-                        null,               // email unchanged
-                        true,               // photoHidden set true
-                        null                // photoURL unchanged
-                ),
-                TIMEOUT_SEC, TimeUnit.SECONDS);
+        // get user
+        User retrievedUser = Tasks.await(controller.getUser(userID), TIMEOUT_SEC, TimeUnit.SECONDS);
 
-        // Fetch updated document
-        DocumentSnapshot snap = Tasks.await(userDoc.get(), TIMEOUT_SEC, TimeUnit.SECONDS);
-        assertTrue(snap.exists());
-
-        User user = snap.toObject(User.class);
-        assertNotNull(user);
-
-        // Confirm changed fields
-        assertEquals("Tester Renamed", user.getName());
-        assertTrue(user.isPhotoHidden());
-
-        // Confirm unchanged fields
-        assertEquals("tester@example.com", user.getEmail());
-        assertFalse(user.isDemoted());
-        assertNotNull(user.getRole());
-        assertEquals(Role.ENTRANT, user.getRole());
+        assertEquals(userID, retrievedUser.getUserID());
+        assertEquals(user.getName(), retrievedUser.getName());
     }
 
     /**
-     * Verify that {@link UserController#setRole(String, Role)} correctly updates the user's role only.
-     * <p>
-     *     This ensures that a user cannot switch to an invalid or unassigned role,
-     *     and that Firestore properly reflects the new activeRole after update.
-     * </p>
-     * @throws Exception if Firestore operations fail or timeout
+     * Make sure getUser() throws when the userID doesn't exist
      */
     @Test
-    public void testSetRole() throws Exception {
-        // Create user with default role ENTRANT
-        Tasks.await(controller.createIfMissing(testUserId, "Tester", "tester@example.com"),
-                TIMEOUT_SEC, TimeUnit.SECONDS);
+    public void testGetUserException() throws Exception {
+        // get userID that does not exist
+        String userID = String.valueOf(UUID.randomUUID());
 
-        // Add ORGANIZER role directly to simulate promotion
-        Tasks.await(userDoc.update("roles", java.util.Arrays.asList(Role.ENTRANT.name(), Role.ORGANIZER.name())),
-                TIMEOUT_SEC, TimeUnit.SECONDS);
-
-        // Set activeRole to ORGANIZER (a valid role for this user)
-        Tasks.await(controller.setRole(testUserId, Role.ORGANIZER),
-                TIMEOUT_SEC, TimeUnit.SECONDS);
-
-        // Firestore should now store ORGANIZER as the active role
-        DocumentSnapshot updatedSnap = Tasks.await(userDoc.get(), TIMEOUT_SEC, TimeUnit.SECONDS);
-        User user = updatedSnap.toObject(User.class);
-        assertNotNull(user);
-        assertEquals(Role.ORGANIZER, user.getRole());
-
-        // Try setting an invalid role not assigned to the user (ADMIN)
-        Exception ex = assertThrows(Exception.class, () -> {
-            Tasks.await(controller.setRole(testUserId, Role.ADMIN),
-                    TIMEOUT_SEC, TimeUnit.SECONDS);
-        });
-
-        // Firestore should not change the active role
-        DocumentSnapshot unchangedSnap = Tasks.await(userDoc.get(), TIMEOUT_SEC, TimeUnit.SECONDS);
-        User unchangedUser = unchangedSnap.toObject(User.class);
-        assertNotNull(unchangedUser);
-        assertEquals(Role.ORGANIZER, unchangedUser.getRole());
+        try {
+            Tasks.await(controller.getUser(userID), TIMEOUT_SEC, TimeUnit.SECONDS);
+        } catch (Exception ex) {
+            Throwable cause = ex.getCause(); // Firebase wraps exceptions
+            assertNotNull(cause);
+            assertTrue(cause instanceof IllegalArgumentException);
+        }
     }
 
     /**
-     * Verify that {@link UserController#deleteProfile(String)} removes the user document.
-     * <p>
-     *     Creates a user, deletes it, then asserts the document no longer exists.
-     * </p>
-     * @throws Exception if Firestore operations fail or timeout
+     * Make sure updateFields() changes the data in the database
      */
     @Test
-    public void testDeleteProfile() throws Exception {
-        // Create user so there is something to delete
-        Tasks.await(controller.createIfMissing(testUserId, "Tester", "tester@example.com"),
-                TIMEOUT_SEC, TimeUnit.SECONDS);
+    public void testUpdateFields() throws Exception {
+        // create user and set fields
+        User user = Tasks.await(controller.createUser(), TIMEOUT_SEC, TimeUnit.SECONDS);
+        String userID = user.getUserID();
 
-        DocumentSnapshot before = Tasks.await(userDoc.get(), TIMEOUT_SEC, TimeUnit.SECONDS);
-        assertTrue(before.exists());
+        Task<Void> updateTask = controller.updateFields(userID, new HashMap<>() {{
+            put("name", "Test Testington");
+            put("email", "tester@gmail.com");
+        }});
 
-        // Delete the document
-        Tasks.await(controller.deleteProfile(testUserId),
-                TIMEOUT_SEC, TimeUnit.SECONDS);
+        Tasks.await(updateTask, TIMEOUT_SEC, TimeUnit.SECONDS);
 
-        // The document should no longer exist
-        DocumentSnapshot after = Tasks.await(userDoc.get(), TIMEOUT_SEC, TimeUnit.SECONDS);
-        assertFalse(after.exists());
+        User retrievedUser = Tasks.await(controller.getUser(userID), TIMEOUT_SEC, TimeUnit.SECONDS);
+
+        assertEquals(userID, retrievedUser.getUserID());
+        assertEquals("Test Testington", retrievedUser.getName());
+        assertEquals("tester@gmail.com", retrievedUser.getEmail());
+    }
+
+    /**
+     * Make sure updateFields() throw an exception if the user does not exist
+     */
+    @Test
+    public void testUpdateFieldsException() throws Exception {
+        // get userID that does not exist
+        String userID = String.valueOf(UUID.randomUUID());
+
+        try {
+            Task<Void> updateTask = controller.updateFields(userID, new HashMap<>() {{
+                put("name", "Test Testington");
+                put("email", "tester@gmail.com");
+            }});
+
+            Tasks.await(updateTask, TIMEOUT_SEC, TimeUnit.SECONDS);
+        } catch (Exception ex) {
+            Throwable cause = ex.getCause(); // Firebase wraps exceptions
+            assertNotNull(cause);
+            assertTrue(cause instanceof IllegalArgumentException);
+        }
+    }
+
+    /**
+     * Make sure that setters on user will update the database through updateFields()
+     */
+    @Test
+    public void testUserSetters() throws Exception {
+        // create user and set fields
+        User user = Tasks.await(controller.createUser(), TIMEOUT_SEC, TimeUnit.SECONDS);
+        String userID = user.getUserID();
+
+        Task<Void> setNameTask = user.setName("Test Testington");
+        Task<Void> setEmailTask = user.setEmail("tester@gmail.com");
+
+        Tasks.await(Tasks.whenAllComplete(setNameTask, setEmailTask), TIMEOUT_SEC, TimeUnit.SECONDS);
+
+        // retrieve user from DB
+        User retrievedUser = Tasks.await(controller.getUser(userID), TIMEOUT_SEC, TimeUnit.SECONDS);
+
+        assertEquals(userID, retrievedUser.getUserID());
+        assertEquals("Test Testington", retrievedUser.getName());
+        assertEquals("tester@gmail.com", retrievedUser.getEmail());
+    }
+
+    /**
+     * Make sure that deleteUser() removes a user from the database
+     */
+    @Test
+    public void testDeleteUser() throws Exception {
+        // create user
+        User user = Tasks.await(controller.createUser(), TIMEOUT_SEC, TimeUnit.SECONDS);
+        String userID = user.getUserID();
+
+        Task<Void> setNameTask = user.setName("Test Testington");
+        Task<Void> setEmailTask = user.setEmail("tester@gmail.com");
+
+        Tasks.await(Tasks.whenAllComplete(setNameTask, setEmailTask), TIMEOUT_SEC, TimeUnit.SECONDS);
+
+
+        // delete user
+        Tasks.await(controller.deleteUser(userID), TIMEOUT_SEC, TimeUnit.SECONDS);
+
+        // try to get user
+        try {
+            Tasks.await(controller.getUser(userID),  TIMEOUT_SEC, TimeUnit.SECONDS);
+        } catch (Exception ex) {
+            Throwable cause = ex.getCause(); // Firebase wraps exceptions
+            assertNotNull(cause);
+            assertTrue(cause instanceof IllegalArgumentException);
+        }
+    }
+
+
+    /**
+     * Tests that the refresh pulls data with the UserController properly.
+     */
+    @Test
+    public void testRefresh() throws Exception {
+        // create user
+        User user = Tasks.await(controller.createUser(), TIMEOUT_SEC, TimeUnit.SECONDS);
+
+        user.setName("Alice");
+        user.setEmail("lost@wonderland.queen");
+        user.setPhone("(980) 765-4321");
+
+        // update database
+        Task<Void> updateTask = controller.updateFields(user.getUserID(), new HashMap<>() {{
+            put("name", "Test Testington");
+            put("email", "tester@gmail.com");
+        }});
+
+        Tasks.await(updateTask, TIMEOUT_SEC, TimeUnit.SECONDS);
+
+        // refresh user
+        Tasks.await(user.refresh(), TIMEOUT_SEC, TimeUnit.SECONDS);;
+
+        assertEquals("Test Testington", user.getName());
+        assertEquals("tester@gmail.com", user.getEmail());
+        assertEquals("(980) 765-4321", user.getPhone());
     }
 }
