@@ -23,12 +23,26 @@ import java.util.function.Consumer;
  */
 public class InvitationController {
 
+    // A single global instance shared by the whole program
+    public static InvitationController singletonInstance = null;
+
     private final FirebaseFirestore db;
     private final CollectionReference invitationsRef;
 
-    public InvitationController() {
+    private InvitationController() {
         this.db = FirebaseFirestore.getInstance();
         this.invitationsRef = db.collection("invitations");
+    }
+
+    /**
+     * Gets a single global instance of the InvitationController
+     * @return an InvitationController singleton
+     */
+    public static InvitationController getInstance() {
+        if (singletonInstance == null)
+            singletonInstance = new InvitationController();
+
+        return singletonInstance;
     }
 
     /**
