@@ -3,7 +3,7 @@ package com.example.syzygy_eventapp;
 /**
  * The possible authorization roles a user can have.
  * <p>
- *     Each user may have one role, which implicity contains.
+ *     Each user may have one or more roles at the same time.
  *     Roles determine the features, navigation, and privileges available to that user.
  *     The users current active role must be one of the roles assigned to them.
  * </p>
@@ -15,33 +15,7 @@ package com.example.syzygy_eventapp;
  * </ul>
  */
 public enum Role {
-    ENTRANT(0),
-    ORGANIZER(1),
-    ADMIN(2);
-
-    private Integer authority;
-
-    private Role(int authority) {
-        this.authority = authority;
-    }
-
-    public boolean hasHigherAuthority(Role other) {
-        return this.authority > other.authority;
-    }
-
-    public Role promote() {
-        if (this == ENTRANT) {
-            return ORGANIZER;
-        } else {
-            return ADMIN;
-        }
-    }
-
-    public Role demote() {
-        if (this == ADMIN) {
-            return ORGANIZER;
-        } else {
-            return ENTRANT;
-        }
-    }
+    ENTRANT,
+    ORGANIZER,
+    ADMIN
 }

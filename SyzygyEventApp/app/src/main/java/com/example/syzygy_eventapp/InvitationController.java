@@ -21,37 +21,14 @@ import java.util.function.Consumer;
  * Controller for reading/writing {@link Invitation} data in Firestore DB.
  * Firestore is the source of truth; views have real-time listeners and render {@link Invitation} models from snapshots. Writes (create/accept/reject/cancel) go through this controller.
  */
-public class InvitationController implements InvitationControllerInterface {
-
-    // A single global instance shared by the whole program
-    private static InvitationControllerInterface singletonInstance = null;
+public class InvitationController {
 
     private final FirebaseFirestore db;
     private final CollectionReference invitationsRef;
 
-    private InvitationController() {
+    public InvitationController() {
         this.db = FirebaseFirestore.getInstance();
         this.invitationsRef = db.collection("invitations");
-    }
-
-    /**
-     * Gets a single global instance of the UserController
-     * @return a InvitationController singleton
-     */
-    public static InvitationControllerInterface getInstance() {
-        if (singletonInstance == null)
-            singletonInstance = new InvitationController();
-
-        return singletonInstance;
-    }
-
-    /**
-     * Override singleton with an external instance, likely for testing
-     * @param instance the external instance
-     */
-
-    protected static void overrideInstance(InvitationControllerInterface instance) {
-        singletonInstance = instance;
     }
 
     /**
