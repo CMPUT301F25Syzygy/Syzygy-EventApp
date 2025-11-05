@@ -117,7 +117,7 @@ var pathtoroot = "../../../";
 public enum <span class="typeNameLabel"><a href=Role.html>Role</a></span>
 
                     </pre>
-                    <div class="block"><p>The possible authorization roles a user can have. </p><p> Each user may have one role, which implicity contains. Roles determine the features, navigation, and privileges available to that user. The users current active role must be one of the roles assigned to them. </p><ul><li>ENTRANT - A normal user who can browse and join event waiting lists.</li><li>ORGANIZER - A user who can create, edit, manage events and waiting lists, and send notifications.</li><li>ADMIN - A privileged user who can manage all parts of the system, including removing events, users, and images.</li></ul></div>
+                    <div class="block"><p>The possible authorization roles a user can have. </p><p> Each user may have one or more roles at the same time. Roles determine the features, navigation, and privileges available to that user. The users current active role must be one of the roles assigned to them. </p><ul><li>ENTRANT - A normal user who can browse and join event waiting lists.</li><li>ORGANIZER - A user who can create, edit, manage events and waiting lists, and send notifications.</li><li>ADMIN - A privileged user who can manage all parts of the system, including removing events, users, and images.</li></ul></div>
 
                     <dl>
 
@@ -264,30 +264,6 @@ public enum <span class="typeNameLabel"><a href=Role.html>Role</a></span>
                                         </tr>
                                         
                                         <tr id="i0" class="altColor">
-                                            <td class="colFirst"><code>boolean</code>
-                                            </td>
-                                            <th class="colSecond" scope="row"><code><a href=Role.html#hasHigherAuthority(com.example.syzygy_eventapp.Role)>hasHigherAuthority</a>(<a href=Role.html>Role</a> other) </code>
-                                            </th>
-                                            <td class="colLast"></td>
-                                        </tr>
-                                        
-                                        <tr id="i1" class="rowColor">
-                                            <td class="colFirst"><code><a href=Role.html>Role</a></code>
-                                            </td>
-                                            <th class="colSecond" scope="row"><code><a href=Role.html#promote()>promote</a>() </code>
-                                            </th>
-                                            <td class="colLast"></td>
-                                        </tr>
-                                        
-                                        <tr id="i2" class="altColor">
-                                            <td class="colFirst"><code><a href=Role.html>Role</a></code>
-                                            </td>
-                                            <th class="colSecond" scope="row"><code><a href=Role.html#demote()>demote</a>() </code>
-                                            </th>
-                                            <td class="colLast"></td>
-                                        </tr>
-                                        
-                                        <tr id="i3" class="rowColor">
                                             <td class="colFirst"><code>static <a href=https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-array/index.html>Array</a>&lt;<a href=Role.html>Role</a>&gt;</code>
                                             </td>
                                             <th class="colSecond" scope="row"><code><a href=Role.html#values()>values</a>() </code>
@@ -295,7 +271,7 @@ public enum <span class="typeNameLabel"><a href=Role.html>Role</a></span>
                                             <td class="colLast">Returns an array containing the constants of this enum type, in the order they're declared.</td>
                                         </tr>
                                         
-                                        <tr id="i4" class="altColor">
+                                        <tr id="i1" class="rowColor">
                                             <td class="colFirst"><code>static <a href=Role.html>Role</a></code>
                                             </td>
                                             <th class="colSecond" scope="row"><code><a href=Role.html#valueOf(java.lang.String)>valueOf</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> name) </code>
@@ -346,75 +322,6 @@ public enum <span class="typeNameLabel"><a href=Role.html>Role</a></span>
                                 <!--   -->
                             </a>
                                 <h3>Method Detail</h3>
-                                
-                                <a id="hasHigherAuthority(com.example.syzygy_eventapp.Role)">
-                                    <!--   -->
-                                </a>
-                                <ul class=
-                                              "blockList"
-                                          >
-                                    <li class="blockList">
-                                        <h4>hasHigherAuthority</h4>
-                                        <pre class="methodSignature"> boolean <a href=Role.html#hasHigherAuthority(com.example.syzygy_eventapp.Role)>hasHigherAuthority</a>(<a href=Role.html>Role</a> other)</pre>
-                                        <div class="block"></div>
-
-                                        <dl>
-
-                                        
-
-                                        
-
-                                        
-
-                                        </dl>
-                                    </li>
-                                </ul>
-                                
-                                <a id="promote()">
-                                    <!--   -->
-                                </a>
-                                <ul class=
-                                              "blockList"
-                                          >
-                                    <li class="blockList">
-                                        <h4>promote</h4>
-                                        <pre class="methodSignature"> <a href=Role.html>Role</a> <a href=Role.html#promote()>promote</a>()</pre>
-                                        <div class="block"></div>
-
-                                        <dl>
-
-                                        
-
-                                        
-
-                                        
-
-                                        </dl>
-                                    </li>
-                                </ul>
-                                
-                                <a id="demote()">
-                                    <!--   -->
-                                </a>
-                                <ul class=
-                                              "blockList"
-                                          >
-                                    <li class="blockList">
-                                        <h4>demote</h4>
-                                        <pre class="methodSignature"> <a href=Role.html>Role</a> <a href=Role.html#demote()>demote</a>()</pre>
-                                        <div class="block"></div>
-
-                                        <dl>
-
-                                        
-
-                                        
-
-                                        
-
-                                        </dl>
-                                    </li>
-                                </ul>
                                 
                                 <a id="values()">
                                     <!--   -->
