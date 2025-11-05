@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <!-- NewPage -->
 <html lang="en"><head>
-    <title>UserController </title>
+    <title>OrganizerController </title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta name="dc.created" content="2020-03-25">
     <link rel="stylesheet" type="text/css" href="../../../stylesheet.css" title="Style">
@@ -89,7 +89,7 @@ var pathtoroot = "../../../";
 <main role="main">
     <div class="header">
         <div class="subTitle"><span class="packageLabelInType">Package</span>&nbsp;<a href="package-summary.html">com.example.syzygy_eventapp</a></div>
-        <h2 title="Class UserController" class="title">Class UserController</h2>
+        <h2 title="Class OrganizerController" class="title">Class OrganizerController</h2>
     </div>
     <div class="contentContainer">
         <!-- <ul class="inheritance">
@@ -108,19 +108,16 @@ var pathtoroot = "../../../";
                         <dt>All Implemented Interfaces:</dt>
                         <dd>
                             
-                            <code>com.example.syzygy_eventapp.UserControllerInterface</code>
-                            
-                            
                         </dd>
                     </dl>
                     
                     <hr>
                     <pre class="wrap-overflow">
 
-public class <span class="typeNameLabel"><a href=UserController.html>UserController</a></span>
- implements <a href=UserControllerInterface.html>UserControllerInterface</a>
+public class <span class="typeNameLabel"><a href=OrganizerController.html>OrganizerController</a></span>
+
                     </pre>
-                    <div class="block"><p>Controller for reading/writing <a href=User.html>User</a> data in Firestore DB. </p><p> UserViews will call this class to create, update, and delete users and to get changes from the User model. Firestore has the true data, and snapshots are converted to <a href=User.html>User</a> and delivered back to the UserView. </p></div>
+                    <div class="block"><p>Controller for reading and writing <a href=Organizer.html>Organizer</a> data in Firestore DB. </p><p> The OrganizerController allows organizers to create new events and validate event info OrganizerView classes will use this to sync Organizer data between the app and Firestore. </p></div>
 
                     <dl>
 
@@ -199,6 +196,12 @@ public class <span class="typeNameLabel"><a href=UserController.html>UserControl
                                         </tr>
 
                                         
+                                            <tr class="altColor">
+                                                <th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a
+                                                        href="#OrganizerController()">OrganizerController</a></span>()</code></th>
+                                                <td class="colLast">Default constructor initializing Firestore and its collections</td>
+                                            </tr>
+                                        
 
                                         </tbody>
                                     </table>
@@ -249,75 +252,27 @@ public class <span class="typeNameLabel"><a href=UserController.html>UserControl
                                         </tr>
                                         
                                         <tr id="i0" class="altColor">
-                                            <td class="colFirst"><code>static <a href=UserControllerInterface.html>UserControllerInterface</a></code>
+                                            <td class="colFirst"><code>Task&lt;Void&gt;</code>
                                             </td>
-                                            <th class="colSecond" scope="row"><code><a href=UserController.html#getInstance()>getInstance</a>() </code>
+                                            <th class="colSecond" scope="row"><code><a href=OrganizerController.html#createEvent(java.lang.String,com.example.syzygy_eventapp.Event)>createEvent</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> organizerID, <a href=Event.html>Event</a> event) </code>
                                             </th>
-                                            <td class="colLast">Gets a single global instance of the UserController</td>
+                                            <td class="colLast">Create a new event under this organizer and store it in Firestore.</td>
                                         </tr>
                                         
                                         <tr id="i1" class="rowColor">
-                                            <td class="colFirst"><code>Task&lt;User&gt;</code>
+                                            <td class="colFirst"><code>ListenerRegistration</code>
                                             </td>
-                                            <th class="colSecond" scope="row"><code><a href=UserController.html#createEntrant()>createEntrant</a>() </code>
+                                            <th class="colSecond" scope="row"><code><a href=OrganizerController.html#observeOrganizer(java.lang.String,java.util.function.Consumer,java.util.function.Consumer)>observeOrganizer</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> organizerID, <a href=https://developer.android.com/reference/kotlin/java/util/function/Consumer.html>Consumer</a>&lt;<a href=Organizer.html>Organizer</a>&gt; onOrganizer, <a href=https://developer.android.com/reference/kotlin/java/util/function/Consumer.html>Consumer</a>&lt;<a href=https://developer.android.com/reference/kotlin/java/lang/Exception.html>Exception</a>&gt; onError) </code>
                                             </th>
-                                            <td class="colLast">Calls createUserFromClass to create a <a href=User.html>User</a> (entrant).</td>
+                                            <td class="colLast">Observes changes to a specific organizer document.</td>
                                         </tr>
                                         
                                         <tr id="i2" class="altColor">
-                                            <td class="colFirst"><code>Task&lt;Organizer&gt;</code>
+                                            <td class="colFirst"><code>Task&lt;List&lt;Event&gt;&gt;</code>
                                             </td>
-                                            <th class="colSecond" scope="row"><code><a href=UserController.html#createOrganizer()>createOrganizer</a>() </code>
+                                            <th class="colSecond" scope="row"><code><a href=OrganizerController.html#getOwnedEvents(java.lang.String)>getOwnedEvents</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> organizerID) </code>
                                             </th>
-                                            <td class="colLast">Calls createUserFromClass to create an <a href=Organizer.html>Organizer</a>.</td>
-                                        </tr>
-                                        
-                                        <tr id="i3" class="rowColor">
-                                            <td class="colFirst"><code>Task&lt;Admin&gt;</code>
-                                            </td>
-                                            <th class="colSecond" scope="row"><code><a href=UserController.html#createAdmin()>createAdmin</a>() </code>
-                                            </th>
-                                            <td class="colLast">Calls createUserFromClass to create an <a href=Admin.html>Admin</a>.</td>
-                                        </tr>
-                                        
-                                        <tr id="i4" class="altColor">
-                                            <td class="colFirst"><code>Task&lt;User&gt;</code>
-                                            </td>
-                                            <th class="colSecond" scope="row"><code><a href=UserController.html#getUser(java.lang.String)>getUser</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> userID) </code>
-                                            </th>
-                                            <td class="colLast">Retrieves a user from the database Results in a IllegalArgumentException if the userID isn't in the database</td>
-                                        </tr>
-                                        
-                                        <tr id="i5" class="rowColor">
-                                            <td class="colFirst"><code>ListenerRegistration</code>
-                                            </td>
-                                            <th class="colSecond" scope="row"><code><a href=UserController.html#observeUser(java.lang.String,java.util.function.Consumer,java.lang.Runnable)>observeUser</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> userID, <a href=https://developer.android.com/reference/kotlin/java/util/function/Consumer.html>Consumer</a>&lt;<a href=User.html>User</a>&gt; onUpdate, <a href=https://developer.android.com/reference/kotlin/java/lang/Runnable.html>Runnable</a> onDelete) </code>
-                                            </th>
-                                            <td class="colLast">Observes userID and pushes the current <a href=User.html>User</a> on each change.</td>
-                                        </tr>
-                                        
-                                        <tr id="i6" class="altColor">
-                                            <td class="colFirst"><code>Task&lt;Void&gt;</code>
-                                            </td>
-                                            <th class="colSecond" scope="row"><code><a href=UserController.html#updateFields(java.lang.String,java.util.HashMap)>updateFields</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> userID, <a href=https://developer.android.com/reference/kotlin/java/util/HashMap.html>HashMap</a>&lt;<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a>, <a href=https://developer.android.com/reference/kotlin/java/lang/Object.html>Object</a>&gt; fields) </code>
-                                            </th>
-                                            <td class="colLast">Partially update a user's fields.</td>
-                                        </tr>
-                                        
-                                        <tr id="i7" class="rowColor">
-                                            <td class="colFirst"><code>Task&lt;User&gt;</code>
-                                            </td>
-                                            <th class="colSecond" scope="row"><code><a href=UserController.html#setUserRole(java.lang.String,com.example.syzygy_eventapp.Role)>setUserRole</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> userID, <a href=Role.html>Role</a> role) </code>
-                                            </th>
-                                            <td class="colLast"></td>
-                                        </tr>
-                                        
-                                        <tr id="i8" class="altColor">
-                                            <td class="colFirst"><code>Task&lt;Void&gt;</code>
-                                            </td>
-                                            <th class="colSecond" scope="row"><code><a href=UserController.html#deleteUser(java.lang.String)>deleteUser</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> userID) </code>
-                                            </th>
-                                            <td class="colLast">Permanently delete this user.</td>
+                                            <td class="colLast">Gets all Event objects owned by the given organizer.</td>
                                         </tr>
                                         
                                         </tbody>
@@ -351,6 +306,16 @@ public class <span class="typeNameLabel"><a href=UserController.html>UserControl
                             </a>
                                 <h3>Constructor Detail</h3>
                                 
+                                <a name="OrganizerController()"></a>
+                                <ul class="blockList">
+                                    <li class="blockList">
+                                        <h4>OrganizerController</h4>
+                                        <pre>OrganizerController()</pre>
+                                        <div class="block">Default constructor initializing Firestore and its collections</div>
+                                        
+                                    </li>
+                                </ul>
+                                
                             </li>
                         </ul>
                     </section>
@@ -364,120 +329,16 @@ public class <span class="typeNameLabel"><a href=UserController.html>UserControl
                             </a>
                                 <h3>Method Detail</h3>
                                 
-                                <a id="getInstance()">
+                                <a id="createEvent(java.lang.String,com.example.syzygy_eventapp.Event)">
                                     <!--   -->
                                 </a>
                                 <ul class=
                                               "blockList"
                                           >
                                     <li class="blockList">
-                                        <h4>getInstance</h4>
-                                        <pre class="methodSignature"> static <a href=UserControllerInterface.html>UserControllerInterface</a> <a href=UserController.html#getInstance()>getInstance</a>()</pre>
-                                        <div class="block"><p>Gets a single global instance of the UserController</p></div>
-
-                                        <dl>
-
-                                        
-
-                                        
-                                            <dt><span class="returnLabel">Returns:</span></dt>
-                                            <dd><p>a UserController singleton</p></dd>
-                                        
-
-                                        
-
-                                        </dl>
-                                    </li>
-                                </ul>
-                                
-                                <a id="createEntrant()">
-                                    <!--   -->
-                                </a>
-                                <ul class=
-                                              "blockList"
-                                          >
-                                    <li class="blockList">
-                                        <h4>createEntrant</h4>
-                                        <pre class="methodSignature"> Task&lt;User&gt; <a href=UserController.html#createEntrant()>createEntrant</a>()</pre>
-                                        <div class="block"><p>Calls createUserFromClass to create a <a href=User.html>User</a> (entrant).</p></div>
-
-                                        <dl>
-
-                                        
-
-                                        
-                                            <dt><span class="returnLabel">Returns:</span></dt>
-                                            <dd><p>A new entrant with default fields.</p></dd>
-                                        
-
-                                        
-
-                                        </dl>
-                                    </li>
-                                </ul>
-                                
-                                <a id="createOrganizer()">
-                                    <!--   -->
-                                </a>
-                                <ul class=
-                                              "blockList"
-                                          >
-                                    <li class="blockList">
-                                        <h4>createOrganizer</h4>
-                                        <pre class="methodSignature"> Task&lt;Organizer&gt; <a href=UserController.html#createOrganizer()>createOrganizer</a>()</pre>
-                                        <div class="block"><p>Calls createUserFromClass to create an <a href=Organizer.html>Organizer</a>.</p></div>
-
-                                        <dl>
-
-                                        
-
-                                        
-                                            <dt><span class="returnLabel">Returns:</span></dt>
-                                            <dd><p>A new organizer with default fields.</p></dd>
-                                        
-
-                                        
-
-                                        </dl>
-                                    </li>
-                                </ul>
-                                
-                                <a id="createAdmin()">
-                                    <!--   -->
-                                </a>
-                                <ul class=
-                                              "blockList"
-                                          >
-                                    <li class="blockList">
-                                        <h4>createAdmin</h4>
-                                        <pre class="methodSignature"> Task&lt;Admin&gt; <a href=UserController.html#createAdmin()>createAdmin</a>()</pre>
-                                        <div class="block"><p>Calls createUserFromClass to create an <a href=Admin.html>Admin</a>.</p></div>
-
-                                        <dl>
-
-                                        
-
-                                        
-                                            <dt><span class="returnLabel">Returns:</span></dt>
-                                            <dd><p>A new admin with default fields.</p></dd>
-                                        
-
-                                        
-
-                                        </dl>
-                                    </li>
-                                </ul>
-                                
-                                <a id="getUser(java.lang.String)">
-                                    <!--   -->
-                                </a>
-                                <ul class=
-                                              "blockList"
-                                          >
-                                    <li class="blockList">
-                                        <h4>getUser</h4>
-                                        <pre class="methodSignature"> Task&lt;User&gt; <a href=UserController.html#getUser(java.lang.String)>getUser</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> userID)</pre>
-                                        <div class="block"><p>Retrieves a user from the database Results in a IllegalArgumentException if the userID isn't in the database</p></div>
+                                        <h4>createEvent</h4>
+                                        <pre class="methodSignature"> Task&lt;Void&gt; <a href=OrganizerController.html#createEvent(java.lang.String,com.example.syzygy_eventapp.Event)>createEvent</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> organizerID, <a href=Event.html>Event</a> event)</pre>
+                                        <div class="block"><p>Create a new event under this organizer and store it in Firestore.</p></div>
 
                                         <dl>
 
@@ -485,14 +346,18 @@ public class <span class="typeNameLabel"><a href=UserController.html>UserControl
                                             <dt><span class="paramLabel">Parameters:</span></dt>
                                             
                                             
-                                            <dd><code>userID</code> - the userID to get a <a href=User.html>User</a> for</dd>
+                                            <dd><code>organizerID</code> - The organizer creating the event</dd>
+                                            
+                                            
+                                            
+                                            <dd><code>event</code> - The event object to be created</dd>
                                             
                                             
                                         
 
                                         
                                             <dt><span class="returnLabel">Returns:</span></dt>
-                                            <dd><p>the <a href=User.html>User</a> found in the database</p></dd>
+                                            <dd><p>Task that completes when both the event and organizer’s list are updated</p></dd>
                                         
 
                                         
@@ -501,16 +366,16 @@ public class <span class="typeNameLabel"><a href=UserController.html>UserControl
                                     </li>
                                 </ul>
                                 
-                                <a id="observeUser(java.lang.String,java.util.function.Consumer,java.lang.Runnable)">
+                                <a id="observeOrganizer(java.lang.String,java.util.function.Consumer,java.util.function.Consumer)">
                                     <!--   -->
                                 </a>
                                 <ul class=
                                               "blockList"
                                           >
                                     <li class="blockList">
-                                        <h4>observeUser</h4>
-                                        <pre class="methodSignature"> ListenerRegistration <a href=UserController.html#observeUser(java.lang.String,java.util.function.Consumer,java.lang.Runnable)>observeUser</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> userID, <a href=https://developer.android.com/reference/kotlin/java/util/function/Consumer.html>Consumer</a>&lt;<a href=User.html>User</a>&gt; onUpdate, <a href=https://developer.android.com/reference/kotlin/java/lang/Runnable.html>Runnable</a> onDelete)</pre>
-                                        <div class="block"><p>Observes userID and pushes the current <a href=User.html>User</a> on each change. This should never be used outside of <a href=User.html>User</a>.</p></div>
+                                        <h4>observeOrganizer</h4>
+                                        <pre class="methodSignature"> ListenerRegistration <a href=OrganizerController.html#observeOrganizer(java.lang.String,java.util.function.Consumer,java.util.function.Consumer)>observeOrganizer</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> organizerID, <a href=https://developer.android.com/reference/kotlin/java/util/function/Consumer.html>Consumer</a>&lt;<a href=Organizer.html>Organizer</a>&gt; onOrganizer, <a href=https://developer.android.com/reference/kotlin/java/util/function/Consumer.html>Consumer</a>&lt;<a href=https://developer.android.com/reference/kotlin/java/lang/Exception.html>Exception</a>&gt; onError)</pre>
+                                        <div class="block"><p>Observes changes to a specific organizer document.</p></div>
 
                                         <dl>
 
@@ -518,59 +383,22 @@ public class <span class="typeNameLabel"><a href=UserController.html>UserControl
                                             <dt><span class="paramLabel">Parameters:</span></dt>
                                             
                                             
-                                            <dd><code>userID</code> - Document ID to observe</dd>
+                                            <dd><code>organizerID</code> - The ID of the organizer to listen to</dd>
                                             
                                             
                                             
-                                            <dd><code>onUpdate</code> - Callback for changed versions of the <a href=User.html>User</a></dd>
+                                            <dd><code>onOrganizer</code> - Callback invoked when the organizer data changes</dd>
                                             
                                             
                                             
-                                            <dd><code>onDelete</code> - Callback for when the user is deleted</dd>
-                                            
-                                            
-                                        
-
-                                        
-                                            <dt><span class="returnLabel">Returns:</span></dt>
-                                            <dd><p>ListenerRegistration for stopping the observation</p></dd>
-                                        
-
-                                        
-
-                                        </dl>
-                                    </li>
-                                </ul>
-                                
-                                <a id="updateFields(java.lang.String,java.util.HashMap)">
-                                    <!--   -->
-                                </a>
-                                <ul class=
-                                              "blockList"
-                                          >
-                                    <li class="blockList">
-                                        <h4>updateFields</h4>
-                                        <pre class="methodSignature"> Task&lt;Void&gt; <a href=UserController.html#updateFields(java.lang.String,java.util.HashMap)>updateFields</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> userID, <a href=https://developer.android.com/reference/kotlin/java/util/HashMap.html>HashMap</a>&lt;<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a>, <a href=https://developer.android.com/reference/kotlin/java/lang/Object.html>Object</a>&gt; fields)</pre>
-                                        <div class="block"><p>Partially update a user's fields. This should never be used outside of <a href=User.html>User</a>.</p></div>
-
-                                        <dl>
-
-                                        
-                                            <dt><span class="paramLabel">Parameters:</span></dt>
-                                            
-                                            
-                                            <dd><code>userID</code> - Document ID</dd>
-                                            
-                                            
-                                            
-                                            <dd><code>fields</code> - A map of field names and new values</dd>
+                                            <dd><code>onError</code> - Callback invoked if there’s a Firestore error</dd>
                                             
                                             
                                         
 
                                         
                                             <dt><span class="returnLabel">Returns:</span></dt>
-                                            <dd><p>Task that completes when the merge is written</p></dd>
+                                            <dd><p>ListenerRegistration for stopping observation</p></dd>
                                         
 
                                         
@@ -579,39 +407,16 @@ public class <span class="typeNameLabel"><a href=UserController.html>UserControl
                                     </li>
                                 </ul>
                                 
-                                <a id="setUserRole(java.lang.String,com.example.syzygy_eventapp.Role)">
-                                    <!--   -->
-                                </a>
-                                <ul class=
-                                              "blockList"
-                                          >
-                                    <li class="blockList">
-                                        <h4>setUserRole</h4>
-                                        <pre class="methodSignature"> Task&lt;User&gt; <a href=UserController.html#setUserRole(java.lang.String,com.example.syzygy_eventapp.Role)>setUserRole</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> userID, <a href=Role.html>Role</a> role)</pre>
-                                        <div class="block"></div>
-
-                                        <dl>
-
-                                        
-
-                                        
-
-                                        
-
-                                        </dl>
-                                    </li>
-                                </ul>
-                                
-                                <a id="deleteUser(java.lang.String)">
+                                <a id="getOwnedEvents(java.lang.String)">
                                     <!--   -->
                                 </a>
                                 <ul class=
                                               "blockListLast"
                                           >
                                     <li class="blockList">
-                                        <h4>deleteUser</h4>
-                                        <pre class="methodSignature"> Task&lt;Void&gt; <a href=UserController.html#deleteUser(java.lang.String)>deleteUser</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> userID)</pre>
-                                        <div class="block"><p>Permanently delete this user.</p></div>
+                                        <h4>getOwnedEvents</h4>
+                                        <pre class="methodSignature"> Task&lt;List&lt;Event&gt;&gt; <a href=OrganizerController.html#getOwnedEvents(java.lang.String)>getOwnedEvents</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> organizerID)</pre>
+                                        <div class="block"><p>Gets all Event objects owned by the given organizer. Loads the organizer’s list of event IDs, then gets each Event from Firestore.</p></div>
 
                                         <dl>
 
@@ -619,14 +424,14 @@ public class <span class="typeNameLabel"><a href=UserController.html>UserControl
                                             <dt><span class="paramLabel">Parameters:</span></dt>
                                             
                                             
-                                            <dd><code>userID</code> - The user document ID</dd>
+                                            <dd><code>organizerID</code> - The ID of the organizer</dd>
                                             
                                             
                                         
 
                                         
                                             <dt><span class="returnLabel">Returns:</span></dt>
-                                            <dd><p>Task that completes when the document is deleted</p></dd>
+                                            <dd><p>Task that resolves to a list of Event objects (possibly empty if none)</p></dd>
                                         
 
                                         
