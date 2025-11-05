@@ -5,7 +5,9 @@ import androidx.annotation.NonNull;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -16,14 +18,15 @@ import java.util.concurrent.ThreadLocalRandom;
  * Other classes like UserController and UserTest are responsible for initializing values upon creating a User.
  */
 public class User {
+    private Role role;
     /**
      * Unique identifier ID for the user.
      */
-    final private @NonNull String userID;
+    private String userID;
     /**
      * Users name.
      */
-    private @NonNull String name;
+    private @NonNull String name = "Untitled_" + ThreadLocalRandom.current().nextInt(1000, 10000);
     /**
      * Users contact info.
      */
@@ -44,20 +47,6 @@ public class User {
      * True if the user has ever been demoted.
      */
     private boolean demoted = false;
-    /**
-     * Role of the user, including the functionality of all of it's subroles *implicitly*
-     * For example, all organizers are also entrants, so we don't need to store that separately
-     * All admins are also organizers and entrants.
-     */
-    private Role role = Role.ENTRANT;
-
-    /**
-     * No-argument constructor to allow deserialization from Firebase, not useful otherwise
-     */
-    public User() {
-        this.userID = "";
-        this.name = "";
-    }
 
     /**
      * Default Constructor used for creating users normally.
@@ -70,10 +59,19 @@ public class User {
      *   <li>all other fields left blank (null)</li>
      * </ul>
      */
-    public User(@NonNull String userID) {
+    public User() {
+        this.setRole(Role.ENTRANT);
+    }
+
+    public User(String userID, @NonNull String name, String email, String phone, String photoURL, boolean photoHidden, boolean demoted, Role role) {
         this.userID = userID;
-        int randomNumber = ThreadLocalRandom.current().nextInt(1000, 10000);
-        this.name = "Untitled_" + randomNumber;
+        this.name = name;
+        this.email = email;
+        this.phone = phone;
+        this.photoURL = photoURL;
+        this.photoHidden = photoHidden;
+        this.demoted = demoted;
+        this.role = role;
     }
 
     /**
@@ -88,10 +86,13 @@ public class User {
             this.photoURL = user.photoURL;
             this.photoHidden = user.photoHidden;
             this.demoted = user.demoted;
-            this.role = user.role;
 
             return Tasks.forResult(null);
         });
+    }
+
+    public void setUserID(String userID) {
+        this.userID = userID;
     }
 
     @NonNull
@@ -171,6 +172,9 @@ public class User {
         return demoted;
     }
 
+    public void setRole(Role role) {
+        this.role = role;
+    }
 
     public Role getRole() {
         return role;
@@ -191,47 +195,6 @@ public class User {
      * @return a task that will complete when the DB has been updated
      */
 
-    public Task<Void> promote() {
-        role = role.promote();
-
-        return updateDB(new HashMap<>() {{
-            put("role", role);
-        }});
-    }
-
-    /**
-     * Demotes the user in the model and the database
-     * @return a task that will complete when the DB has been updated
-     */
-
-    public Task<Void> demote() {
-        role = role.demote();
-        demoted = true;
-
-        return updateDB(new HashMap<>() {{
-            put("role", role);
-            put("demoted", demoted);
-        }});
-    }
-
-    /**
-     * Changes the user's role, and detects if they have been demoted
-     *
-     * @param role the role to change the user to
-     * @return a task that will complete when the DB has been updated
-     */
-    public Task<Void> setRole(Role role) {
-        if (this.role != null && this.role.hasHigherAuthority(role)) {
-            this.demoted = true;
-        }
-        this.role = role;
-
-        return updateDB(new HashMap<>() {{
-            put("role", role);
-            put("demoted", demoted);
-        }});
-    }
-
     public String getPhone() {
         return phone;
     }
@@ -249,7 +212,18 @@ public class User {
         }});
     }
 
-    private Task<Void> updateDB(HashMap<String, Object> fields) {
+    public User demote() {
+        return this;
+    }
+
+    public Organizer promote() {
+        return new Organizer(userID, name, email, phone, photoURL, photoHidden, demoted, new ArrayList<>(), Role.ORGANIZER);
+    }
+
+    protected Task<Void> updateDB(HashMap<String, Object> fields) {
+        if (userID == null) {
+            return Tasks.forResult(null);
+        }
         return UserController.getInstance().updateFields(userID, fields);
     }
 }
