@@ -1,255 +1,127 @@
 package com.example.syzygy_eventapp;
 
-import androidx.annotation.NonNull;
-
-import com.google.android.gms.tasks.Task;
-import com.google.android.gms.tasks.Tasks;
-
-import java.util.HashMap;
-import java.util.concurrent.ThreadLocalRandom;
+import java.util.List;
 
 /**
- * User Model containing user profile data and active role.
- * Fields are automatically updated when Firebase DB changes.
- * Updates the Firebase DB when fields are set.
- * Once the user is deleted it is still valid to read, but it will throw IllegalStateException when written to.
+ * User Model containing user profile data and active role. Should match and be synced with Firebase DB.
  * Other classes like UserController and UserTest are responsible for initializing values upon creating a User.
  */
 public class User {
-    /**
-     * Unique identifier ID for the user.
-     */
-    final private @NonNull String userID;
-    /**
-     * Users name.
-     */
-    private @NonNull String name;
-    /**
-     * Users contact info.
-     */
+
+    /** Unique identifier ID for the user. */
+    private String userID;
+    /** Users name and contact info. */
+    private String name;
     private String email;
-    /**
-     * Users contact info.
-     */
     private String phone;
-    /**
-     * Users profile picture URL.
-     */
+    /** Users profile picture URL. */
     private String photoURL;
+    /** True if the profile picture is disabled or hidden. */
+    private boolean photoHidden;
+    /** True if the user has ever been demoted. */
+    private boolean demoted;
+    /** List of assigned roles for the user. */
+    private List<Role> roles;
     /**
-     * True if the profile picture is disabled or hidden.
+     * The users active role determines their current nav bar, views, privileges, etc.
+     * Should be present in the "roles" list.
      */
-    private boolean photoHidden = false;
-    /**
-     * True if the user has ever been demoted.
-     */
-    private boolean demoted = false;
-    /**
-     * Role of the user, including the functionality of all of it's subroles *implicitly*
-     * For example, all organizers are also entrants, so we don't need to store that separately
-     * All admins are also organizers and entrants.
-     */
-    private Role role = Role.ENTRANT;
+    private Role activeRole;
 
-    /**
-     * No-argument constructor to allow deserialization from Firebase, not useful otherwise
-     */
+    /** Default Constructor used for creating users normally. */
     public User() {
-        this.userID = "";
-        this.name = "";
     }
 
-    /**
-     * Default Constructor used for creating users normally.
-     * Starts with these default fields.
-     * <ul>
-     *   <li>role = ENTRANT</li>
-     *   <li>photoHidden = false</li>
-     *   <li>demoted = false</li>
-     *   <li>name = "Untitled_0000" (random number ever time)</li>
-     *   <li>all other fields left blank (null)</li>
-     * </ul>
-     */
-    public User(@NonNull String userID) {
+    /** Constructor with all values, used mostly for testing. */
+    public User(String userID, String name, String email, String phone, String photoURL, boolean photoHidden, boolean demoted, List<Role> roles, Role activeRole) {
         this.userID = userID;
-        int randomNumber = ThreadLocalRandom.current().nextInt(1000, 10000);
-        this.name = "Untitled_" + randomNumber;
+        this.name = name;
+        this.email = email;
+        this.phone = phone;
+        this.photoURL = photoURL;
+        this.photoHidden = photoHidden;
+        this.demoted = demoted;
+        this.roles = roles;
+        this.activeRole = activeRole;
     }
 
-    /**
-     * Refreshes the user data from the database
-     * @return a task that will complete after the refresh is done
-     */
-    public Task<Void> refresh() {
-        return UserController.getInstance().getUser(userID).onSuccessTask((user) -> {
-            this.name = user.name;
-            this.email = user.email;
-            this.phone = user.phone;
-            this.photoURL = user.photoURL;
-            this.photoHidden = user.photoHidden;
-            this.demoted = user.demoted;
-            this.role = user.role;
-
-            return Tasks.forResult(null);
-        });
-    }
-
-    @NonNull
     public String getUserID() {
         return userID;
     }
 
-    public @NonNull String getName() {
+    public void setUserID(String userID) {
+        this.userID = userID;
+    }
+
+    public String getName() {
         return name;
     }
 
-    /**
-     * Sets the user's name in the model and the database
-     * @return a task that will complete when the DB has been updated
-     */
-
-    public Task<Void> setName(String name) {
+    public void setName(String name) {
         this.name = name;
-
-        return updateDB(new HashMap<>() {{
-            put("name", name);
-        }});
     }
 
     public String getEmail() {
         return email;
     }
 
-    /**
-     * Sets the user's email in the model and the database
-     * @return a task that will complete when the DB has been updated
-     */
-
-    public Task<Void> setEmail(String email) {
+    public void setEmail(String email) {
         this.email = email;
-
-        return updateDB(new HashMap<>() {{
-            put("email", email);
-        }});
     }
 
     public String getPhotoURL() {
         return photoURL;
     }
 
-    /**
-     * Sets the user's profile picture in the model and the database
-     * @return a task that will complete when the DB has been updated
-     */
-
-    public Task<Void> setPhotoURL(String photoURL) {
+    public void setPhotoURL(String photoURL) {
         this.photoURL = photoURL;
-
-        return updateDB(new HashMap<>() {{
-            put("photoURL", photoURL);
-        }});
     }
 
     public boolean isPhotoHidden() {
         return photoHidden;
     }
 
-    /**
-     * Sets if the user's profile picture is hidden in the model and the database
-     * @return a task that will complete when the DB has been updated
-     */
-
-    public Task<Void> setPhotoHidden(boolean photoHidden) {
+    public void setPhotoHidden(boolean photoHidden) {
         this.photoHidden = photoHidden;
-
-        return updateDB(new HashMap<>() {{
-            put("photoHidden", photoHidden);
-        }});
     }
 
     public boolean isDemoted() {
         return demoted;
     }
 
-
-    public Role getRole() {
-        return role;
+    public void setDemoted(boolean demoted) {
+        this.demoted = demoted;
     }
 
-    /**
-     * Tests if the user has the abilities of another role
-     *
-     * @param role the role to test
-     * @return if the user has the abilities of the role
-     */
-    public boolean hasAbilitiesOfRole(Role role) {
-        return !role.hasHigherAuthority(this.role);
+    public List<Role> getRoles() {
+        return roles;
     }
 
-    /**
-     * Promotes the user in the model and the database
-     * @return a task that will complete when the DB has been updated
-     */
-
-    public Task<Void> promote() {
-        role = role.promote();
-
-        return updateDB(new HashMap<>() {{
-            put("role", role);
-        }});
+    public void setRoles(List<Role> roles) {
+        this.roles = roles;
     }
 
-    /**
-     * Demotes the user in the model and the database
-     * @return a task that will complete when the DB has been updated
-     */
-
-    public Task<Void> demote() {
-        role = role.demote();
-        demoted = true;
-
-        return updateDB(new HashMap<>() {{
-            put("role", role);
-            put("demoted", demoted);
-        }});
+    public Role getActiveRole() {
+        return activeRole;
     }
 
-    /**
-     * Changes the user's role, and detects if they have been demoted
-     *
-     * @param role the role to change the user to
-     * @return a task that will complete when the DB has been updated
-     */
-    public Task<Void> setRole(Role role) {
-        if (this.role != null && this.role.hasHigherAuthority(role)) {
-            this.demoted = true;
-        }
-        this.role = role;
-
-        return updateDB(new HashMap<>() {{
-            put("role", role);
-            put("demoted", demoted);
-        }});
+    public void setActiveRole(Role activeRole) {
+        this.activeRole = activeRole;
     }
 
     public String getPhone() {
         return phone;
     }
 
-    /**
-     * Sets the user's phone number in the model and the database
-     * @return a task that will complete when the DB has been updated
-     */
-
-    public Task<Void> setPhone(String phone) {
+    public void setPhone(String phone) {
         this.phone = phone;
-
-        return updateDB(new HashMap<>() {{
-            put("phone", phone);
-        }});
     }
 
-    private Task<Void> updateDB(HashMap<String, Object> fields) {
-        return UserController.getInstance().updateFields(userID, fields);
+    /**
+     * Ensures the users active role is actually one of their assigned roles.
+     * @return true if activeRole and roles are not null and roles has the active role in the list.
+     */
+    public boolean hasValidActiveRole() {
+        return activeRole != null && roles != null && roles.contains(activeRole);
     }
 }
