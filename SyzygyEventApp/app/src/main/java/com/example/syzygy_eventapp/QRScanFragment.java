@@ -99,6 +99,6 @@ public class QRScanFragment extends Fragment {
     }
 
     private void bindCameraUseCases(@NonNull ProcessCameraProvider cameraProvider) {
-        
+
     }
 }
