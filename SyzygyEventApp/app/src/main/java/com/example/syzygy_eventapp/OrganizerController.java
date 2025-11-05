@@ -32,39 +32,6 @@ public class OrganizerController {
     }
 
     /**
-     * Create a new organizer profile in Firestore if missing.
-     * @param organizerID Unique organizer ID (same as UserID)
-     * @param name Organizer display name
-     * @param email Organizer email
-     * @return Task that completes when the document is created (or already exists)
-     */
-    public Task<Void> createIfMissing(String organizerID, String name, String email) {
-        DocumentReference doc = organizersRef.document(organizerID);
-
-        return doc.get().continueWithTask(task -> {
-            DocumentSnapshot snap = task.getResult();
-            if (snap != null && snap.exists()) {
-                // already exists, don't need to create again
-                return Tasks.forResult(null);
-            }
-
-            // create organizer with defaults
-            Organizer organizer = new Organizer();
-            organizer.setUserID(organizerID);
-            organizer.setName(name);
-            organizer.setEmail(email);
-            organizer.setOwnedEventIDs(new ArrayList<>());
-
-            // ensure roles are initialized
-            organizer.setRoles(Arrays.asList(Role.ORGANIZER));
-            organizer.setActiveRole(Role.ORGANIZER);
-
-            // initial write
-            return doc.set(organizer);
-        });
-    }
-
-    /**
      * Create a new event under this organizer and store it in Firestore.
      * @param organizerID The organizer creating the event
      * @param event The event object to be created

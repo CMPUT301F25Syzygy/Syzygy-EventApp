@@ -14,7 +14,7 @@ import java.util.Date;
 /**
  * Unit tests for Event class
  */
-public class EventModelTest {
+public class EventTest {
 
     private Event event;
 
