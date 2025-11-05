@@ -7,9 +7,9 @@ import java.util.HashMap;
 import java.util.function.Consumer;
 
 public interface UserControllerInterface {
-    public Task<User> createEntrant();
-    public Task<Organizer> createOrganizer();
-    public Task<Admin> createAdmin();
+    public Task<User> createEntrant(String userID);
+    public Task<Organizer> createOrganizer(String userID);
+    public Task<Admin> createAdmin(String userID);
     public Task<User> getUser(String userID);
     public ListenerRegistration observeUser(String userID, Consumer<User> onUpdate, Runnable onDelete);
     public Task<Void> updateFields(String userID, HashMap<String, Object> fields);

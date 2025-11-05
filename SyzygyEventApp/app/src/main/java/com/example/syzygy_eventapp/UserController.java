@@ -1,5 +1,7 @@
 package com.example.syzygy_eventapp;
 
+import androidx.annotation.Nullable;
+
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.*;
@@ -55,53 +57,61 @@ public class UserController implements UserControllerInterface {
     }
 
     /**
-     * Calls {@link #createUserFromClass(Supplier)} to create a {@link User} (entrant).
+     * Calls {@link #createUserFromClass(Supplier, String)} to create a {@link User} (entrant).
      * @return A new entrant with default fields.
      */
-    public Task<User> createEntrant() {
-        return createUserFromClass(User::new);
+    public Task<User> createEntrant(String userID) {
+        return createUserFromClass(User::new, userID);
     }
 
     /**
-     * Calls {@link #createUserFromClass(Supplier)} to create an {@link Organizer}.
+     * Calls {@link #createUserFromClass(Supplier, String)} to create an {@link Organizer}.
      * @return A new organizer with default fields.
      */
-    public Task<Organizer> createOrganizer() {
-        return createUserFromClass(Organizer::new);
+    public Task<Organizer> createOrganizer(String userID) {
+        return createUserFromClass(Organizer::new, userID);
     }
 
     /**
-     * Calls {@link #createUserFromClass(Supplier)} to create an {@link Admin}.
+     * Calls {@link #createUserFromClass(Supplier, String)} to create an {@link Admin}.
      * @return A new admin with default fields.
      */
-    public Task<Admin> createAdmin() {
-        return createUserFromClass(Admin::new);
+    public Task<Admin> createAdmin(String userID) {
+        return createUserFromClass(Admin::new, userID);
     }
 
     /**
      * Creates a new {@link User}, or any subclass of it, and checks it's ID doesn't collide in the database.
      * The user will have the default fields.
+     * @param userID The ID that the newly created user will have.
      * @return Task that completes when the document is created or if it already exists
      */
-    private <T extends User> Task<T> createUserFromClass(Supplier<T> constructor) {
-        String userID = String.valueOf(UUID.randomUUID());
+    private <T extends User> Task<T> createUserFromClass(Supplier<T> constructor, String userID) {
         DocumentReference doc = usersRef.document(userID);
 
         return doc.get().continueWithTask(task -> {
-            DocumentSnapshot snap = task.getResult();
-            if (snap.exists()) {
-                // the UUID collided, let's try again with a new one
-                return createUserFromClass(constructor);
+            if (task.isSuccessful()) {
+                DocumentSnapshot snapshot = task.getResult();
+                if (snapshot.exists()) {
+                    // Document already exists, return a failed task
+                    return Tasks.forException(new Exception("User with ID " + userID + " already exists"));
+                } else {
+                    // Document doesn't exist, create new user
+                    T user = constructor.get();
+                    user.setUserID(userID);
+
+                    return doc.set(user).continueWith(createTask -> {
+                        if (createTask.isSuccessful()) {
+                            return user;
+                        } else {
+                            throw createTask.getException();
+                        }
+                    });
+                }
+            } else {
+                // Failed to check document existence
+                return Tasks.forException(task.getException());
             }
-
-            // create a user
-            T user = constructor.get();
-            user.setUserID(userID);
-
-            // Initial write
-            return doc.set(user).continueWithTask((nothing) -> {
-                return Tasks.forResult(user);
-            });
         });
     }
 
