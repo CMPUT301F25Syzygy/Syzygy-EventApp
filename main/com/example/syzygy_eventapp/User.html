@@ -117,7 +117,7 @@ var pathtoroot = "../../../";
 public class <span class="typeNameLabel"><a href=User.html>User</a></span>
 
                     </pre>
-                    <div class="block"><p>User Model containing user profile data and active role. Should match and be synced with Firebase DB. Other classes like UserController and UserTest are responsible for initializing values upon creating a User.</p></div>
+                    <div class="block"><p>User Model containing user profile data and active role. Fields are automatically updated when Firebase DB changes. Updates the Firebase DB when fields are set. Once the user is deleted it is still valid to read, but it will throw IllegalStateException when written to. Other classes like UserController and UserTest are responsible for initializing values upon creating a User.</p></div>
 
                     <dl>
 
@@ -173,7 +173,7 @@ public class <span class="typeNameLabel"><a href=User.html>User</a></span>
                                         </tr>
                                         
                                         <tr class="altColor">
-                                            <td class="colFirst"><code>public  <a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a></code></td>
+                                            <td class="colFirst"><code>public final <a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a></code></td>
                                             <th class="colSecond" scope="row"><code><a href=Organizer.html#userID>userID</a></code></th>
                                             <td class="colLast"></td>
                                         </tr>
@@ -203,14 +203,8 @@ public class <span class="typeNameLabel"><a href=User.html>User</a></span>
                                         </tr>
                                         
                                         <tr class="rowColor">
-                                            <td class="colFirst"><code>public  <a href=https://developer.android.com/reference/kotlin/java/util/List.html>List</a>&lt;<a href=Role.html>Role</a>&gt;</code></td>
-                                            <th class="colSecond" scope="row"><code><a href=Organizer.html#roles>roles</a></code></th>
-                                            <td class="colLast"></td>
-                                        </tr>
-                                        
-                                        <tr class="altColor">
                                             <td class="colFirst"><code>public  <a href=Role.html>Role</a></code></td>
-                                            <th class="colSecond" scope="row"><code><a href=Organizer.html#activeRole>activeRole</a></code></th>
+                                            <th class="colSecond" scope="row"><code><a href=Organizer.html#role>role</a></code></th>
                                             <td class="colLast"></td>
                                         </tr>
                                         
@@ -241,13 +235,13 @@ public class <span class="typeNameLabel"><a href=User.html>User</a></span>
                                             <tr class="altColor">
                                                 <th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a
                                                         href="#User()">User</a></span>()</code></th>
-                                                <td class="colLast">Default Constructor used for creating users normally.</td>
+                                                <td class="colLast">No-argument constructor to allow deserialization from Firebase, not useful otherwise</td>
                                             </tr>
                                         
                                             <tr class="rowColor">
                                                 <th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a
-                                                        href="#User(java.lang.String,java.lang.String,java.lang.String,java.lang.String,java.lang.String,boolean,boolean,java.util.List,com.example.syzygy_eventapp.Role)">User</a></span>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> userID, <a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> name, <a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> email, <a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> phone, <a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> photoURL, boolean photoHidden, boolean demoted, <a href=https://developer.android.com/reference/kotlin/java/util/List.html>List</a>&lt;<a href=Role.html>Role</a>&gt; roles, <a href=Role.html>Role</a> activeRole)</code></th>
-                                                <td class="colLast">Constructor with all values, used mostly for testing.</td>
+                                                        href="#User(java.lang.String)">User</a></span>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> userID)</code></th>
+                                                <td class="colLast">Default Constructor used for creating users normally.</td>
                                             </tr>
                                         
 
@@ -308,14 +302,6 @@ public class <span class="typeNameLabel"><a href=User.html>User</a></span>
                                         </tr>
                                         
                                         <tr id="i1" class="rowColor">
-                                            <td class="colFirst"><code>void</code>
-                                            </td>
-                                            <th class="colSecond" scope="row"><code><a href=Organizer.html#setUserID(java.lang.String)>setUserID</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> userID) </code>
-                                            </th>
-                                            <td class="colLast"></td>
-                                        </tr>
-                                        
-                                        <tr id="i2" class="altColor">
                                             <td class="colFirst"><code><a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a></code>
                                             </td>
                                             <th class="colSecond" scope="row"><code><a href=Organizer.html#getName()>getName</a>() </code>
@@ -323,15 +309,15 @@ public class <span class="typeNameLabel"><a href=User.html>User</a></span>
                                             <td class="colLast"></td>
                                         </tr>
                                         
-                                        <tr id="i3" class="rowColor">
-                                            <td class="colFirst"><code>void</code>
+                                        <tr id="i2" class="altColor">
+                                            <td class="colFirst"><code>Task&lt;Void&gt;</code>
                                             </td>
                                             <th class="colSecond" scope="row"><code><a href=Organizer.html#setName(java.lang.String)>setName</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> name) </code>
                                             </th>
-                                            <td class="colLast"></td>
+                                            <td class="colLast">Sets the user's name in the model and the database</td>
                                         </tr>
                                         
-                                        <tr id="i4" class="altColor">
+                                        <tr id="i3" class="rowColor">
                                             <td class="colFirst"><code><a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a></code>
                                             </td>
                                             <th class="colSecond" scope="row"><code><a href=Organizer.html#getEmail()>getEmail</a>() </code>
@@ -339,15 +325,15 @@ public class <span class="typeNameLabel"><a href=User.html>User</a></span>
                                             <td class="colLast"></td>
                                         </tr>
                                         
-                                        <tr id="i5" class="rowColor">
-                                            <td class="colFirst"><code>void</code>
+                                        <tr id="i4" class="altColor">
+                                            <td class="colFirst"><code>Task&lt;Void&gt;</code>
                                             </td>
                                             <th class="colSecond" scope="row"><code><a href=Organizer.html#setEmail(java.lang.String)>setEmail</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> email) </code>
                                             </th>
-                                            <td class="colLast"></td>
+                                            <td class="colLast">Sets the user's email in the model and the database</td>
                                         </tr>
                                         
-                                        <tr id="i6" class="altColor">
+                                        <tr id="i5" class="rowColor">
                                             <td class="colFirst"><code><a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a></code>
                                             </td>
                                             <th class="colSecond" scope="row"><code><a href=Organizer.html#getPhone()>getPhone</a>() </code>
@@ -355,15 +341,15 @@ public class <span class="typeNameLabel"><a href=User.html>User</a></span>
                                             <td class="colLast"></td>
                                         </tr>
                                         
-                                        <tr id="i7" class="rowColor">
-                                            <td class="colFirst"><code>void</code>
+                                        <tr id="i6" class="altColor">
+                                            <td class="colFirst"><code>Task&lt;Void&gt;</code>
                                             </td>
                                             <th class="colSecond" scope="row"><code><a href=Organizer.html#setPhone(java.lang.String)>setPhone</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> phone) </code>
                                             </th>
-                                            <td class="colLast"></td>
+                                            <td class="colLast">Sets the user's phone number in the model and the database</td>
                                         </tr>
                                         
-                                        <tr id="i8" class="altColor">
+                                        <tr id="i7" class="rowColor">
                                             <td class="colFirst"><code><a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a></code>
                                             </td>
                                             <th class="colSecond" scope="row"><code><a href=Organizer.html#getPhotoURL()>getPhotoURL</a>() </code>
@@ -371,47 +357,39 @@ public class <span class="typeNameLabel"><a href=User.html>User</a></span>
                                             <td class="colLast"></td>
                                         </tr>
                                         
-                                        <tr id="i9" class="rowColor">
-                                            <td class="colFirst"><code>void</code>
+                                        <tr id="i8" class="altColor">
+                                            <td class="colFirst"><code>Task&lt;Void&gt;</code>
                                             </td>
                                             <th class="colSecond" scope="row"><code><a href=Organizer.html#setPhotoURL(java.lang.String)>setPhotoURL</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> photoURL) </code>
+                                            </th>
+                                            <td class="colLast">Sets the user's profile picture in the model and the database</td>
+                                        </tr>
+                                        
+                                        <tr id="i9" class="rowColor">
+                                            <td class="colFirst"><code><a href=Role.html>Role</a></code>
+                                            </td>
+                                            <th class="colSecond" scope="row"><code><a href=Organizer.html#getRole()>getRole</a>() </code>
                                             </th>
                                             <td class="colLast"></td>
                                         </tr>
                                         
                                         <tr id="i10" class="altColor">
-                                            <td class="colFirst"><code><a href=https://developer.android.com/reference/kotlin/java/util/List.html>List</a>&lt;<a href=Role.html>Role</a>&gt;</code>
+                                            <td class="colFirst"><code>Task&lt;Void&gt;</code>
                                             </td>
-                                            <th class="colSecond" scope="row"><code><a href=Organizer.html#getRoles()>getRoles</a>() </code>
+                                            <th class="colSecond" scope="row"><code><a href=Organizer.html#setRole(com.example.syzygy_eventapp.Role)>setRole</a>(<a href=Role.html>Role</a> role) </code>
                                             </th>
-                                            <td class="colLast"></td>
+                                            <td class="colLast">Changes the user's role, and detects if they have been demoted</td>
                                         </tr>
                                         
                                         <tr id="i11" class="rowColor">
-                                            <td class="colFirst"><code>void</code>
+                                            <td class="colFirst"><code>Task&lt;Void&gt;</code>
                                             </td>
-                                            <th class="colSecond" scope="row"><code><a href=Organizer.html#setRoles(java.util.List)>setRoles</a>(<a href=https://developer.android.com/reference/kotlin/java/util/List.html>List</a>&lt;<a href=Role.html>Role</a>&gt; roles) </code>
+                                            <th class="colSecond" scope="row"><code><a href=Organizer.html#refresh()>refresh</a>() </code>
                                             </th>
-                                            <td class="colLast"></td>
+                                            <td class="colLast">Refreshes the user data from the database</td>
                                         </tr>
                                         
                                         <tr id="i12" class="altColor">
-                                            <td class="colFirst"><code><a href=Role.html>Role</a></code>
-                                            </td>
-                                            <th class="colSecond" scope="row"><code><a href=Organizer.html#getActiveRole()>getActiveRole</a>() </code>
-                                            </th>
-                                            <td class="colLast"></td>
-                                        </tr>
-                                        
-                                        <tr id="i13" class="rowColor">
-                                            <td class="colFirst"><code>void</code>
-                                            </td>
-                                            <th class="colSecond" scope="row"><code><a href=Organizer.html#setActiveRole(com.example.syzygy_eventapp.Role)>setActiveRole</a>(<a href=Role.html>Role</a> activeRole) </code>
-                                            </th>
-                                            <td class="colLast"></td>
-                                        </tr>
-                                        
-                                        <tr id="i14" class="altColor">
                                             <td class="colFirst"><code>boolean</code>
                                             </td>
                                             <th class="colSecond" scope="row"><code><a href=Organizer.html#isPhotoHidden()>isPhotoHidden</a>() </code>
@@ -419,7 +397,7 @@ public class <span class="typeNameLabel"><a href=User.html>User</a></span>
                                             <td class="colLast"></td>
                                         </tr>
                                         
-                                        <tr id="i15" class="rowColor">
+                                        <tr id="i13" class="rowColor">
                                             <td class="colFirst"><code>boolean</code>
                                             </td>
                                             <th class="colSecond" scope="row"><code><a href=Organizer.html#isDemoted()>isDemoted</a>() </code>
@@ -427,28 +405,36 @@ public class <span class="typeNameLabel"><a href=User.html>User</a></span>
                                             <td class="colLast"></td>
                                         </tr>
                                         
-                                        <tr id="i16" class="altColor">
+                                        <tr id="i14" class="altColor">
                                             <td class="colFirst"><code>boolean</code>
                                             </td>
-                                            <th class="colSecond" scope="row"><code><a href=Organizer.html#hasValidActiveRole()>hasValidActiveRole</a>() </code>
+                                            <th class="colSecond" scope="row"><code><a href=Organizer.html#hasAbilitiesOfRole(com.example.syzygy_eventapp.Role)>hasAbilitiesOfRole</a>(<a href=Role.html>Role</a> role) </code>
                                             </th>
-                                            <td class="colLast">Ensures the users active role is actually one of their assigned roles.</td>
+                                            <td class="colLast">Tests if the user has the abilities of another role</td>
+                                        </tr>
+                                        
+                                        <tr id="i15" class="rowColor">
+                                            <td class="colFirst"><code>Task&lt;Void&gt;</code>
+                                            </td>
+                                            <th class="colSecond" scope="row"><code><a href=Organizer.html#promote()>promote</a>() </code>
+                                            </th>
+                                            <td class="colLast">Promotes the user in the model and the database</td>
+                                        </tr>
+                                        
+                                        <tr id="i16" class="altColor">
+                                            <td class="colFirst"><code>Task&lt;Void&gt;</code>
+                                            </td>
+                                            <th class="colSecond" scope="row"><code><a href=Organizer.html#demote()>demote</a>() </code>
+                                            </th>
+                                            <td class="colLast">Demotes the user in the model and the database</td>
                                         </tr>
                                         
                                         <tr id="i17" class="rowColor">
-                                            <td class="colFirst"><code>void</code>
+                                            <td class="colFirst"><code>Task&lt;Void&gt;</code>
                                             </td>
                                             <th class="colSecond" scope="row"><code><a href=Organizer.html#setPhotoHidden(boolean)>setPhotoHidden</a>(boolean photoHidden) </code>
                                             </th>
-                                            <td class="colLast"></td>
-                                        </tr>
-                                        
-                                        <tr id="i18" class="altColor">
-                                            <td class="colFirst"><code>void</code>
-                                            </td>
-                                            <th class="colSecond" scope="row"><code><a href=Organizer.html#setDemoted(boolean)>setDemoted</a>(boolean demoted) </code>
-                                            </th>
-                                            <td class="colLast"></td>
+                                            <td class="colLast">Sets if the user's profile picture is hidden in the model and the database</td>
                                         </tr>
                                         
                                         </tbody>
@@ -487,17 +473,17 @@ public class <span class="typeNameLabel"><a href=User.html>User</a></span>
                                     <li class="blockList">
                                         <h4>User</h4>
                                         <pre>User()</pre>
-                                        <div class="block">Default Constructor used for creating users normally.</div>
+                                        <div class="block">No-argument constructor to allow deserialization from Firebase, not useful otherwise</div>
                                         
                                     </li>
                                 </ul>
                                 
-                                <a name="User(java.lang.String,java.lang.String,java.lang.String,java.lang.String,java.lang.String,boolean,boolean,java.util.List,com.example.syzygy_eventapp.Role)"></a>
+                                <a name="User(java.lang.String)"></a>
                                 <ul class="blockList">
                                     <li class="blockList">
                                         <h4>User</h4>
-                                        <pre>User(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> userID, <a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> name, <a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> email, <a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> phone, <a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> photoURL, boolean photoHidden, boolean demoted, <a href=https://developer.android.com/reference/kotlin/java/util/List.html>List</a>&lt;<a href=Role.html>Role</a>&gt; roles, <a href=Role.html>Role</a> activeRole)</pre>
-                                        <div class="block">Constructor with all values, used mostly for testing.</div>
+                                        <pre>User(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> userID)</pre>
+                                        <div class="block">Default Constructor used for creating users normally.</div>
                                         
                                     </li>
                                 </ul>
@@ -524,29 +510,6 @@ public class <span class="typeNameLabel"><a href=User.html>User</a></span>
                                     <li class="blockList">
                                         <h4>getUserID</h4>
                                         <pre class="methodSignature"> <a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> <a href=Organizer.html#getUserID()>getUserID</a>()</pre>
-                                        <div class="block"></div>
-
-                                        <dl>
-
-                                        
-
-                                        
-
-                                        
-
-                                        </dl>
-                                    </li>
-                                </ul>
-                                
-                                <a id="setUserID(java.lang.String)">
-                                    <!--   -->
-                                </a>
-                                <ul class=
-                                              "blockList"
-                                          >
-                                    <li class="blockList">
-                                        <h4>setUserID</h4>
-                                        <pre class="methodSignature"> void <a href=Organizer.html#setUserID(java.lang.String)>setUserID</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> userID)</pre>
                                         <div class="block"></div>
 
                                         <dl>
@@ -592,13 +555,16 @@ public class <span class="typeNameLabel"><a href=User.html>User</a></span>
                                           >
                                     <li class="blockList">
                                         <h4>setName</h4>
-                                        <pre class="methodSignature"> void <a href=Organizer.html#setName(java.lang.String)>setName</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> name)</pre>
-                                        <div class="block"></div>
+                                        <pre class="methodSignature"> Task&lt;Void&gt; <a href=Organizer.html#setName(java.lang.String)>setName</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> name)</pre>
+                                        <div class="block"><p>Sets the user's name in the model and the database</p></div>
 
                                         <dl>
 
                                         
 
+                                        
+                                            <dt><span class="returnLabel">Returns:</span></dt>
+                                            <dd><p>a task that will complete when the DB has been updated</p></dd>
                                         
 
                                         
@@ -638,13 +604,16 @@ public class <span class="typeNameLabel"><a href=User.html>User</a></span>
                                           >
                                     <li class="blockList">
                                         <h4>setEmail</h4>
-                                        <pre class="methodSignature"> void <a href=Organizer.html#setEmail(java.lang.String)>setEmail</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> email)</pre>
-                                        <div class="block"></div>
+                                        <pre class="methodSignature"> Task&lt;Void&gt; <a href=Organizer.html#setEmail(java.lang.String)>setEmail</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> email)</pre>
+                                        <div class="block"><p>Sets the user's email in the model and the database</p></div>
 
                                         <dl>
 
                                         
 
+                                        
+                                            <dt><span class="returnLabel">Returns:</span></dt>
+                                            <dd><p>a task that will complete when the DB has been updated</p></dd>
                                         
 
                                         
@@ -684,13 +653,16 @@ public class <span class="typeNameLabel"><a href=User.html>User</a></span>
                                           >
                                     <li class="blockList">
                                         <h4>setPhone</h4>
-                                        <pre class="methodSignature"> void <a href=Organizer.html#setPhone(java.lang.String)>setPhone</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> phone)</pre>
-                                        <div class="block"></div>
+                                        <pre class="methodSignature"> Task&lt;Void&gt; <a href=Organizer.html#setPhone(java.lang.String)>setPhone</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> phone)</pre>
+                                        <div class="block"><p>Sets the user's phone number in the model and the database</p></div>
 
                                         <dl>
 
                                         
 
+                                        
+                                            <dt><span class="returnLabel">Returns:</span></dt>
+                                            <dd><p>a task that will complete when the DB has been updated</p></dd>
                                         
 
                                         
@@ -730,7 +702,33 @@ public class <span class="typeNameLabel"><a href=User.html>User</a></span>
                                           >
                                     <li class="blockList">
                                         <h4>setPhotoURL</h4>
-                                        <pre class="methodSignature"> void <a href=Organizer.html#setPhotoURL(java.lang.String)>setPhotoURL</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> photoURL)</pre>
+                                        <pre class="methodSignature"> Task&lt;Void&gt; <a href=Organizer.html#setPhotoURL(java.lang.String)>setPhotoURL</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> photoURL)</pre>
+                                        <div class="block"><p>Sets the user's profile picture in the model and the database</p></div>
+
+                                        <dl>
+
+                                        
+
+                                        
+                                            <dt><span class="returnLabel">Returns:</span></dt>
+                                            <dd><p>a task that will complete when the DB has been updated</p></dd>
+                                        
+
+                                        
+
+                                        </dl>
+                                    </li>
+                                </ul>
+                                
+                                <a id="getRole()">
+                                    <!--   -->
+                                </a>
+                                <ul class=
+                                              "blockList"
+                                          >
+                                    <li class="blockList">
+                                        <h4>getRole</h4>
+                                        <pre class="methodSignature"> <a href=Role.html>Role</a> <a href=Organizer.html#getRole()>getRole</a>()</pre>
                                         <div class="block"></div>
 
                                         <dl>
@@ -745,21 +743,31 @@ public class <span class="typeNameLabel"><a href=User.html>User</a></span>
                                     </li>
                                 </ul>
                                 
-                                <a id="getRoles()">
+                                <a id="setRole(com.example.syzygy_eventapp.Role)">
                                     <!--   -->
                                 </a>
                                 <ul class=
                                               "blockList"
                                           >
                                     <li class="blockList">
-                                        <h4>getRoles</h4>
-                                        <pre class="methodSignature"> <a href=https://developer.android.com/reference/kotlin/java/util/List.html>List</a>&lt;<a href=Role.html>Role</a>&gt; <a href=Organizer.html#getRoles()>getRoles</a>()</pre>
-                                        <div class="block"></div>
+                                        <h4>setRole</h4>
+                                        <pre class="methodSignature"> Task&lt;Void&gt; <a href=Organizer.html#setRole(com.example.syzygy_eventapp.Role)>setRole</a>(<a href=Role.html>Role</a> role)</pre>
+                                        <div class="block"><p>Changes the user's role, and detects if they have been demoted</p></div>
 
                                         <dl>
 
                                         
+                                            <dt><span class="paramLabel">Parameters:</span></dt>
+                                            
+                                            
+                                            <dd><code>role</code> - the role to change the user to</dd>
+                                            
+                                            
+                                        
 
+                                        
+                                            <dt><span class="returnLabel">Returns:</span></dt>
+                                            <dd><p>a task that will complete when the DB has been updated</p></dd>
                                         
 
                                         
@@ -768,67 +776,24 @@ public class <span class="typeNameLabel"><a href=User.html>User</a></span>
                                     </li>
                                 </ul>
                                 
-                                <a id="setRoles(java.util.List)">
+                                <a id="refresh()">
                                     <!--   -->
                                 </a>
                                 <ul class=
                                               "blockList"
                                           >
                                     <li class="blockList">
-                                        <h4>setRoles</h4>
-                                        <pre class="methodSignature"> void <a href=Organizer.html#setRoles(java.util.List)>setRoles</a>(<a href=https://developer.android.com/reference/kotlin/java/util/List.html>List</a>&lt;<a href=Role.html>Role</a>&gt; roles)</pre>
-                                        <div class="block"></div>
+                                        <h4>refresh</h4>
+                                        <pre class="methodSignature"> Task&lt;Void&gt; <a href=Organizer.html#refresh()>refresh</a>()</pre>
+                                        <div class="block"><p>Refreshes the user data from the database</p></div>
 
                                         <dl>
 
                                         
 
                                         
-
-                                        
-
-                                        </dl>
-                                    </li>
-                                </ul>
-                                
-                                <a id="getActiveRole()">
-                                    <!--   -->
-                                </a>
-                                <ul class=
-                                              "blockList"
-                                          >
-                                    <li class="blockList">
-                                        <h4>getActiveRole</h4>
-                                        <pre class="methodSignature"> <a href=Role.html>Role</a> <a href=Organizer.html#getActiveRole()>getActiveRole</a>()</pre>
-                                        <div class="block"></div>
-
-                                        <dl>
-
-                                        
-
-                                        
-
-                                        
-
-                                        </dl>
-                                    </li>
-                                </ul>
-                                
-                                <a id="setActiveRole(com.example.syzygy_eventapp.Role)">
-                                    <!--   -->
-                                </a>
-                                <ul class=
-                                              "blockList"
-                                          >
-                                    <li class="blockList">
-                                        <h4>setActiveRole</h4>
-                                        <pre class="methodSignature"> void <a href=Organizer.html#setActiveRole(com.example.syzygy_eventapp.Role)>setActiveRole</a>(<a href=Role.html>Role</a> activeRole)</pre>
-                                        <div class="block"></div>
-
-                                        <dl>
-
-                                        
-
+                                            <dt><span class="returnLabel">Returns:</span></dt>
+                                            <dd><p>a task that will complete after the refresh is done</p></dd>
                                         
 
                                         
@@ -883,16 +848,49 @@ public class <span class="typeNameLabel"><a href=User.html>User</a></span>
                                     </li>
                                 </ul>
                                 
-                                <a id="hasValidActiveRole()">
+                                <a id="hasAbilitiesOfRole(com.example.syzygy_eventapp.Role)">
                                     <!--   -->
                                 </a>
                                 <ul class=
                                               "blockList"
                                           >
                                     <li class="blockList">
-                                        <h4>hasValidActiveRole</h4>
-                                        <pre class="methodSignature"> boolean <a href=Organizer.html#hasValidActiveRole()>hasValidActiveRole</a>()</pre>
-                                        <div class="block"><p>Ensures the users active role is actually one of their assigned roles.</p></div>
+                                        <h4>hasAbilitiesOfRole</h4>
+                                        <pre class="methodSignature"> boolean <a href=Organizer.html#hasAbilitiesOfRole(com.example.syzygy_eventapp.Role)>hasAbilitiesOfRole</a>(<a href=Role.html>Role</a> role)</pre>
+                                        <div class="block"><p>Tests if the user has the abilities of another role</p></div>
+
+                                        <dl>
+
+                                        
+                                            <dt><span class="paramLabel">Parameters:</span></dt>
+                                            
+                                            
+                                            <dd><code>role</code> - the role to test</dd>
+                                            
+                                            
+                                        
+
+                                        
+                                            <dt><span class="returnLabel">Returns:</span></dt>
+                                            <dd><p>if the user has the abilities of the role</p></dd>
+                                        
+
+                                        
+
+                                        </dl>
+                                    </li>
+                                </ul>
+                                
+                                <a id="promote()">
+                                    <!--   -->
+                                </a>
+                                <ul class=
+                                              "blockList"
+                                          >
+                                    <li class="blockList">
+                                        <h4>promote</h4>
+                                        <pre class="methodSignature"> Task&lt;Void&gt; <a href=Organizer.html#promote()>promote</a>()</pre>
+                                        <div class="block"><p>Promotes the user in the model and the database</p></div>
 
                                         <dl>
 
@@ -900,7 +898,33 @@ public class <span class="typeNameLabel"><a href=User.html>User</a></span>
 
                                         
                                             <dt><span class="returnLabel">Returns:</span></dt>
-                                            <dd><p>true if activeRole and roles are not null and roles has the active role in the list.</p></dd>
+                                            <dd><p>a task that will complete when the DB has been updated</p></dd>
+                                        
+
+                                        
+
+                                        </dl>
+                                    </li>
+                                </ul>
+                                
+                                <a id="demote()">
+                                    <!--   -->
+                                </a>
+                                <ul class=
+                                              "blockList"
+                                          >
+                                    <li class="blockList">
+                                        <h4>demote</h4>
+                                        <pre class="methodSignature"> Task&lt;Void&gt; <a href=Organizer.html#demote()>demote</a>()</pre>
+                                        <div class="block"><p>Demotes the user in the model and the database</p></div>
+
+                                        <dl>
+
+                                        
+
+                                        
+                                            <dt><span class="returnLabel">Returns:</span></dt>
+                                            <dd><p>a task that will complete when the DB has been updated</p></dd>
                                         
 
                                         
@@ -913,40 +937,20 @@ public class <span class="typeNameLabel"><a href=User.html>User</a></span>
                                     <!--   -->
                                 </a>
                                 <ul class=
-                                              "blockList"
-                                          >
-                                    <li class="blockList">
-                                        <h4>setPhotoHidden</h4>
-                                        <pre class="methodSignature"> void <a href=Organizer.html#setPhotoHidden(boolean)>setPhotoHidden</a>(boolean photoHidden)</pre>
-                                        <div class="block"></div>
-
-                                        <dl>
-
-                                        
-
-                                        
-
-                                        
-
-                                        </dl>
-                                    </li>
-                                </ul>
-                                
-                                <a id="setDemoted(boolean)">
-                                    <!--   -->
-                                </a>
-                                <ul class=
                                               "blockListLast"
                                           >
                                     <li class="blockList">
-                                        <h4>setDemoted</h4>
-                                        <pre class="methodSignature"> void <a href=Organizer.html#setDemoted(boolean)>setDemoted</a>(boolean demoted)</pre>
-                                        <div class="block"></div>
+                                        <h4>setPhotoHidden</h4>
+                                        <pre class="methodSignature"> Task&lt;Void&gt; <a href=Organizer.html#setPhotoHidden(boolean)>setPhotoHidden</a>(boolean photoHidden)</pre>
+                                        <div class="block"><p>Sets if the user's profile picture is hidden in the model and the database</p></div>
 
                                         <dl>
 
                                         
 
+                                        
+                                            <dt><span class="returnLabel">Returns:</span></dt>
+                                            <dd><p>a task that will complete when the DB has been updated</p></dd>
                                         
 
                                         
