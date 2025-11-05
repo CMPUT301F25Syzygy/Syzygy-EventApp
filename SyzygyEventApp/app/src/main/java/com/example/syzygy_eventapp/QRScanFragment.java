@@ -34,6 +34,7 @@ import java.util.concurrent.Executors;
 public class QRScanFragment extends Fragment {
     private NavigationStackFragment navStack;
     private ExecutorService cameraExecutor;
+    private PreviewView previewView;
 
     // permissions launcher
     private ActivityResultLauncher<String> requestPermissionLauncher;
@@ -46,6 +47,7 @@ public class QRScanFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_qr_scan, container, false);
 
+        previewView = view.findViewById(R.id.previewView);
         cameraExecutor = Executors.newSingleThreadExecutor();
 
         // Setup permission launcher
@@ -84,7 +86,7 @@ public class QRScanFragment extends Fragment {
     }
 
     private void startCamera() {
-        // gives ProcessCameraProvider when it's ready
+        // Get a camera provider asynchronously
         ListenableFuture<ProcessCameraProvider> cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext());
 
         // After camera system is ready, retrieve the camera process and run bindCameraUseCases
@@ -99,23 +101,8 @@ public class QRScanFragment extends Fragment {
     }
 
     private void bindCameraUseCases(@NonNull ProcessCameraProvider cameraProvider) {
-        PreviewView previewView = requireView().findViewById(R.id.previewView);
-
         // unbind anything before rebinding to prevent crahses
         cameraProvider.unbindAll();
-
-        // 1. Build the preview use case
-        androidx.camera.core.Preview preview = new androidx.camera.core.Preview.Builder().build();
-        preview.setSurfaceProvider(previewView.getSurfaceProvider());
-
-        // 2. Build the image analysis use case for barcode scanning (QR codes are considered as a type of barcode)
-        androidx.camera.core.ImageAnalysis imageAnalysis =
-                new androidx.camera.core.ImageAnalysis.Builder()
-                        .setBackpressureStrategy(androidx.camera.core.ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
-                        .build();
-
-        // 3. Set up ML Kit Barcode Scanner
-        com.google.mlkit.vision.barcode.BarcodeScanner scanner =
-                com.google.mlkit.vision.barcode.BarcodeScanning.getClient();
+        
     }
 }
