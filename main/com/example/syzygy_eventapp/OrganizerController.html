@@ -254,20 +254,12 @@ public class <span class="typeNameLabel"><a href=OrganizerController.html>Organi
                                         <tr id="i0" class="altColor">
                                             <td class="colFirst"><code>Task&lt;Void&gt;</code>
                                             </td>
-                                            <th class="colSecond" scope="row"><code><a href=OrganizerController.html#createIfMissing(java.lang.String,java.lang.String,java.lang.String)>createIfMissing</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> organizerID, <a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> name, <a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> email) </code>
-                                            </th>
-                                            <td class="colLast">Create a new organizer profile in Firestore if missing.</td>
-                                        </tr>
-                                        
-                                        <tr id="i1" class="rowColor">
-                                            <td class="colFirst"><code>Task&lt;Void&gt;</code>
-                                            </td>
                                             <th class="colSecond" scope="row"><code><a href=OrganizerController.html#createEvent(java.lang.String,com.example.syzygy_eventapp.Event)>createEvent</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> organizerID, <a href=Event.html>Event</a> event) </code>
                                             </th>
                                             <td class="colLast">Create a new event under this organizer and store it in Firestore.</td>
                                         </tr>
                                         
-                                        <tr id="i2" class="altColor">
+                                        <tr id="i1" class="rowColor">
                                             <td class="colFirst"><code>ListenerRegistration</code>
                                             </td>
                                             <th class="colSecond" scope="row"><code><a href=OrganizerController.html#observeOrganizer(java.lang.String,java.util.function.Consumer,java.util.function.Consumer)>observeOrganizer</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> organizerID, <a href=https://developer.android.com/reference/kotlin/java/util/function/Consumer.html>Consumer</a>&lt;<a href=Organizer.html>Organizer</a>&gt; onOrganizer, <a href=https://developer.android.com/reference/kotlin/java/util/function/Consumer.html>Consumer</a>&lt;<a href=https://developer.android.com/reference/kotlin/java/lang/Exception.html>Exception</a>&gt; onError) </code>
@@ -275,7 +267,7 @@ public class <span class="typeNameLabel"><a href=OrganizerController.html>Organi
                                             <td class="colLast">Observes changes to a specific organizer document.</td>
                                         </tr>
                                         
-                                        <tr id="i3" class="rowColor">
+                                        <tr id="i2" class="altColor">
                                             <td class="colFirst"><code>Task&lt;List&lt;Event&gt;&gt;</code>
                                             </td>
                                             <th class="colSecond" scope="row"><code><a href=OrganizerController.html#getOwnedEvents(java.lang.String)>getOwnedEvents</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> organizerID) </code>
@@ -336,47 +328,6 @@ public class <span class="typeNameLabel"><a href=OrganizerController.html>Organi
                                 <!--   -->
                             </a>
                                 <h3>Method Detail</h3>
-                                
-                                <a id="createIfMissing(java.lang.String,java.lang.String,java.lang.String)">
-                                    <!--   -->
-                                </a>
-                                <ul class=
-                                              "blockList"
-                                          >
-                                    <li class="blockList">
-                                        <h4>createIfMissing</h4>
-                                        <pre class="methodSignature"> Task&lt;Void&gt; <a href=OrganizerController.html#createIfMissing(java.lang.String,java.lang.String,java.lang.String)>createIfMissing</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> organizerID, <a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> name, <a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> email)</pre>
-                                        <div class="block"><p>Create a new organizer profile in Firestore if missing.</p></div>
-
-                                        <dl>
-
-                                        
-                                            <dt><span class="paramLabel">Parameters:</span></dt>
-                                            
-                                            
-                                            <dd><code>organizerID</code> - Unique organizer ID (same as UserID)</dd>
-                                            
-                                            
-                                            
-                                            <dd><code>name</code> - Organizer display name</dd>
-                                            
-                                            
-                                            
-                                            <dd><code>email</code> - Organizer email</dd>
-                                            
-                                            
-                                        
-
-                                        
-                                            <dt><span class="returnLabel">Returns:</span></dt>
-                                            <dd><p>Task that completes when the document is created (or already exists)</p></dd>
-                                        
-
-                                        
-
-                                        </dl>
-                                    </li>
-                                </ul>
                                 
                                 <a id="createEvent(java.lang.String,com.example.syzygy_eventapp.Event)">
                                     <!--   -->
