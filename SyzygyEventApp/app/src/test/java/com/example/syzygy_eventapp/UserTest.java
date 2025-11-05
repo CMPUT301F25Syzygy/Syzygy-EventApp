@@ -9,6 +9,7 @@ import com.google.firebase.firestore.ListenerRegistration;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.function.Consumer;
 
@@ -19,41 +20,6 @@ import java.util.function.Consumer;
  * </p>
  */
 public class UserTest {
-    public User mockUser() {
-        User user = new User("Test123");
-
-        user.setName("Tester Testington");
-        user.setEmail("test@testmail.com");
-        user.setPhone("(123) 456-7890");
-        user.setPhotoURL("https://testphoto.com/test.jpg");
-        user.setPhotoHidden(false);
-        user.setRole(Role.ENTRANT);
-
-        return user;
-    }
-
-    private class UserControllerMock implements UserControllerInterface {
-        public Task<User> createUser() {
-            return Tasks.forResult(mockUser());
-        }
-
-        public Task<User> getUser(String userID) {
-            return Tasks.forResult(mockUser());
-        }
-
-        public ListenerRegistration observeUser(String userID, Consumer<User> onUpdate, Runnable onDelete) {
-            return () -> {};
-        }
-
-        public Task<Void> updateFields(String userID, HashMap<String, Object> fields) {
-            return Tasks.forResult(null);
-        }
-
-        public Task<Void> deleteUser(String userID) {
-            return Tasks.forResult(null);
-        }
-    }
-
     @Before
     public void setup() {
         UserController.overrideInstance(new UserControllerMock());
@@ -64,8 +30,9 @@ public class UserTest {
      */
     @Test
     public void testConstructor() {
-        User user = new User("Test123");
+        User user = new User();
 
+        assertNull(user.getUserID());
         assertNotNull(user.getName());
         assertTrue(user.getName().length() >= 8);
         assertNull(user.getEmail());
@@ -77,12 +44,43 @@ public class UserTest {
     }
 
     /**
+     * Tests that organizer is properly made from Admin.promote()
+     */
+    @Test
+    public void testFromOrganizerDemote() {
+        // make a base user to inherit from and compare against
+        Organizer organizer = new Organizer(
+                "U001",
+                "Test Organizer",
+                "organizer@example.com",
+                "123-456-7890",
+                "https://testphoto.com/test.jpg",
+                false,
+                false,
+                new ArrayList<String>(){{
+                    add("event1");
+                }},
+                Role.ORGANIZER
+        );
+
+        User user = organizer.demote();
+
+        assertEquals(organizer.getUserID(), user.getUserID());
+        assertEquals(organizer.getName(), user.getName());
+        assertEquals(organizer.getEmail(), user.getEmail());
+        assertEquals(Role.ENTRANT, user.getRole());
+
+        assertEquals(User.class, user.getClass());
+    }
+
+    /**
      * Tests that setter methods correctly assign values and that getters return those values.
      */
     @Test
     public void testSettersAndGetters() {
-        User user = new User("Alice543");
+        User user = new User();
 
+        user.setUserID("Alice543");
         user.setName("Alice");
         user.setEmail("lost@wonderland.queen");
         user.setPhone("(980) 765-4321");
@@ -90,6 +88,7 @@ public class UserTest {
         user.setPhotoHidden(true);
         user.setRole(Role.ORGANIZER);
 
+        assertEquals("Alice543", user.getUserID());
         assertEquals("Alice", user.getName());
         assertEquals("lost@wonderland.queen", user.getEmail());
         assertEquals("(980) 765-4321", user.getPhone());
@@ -100,45 +99,24 @@ public class UserTest {
     }
 
     /**
-     * Tests that roles can be added and removed properly.
-     */
-    @Test
-    public void testSetRole() {
-        User user = new User("Tester745");
-        user.setRole(Role.ENTRANT);
-        assertEquals(Role.ENTRANT, user.getRole());
-        assertFalse(user.isDemoted());
-
-        // promote role
-        user.setRole(Role.ORGANIZER);
-        assertEquals(Role.ORGANIZER, user.getRole());
-        assertFalse(user.isDemoted());
-
-        // demote
-        user.setRole(Role.ENTRANT);
-        assertEquals(Role.ENTRANT, user.getRole());
-        assertTrue(user.isDemoted());
-    }
-
-    /**
      * Tests that users have the abilities of all their inferior roles.
      * ie, organizers can do everything entrants can do
      */
     @Test
     public void testHasAbilitiesOfRole() {
-        User user = new User("Testington999");
+        User user = new User();
         user.setRole(Role.ENTRANT);
         assertTrue(user.hasAbilitiesOfRole(Role.ENTRANT));
         assertFalse(user.hasAbilitiesOfRole(Role.ORGANIZER));
 
         // promote role
-        user.promote();
+        user = user.promote();
         assertTrue(user.hasAbilitiesOfRole(Role.ENTRANT));
         assertTrue(user.hasAbilitiesOfRole(Role.ORGANIZER));
         assertFalse(user.hasAbilitiesOfRole(Role.ADMIN));
 
         // demote
-        user.demote();
+        user = user.demote();
         assertTrue(user.hasAbilitiesOfRole(Role.ENTRANT));
         assertFalse(user.hasAbilitiesOfRole(Role.ORGANIZER));
     }
@@ -148,18 +126,17 @@ public class UserTest {
      */
     @Test
     public void testPromoteDemoteRole() {
-        User user = new User("john444");
-        user.setRole(Role.ENTRANT);
+        User user = new User();
         assertEquals(Role.ENTRANT, user.getRole());
         assertFalse(user.isDemoted());
 
         // promote role
-        user.promote();
+        user = user.promote();
         assertEquals(Role.ORGANIZER, user.getRole());
         assertFalse(user.isDemoted());
 
         // demote
-        user.demote();
+        user = user.demote();
         assertEquals(Role.ENTRANT, user.getRole());
         assertTrue(user.isDemoted());
     }
@@ -169,7 +146,7 @@ public class UserTest {
      */
     @Test
     public void testHiddenFlag() {
-        User user = new User("josh457");
+        User user = new User();
         user.setPhotoHidden(false);
 
         assertFalse(user.isPhotoHidden());

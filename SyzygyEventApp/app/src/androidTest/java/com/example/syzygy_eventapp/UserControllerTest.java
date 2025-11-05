@@ -8,7 +8,10 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.FirebaseApp;
 
+import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.HashMap;
@@ -22,10 +25,10 @@ import java.util.concurrent.TimeUnit;
 public class UserControllerTest {
     private static final int TIMEOUT_SEC = 10;
 
-    private UserControllerInterface controller;
+    private static UserControllerInterface controller;
 
-    @Before
-    public void setup() throws Exception {
+    @BeforeClass
+    public static void setup() throws Exception {
         // Initialize Firebase app
         try {
             FirebaseApp.initializeApp(
@@ -33,15 +36,22 @@ public class UserControllerTest {
         } catch (IllegalStateException ignore) {
         }
 
+        BatchDeleter.deleteCollection("users");
+
         controller = UserController.getInstance();
     }
 
+    @AfterClass
+    public static void teardown() {
+        BatchDeleter.deleteCollection("users");
+    }
+
     /**
-     * Verify createUser() creates a new user with default values
+     * Verify createEntrant(), createOrganizer() and, createAdmin() creates a new user with default values
      */
     @Test
     public void testCreateUser() throws Exception {
-        User user = Tasks.await(controller.createUser(), TIMEOUT_SEC, TimeUnit.SECONDS);
+        User user = Tasks.await(controller.createEntrant(), TIMEOUT_SEC, TimeUnit.SECONDS);
 
         assertNotNull(user);
 
@@ -54,6 +64,12 @@ public class UserControllerTest {
         assertFalse(user.isPhotoHidden());
         assertFalse(user.isDemoted());
         assertEquals(Role.ENTRANT, user.getRole());
+
+        Organizer organizer = Tasks.await(controller.createOrganizer(), TIMEOUT_SEC, TimeUnit.SECONDS);
+        Admin admin = Tasks.await(controller.createAdmin(), TIMEOUT_SEC, TimeUnit.SECONDS);
+
+        assertEquals(Role.ORGANIZER, organizer.getRole());
+        assertEquals(Role.ADMIN, admin.getRole());
     }
 
     /**
@@ -62,7 +78,7 @@ public class UserControllerTest {
     @Test
     public void testGetUser() throws Exception {
         // create user and set fields
-        User user = Tasks.await(controller.createUser(), TIMEOUT_SEC, TimeUnit.SECONDS);
+        User user = Tasks.await(controller.createEntrant(), TIMEOUT_SEC, TimeUnit.SECONDS);
         String userID = user.getUserID();
 
         // get user
@@ -95,7 +111,7 @@ public class UserControllerTest {
     @Test
     public void testUpdateFields() throws Exception {
         // create user and set fields
-        User user = Tasks.await(controller.createUser(), TIMEOUT_SEC, TimeUnit.SECONDS);
+        User user = Tasks.await(controller.createEntrant(), TIMEOUT_SEC, TimeUnit.SECONDS);
         String userID = user.getUserID();
 
         Task<Void> updateTask = controller.updateFields(userID, new HashMap<>() {{
@@ -140,7 +156,7 @@ public class UserControllerTest {
     @Test
     public void testUserSetters() throws Exception {
         // create user and set fields
-        User user = Tasks.await(controller.createUser(), TIMEOUT_SEC, TimeUnit.SECONDS);
+        User user = Tasks.await(controller.createEntrant(), TIMEOUT_SEC, TimeUnit.SECONDS);
         String userID = user.getUserID();
 
         Task<Void> setNameTask = user.setName("Test Testington");
@@ -157,12 +173,62 @@ public class UserControllerTest {
     }
 
     /**
+     * Make sure setUserRole() changes the role of a user
+     */
+    @Test
+    public void testSetUserRolePromote() throws Exception {
+        // create user and set fields
+        User entrant = Tasks.await(controller.createEntrant(), TIMEOUT_SEC, TimeUnit.SECONDS);
+        String userID = entrant.getUserID();
+
+        // set role
+        Task<User> setAdminTask = controller.setUserRole(userID, Role.ADMIN);
+        User admin = Tasks.await(setAdminTask, TIMEOUT_SEC, TimeUnit.SECONDS);
+
+        assertEquals(entrant.getName(), admin.getName());
+        assertEquals(Role.ADMIN, admin.getRole());
+        assertEquals(Admin.class, admin.getClass());
+
+        // get user
+        User retrievedUser = Tasks.await(controller.getUser(userID), TIMEOUT_SEC, TimeUnit.SECONDS);
+
+        assertEquals(entrant.getName(), retrievedUser.getName());
+        assertEquals(Role.ADMIN, retrievedUser.getRole());
+        assertEquals(Admin.class, retrievedUser.getClass());
+    }
+
+    /**
+     * Make sure setUserRole() changes the role of a user
+     */
+    @Test
+    public void testSetUserRoleDemote() throws Exception {
+        // create user and set fields
+        User admin = Tasks.await(controller.createAdmin(), TIMEOUT_SEC, TimeUnit.SECONDS);
+        String userID = admin.getUserID();
+
+        // set role
+        Task<User> setAdminTask = controller.setUserRole(userID, Role.ORGANIZER);
+        User organizer = Tasks.await(setAdminTask, TIMEOUT_SEC, TimeUnit.SECONDS);
+
+        assertEquals(admin.getName(), organizer.getName());
+        assertEquals(Role.ORGANIZER, organizer.getRole());
+        assertEquals(Organizer.class, organizer.getClass());
+
+        // get user
+        User retrievedUser = Tasks.await(controller.getUser(userID), TIMEOUT_SEC, TimeUnit.SECONDS);
+
+        assertEquals(admin.getName(), retrievedUser.getName());
+        assertEquals(Role.ORGANIZER, retrievedUser.getRole());
+        assertEquals(Organizer.class, retrievedUser.getClass());
+    }
+
+    /**
      * Make sure that deleteUser() removes a user from the database
      */
     @Test
     public void testDeleteUser() throws Exception {
         // create user
-        User user = Tasks.await(controller.createUser(), TIMEOUT_SEC, TimeUnit.SECONDS);
+        User user = Tasks.await(controller.createEntrant(), TIMEOUT_SEC, TimeUnit.SECONDS);
         String userID = user.getUserID();
 
         Task<Void> setNameTask = user.setName("Test Testington");
@@ -191,7 +257,7 @@ public class UserControllerTest {
     @Test
     public void testRefresh() throws Exception {
         // create user
-        User user = Tasks.await(controller.createUser(), TIMEOUT_SEC, TimeUnit.SECONDS);
+        User user = Tasks.await(controller.createEntrant(), TIMEOUT_SEC, TimeUnit.SECONDS);
 
         user.setName("Alice");
         user.setEmail("lost@wonderland.queen");
