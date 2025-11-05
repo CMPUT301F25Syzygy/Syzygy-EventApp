@@ -51,7 +51,8 @@ public class UserControllerTest {
      */
     @Test
     public void testCreateUser() throws Exception {
-        User user = Tasks.await(controller.createEntrant(), TIMEOUT_SEC, TimeUnit.SECONDS);
+        String userID1 = String.valueOf(UUID.randomUUID());
+        User user = Tasks.await(controller.createEntrant(userID1), TIMEOUT_SEC, TimeUnit.SECONDS);
 
         assertNotNull(user);
 
@@ -65,8 +66,11 @@ public class UserControllerTest {
         assertFalse(user.isDemoted());
         assertEquals(Role.ENTRANT, user.getRole());
 
-        Organizer organizer = Tasks.await(controller.createOrganizer(), TIMEOUT_SEC, TimeUnit.SECONDS);
-        Admin admin = Tasks.await(controller.createAdmin(), TIMEOUT_SEC, TimeUnit.SECONDS);
+        String userID2 = String.valueOf(UUID.randomUUID());
+        Organizer organizer = Tasks.await(controller.createOrganizer(userID2), TIMEOUT_SEC, TimeUnit.SECONDS);
+
+        String userID3 = String.valueOf(UUID.randomUUID());
+        Admin admin = Tasks.await(controller.createAdmin(userID3), TIMEOUT_SEC, TimeUnit.SECONDS);
 
         assertEquals(Role.ORGANIZER, organizer.getRole());
         assertEquals(Role.ADMIN, admin.getRole());
@@ -78,8 +82,8 @@ public class UserControllerTest {
     @Test
     public void testGetUser() throws Exception {
         // create user and set fields
-        User user = Tasks.await(controller.createEntrant(), TIMEOUT_SEC, TimeUnit.SECONDS);
-        String userID = user.getUserID();
+        String userID = String.valueOf(UUID.randomUUID());
+        User user = Tasks.await(controller.createEntrant(userID), TIMEOUT_SEC, TimeUnit.SECONDS);
 
         // get user
         User retrievedUser = Tasks.await(controller.getUser(userID), TIMEOUT_SEC, TimeUnit.SECONDS);
@@ -111,8 +115,8 @@ public class UserControllerTest {
     @Test
     public void testUpdateFields() throws Exception {
         // create user and set fields
-        User user = Tasks.await(controller.createEntrant(), TIMEOUT_SEC, TimeUnit.SECONDS);
-        String userID = user.getUserID();
+        String userID = String.valueOf(UUID.randomUUID());
+        User user = Tasks.await(controller.createEntrant(userID), TIMEOUT_SEC, TimeUnit.SECONDS);
 
         Task<Void> updateTask = controller.updateFields(userID, new HashMap<>() {{
             put("name", "Test Testington");
@@ -156,8 +160,8 @@ public class UserControllerTest {
     @Test
     public void testUserSetters() throws Exception {
         // create user and set fields
-        User user = Tasks.await(controller.createEntrant(), TIMEOUT_SEC, TimeUnit.SECONDS);
-        String userID = user.getUserID();
+        String userID = String.valueOf(UUID.randomUUID());
+        User user = Tasks.await(controller.createEntrant(userID), TIMEOUT_SEC, TimeUnit.SECONDS);
 
         Task<Void> setNameTask = user.setName("Test Testington");
         Task<Void> setEmailTask = user.setEmail("tester@gmail.com");
@@ -178,8 +182,8 @@ public class UserControllerTest {
     @Test
     public void testSetUserRolePromote() throws Exception {
         // create user and set fields
-        User entrant = Tasks.await(controller.createEntrant(), TIMEOUT_SEC, TimeUnit.SECONDS);
-        String userID = entrant.getUserID();
+        String userID = String.valueOf(UUID.randomUUID());
+        User entrant = Tasks.await(controller.createEntrant(userID), TIMEOUT_SEC, TimeUnit.SECONDS);
 
         // set role
         Task<User> setAdminTask = controller.setUserRole(userID, Role.ADMIN);
@@ -203,8 +207,8 @@ public class UserControllerTest {
     @Test
     public void testSetUserRoleDemote() throws Exception {
         // create user and set fields
-        User admin = Tasks.await(controller.createAdmin(), TIMEOUT_SEC, TimeUnit.SECONDS);
-        String userID = admin.getUserID();
+        String userID = String.valueOf(UUID.randomUUID());
+        User admin = Tasks.await(controller.createAdmin(userID), TIMEOUT_SEC, TimeUnit.SECONDS);
 
         // set role
         Task<User> setAdminTask = controller.setUserRole(userID, Role.ORGANIZER);
@@ -228,8 +232,8 @@ public class UserControllerTest {
     @Test
     public void testDeleteUser() throws Exception {
         // create user
-        User user = Tasks.await(controller.createEntrant(), TIMEOUT_SEC, TimeUnit.SECONDS);
-        String userID = user.getUserID();
+        String userID = String.valueOf(UUID.randomUUID());
+        User user = Tasks.await(controller.createEntrant(userID), TIMEOUT_SEC, TimeUnit.SECONDS);
 
         Task<Void> setNameTask = user.setName("Test Testington");
         Task<Void> setEmailTask = user.setEmail("tester@gmail.com");
@@ -257,7 +261,8 @@ public class UserControllerTest {
     @Test
     public void testRefresh() throws Exception {
         // create user
-        User user = Tasks.await(controller.createEntrant(), TIMEOUT_SEC, TimeUnit.SECONDS);
+        String userID = String.valueOf(UUID.randomUUID());
+        User user = Tasks.await(controller.createEntrant(userID), TIMEOUT_SEC, TimeUnit.SECONDS);
 
         user.setName("Alice");
         user.setEmail("lost@wonderland.queen");
