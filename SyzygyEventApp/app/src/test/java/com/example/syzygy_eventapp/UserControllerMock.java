@@ -8,15 +8,15 @@ import java.util.HashMap;
 import java.util.function.Consumer;
 
 public class UserControllerMock implements UserControllerInterface {
-    public Task<User> createEntrant() {
+    public Task<User> createEntrant(String userID) {
         return Tasks.forResult(new User());
     }
 
-    public Task<Organizer> createOrganizer() {
+    public Task<Organizer> createOrganizer(String userID) {
         return Tasks.forResult(new Organizer());
     }
 
-    public Task<Admin> createAdmin() {
+    public Task<Admin> createAdmin(String userID) {
         return Tasks.forResult(new Admin());
     }
 
