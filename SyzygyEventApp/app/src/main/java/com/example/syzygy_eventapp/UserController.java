@@ -4,9 +4,16 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.*;
 
+import java.lang.reflect.Constructor;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Random;
 import java.util.UUID;
 import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.stream.IntStream;
 
 /**
  * Controller for reading/writing {@link User} data in Firestore DB.
@@ -48,11 +55,35 @@ public class UserController implements UserControllerInterface {
     }
 
     /**
-     * Creates a new {@link User}, and checks it's ID doesn't collide in the database.
+     * Calls {@link #createUserFromClass(Supplier)} to create a {@link User} (entrant).
+     * @return A new entrant with default fields.
+     */
+    public Task<User> createEntrant() {
+        return createUserFromClass(User::new);
+    }
+
+    /**
+     * Calls {@link #createUserFromClass(Supplier)} to create an {@link Organizer}.
+     * @return A new organizer with default fields.
+     */
+    public Task<Organizer> createOrganizer() {
+        return createUserFromClass(Organizer::new);
+    }
+
+    /**
+     * Calls {@link #createUserFromClass(Supplier)} to create an {@link Admin}.
+     * @return A new admin with default fields.
+     */
+    public Task<Admin> createAdmin() {
+        return createUserFromClass(Admin::new);
+    }
+
+    /**
+     * Creates a new {@link User}, or any subclass of it, and checks it's ID doesn't collide in the database.
      * The user will have the default fields.
      * @return Task that completes when the document is created or if it already exists
      */
-    public Task<User> createUser() {
+    private <T extends User> Task<T> createUserFromClass(Supplier<T> constructor) {
         String userID = String.valueOf(UUID.randomUUID());
         DocumentReference doc = usersRef.document(userID);
 
@@ -60,14 +91,15 @@ public class UserController implements UserControllerInterface {
             DocumentSnapshot snap = task.getResult();
             if (snap.exists()) {
                 // the UUID collided, let's try again with a new one
-                return createUser();
+                return createUserFromClass(constructor);
             }
 
-            // create user with defaults
-            User user = new User(userID);
+            // create a user
+            T user = constructor.get();
+            user.setUserID(userID);
 
             // Initial write
-            return doc.set(user).onSuccessTask((nothing) -> {
+            return doc.set(user).continueWithTask((nothing) -> {
                 return Tasks.forResult(user);
             });
         });
@@ -92,7 +124,7 @@ public class UserController implements UserControllerInterface {
                 );
             }
 
-            User user = snap.toObject(User.class);
+            User user = buildUser(snap);
 
             return Tasks.forResult(user);
         });
@@ -111,7 +143,7 @@ public class UserController implements UserControllerInterface {
         return doc.addSnapshotListener((snap, error) -> {
            if (snap != null) {
                if (snap.exists()) {
-                   User user = snap.toObject(User.class);
+                   User user = buildUser(snap);
                    onUpdate.accept(user);
                } else {
                    onDelete.run();
@@ -152,6 +184,34 @@ public class UserController implements UserControllerInterface {
         });
     }
 
+    public Task<User> setUserRole(String userID, Role role) {
+        DocumentReference doc = usersRef.document(userID);
+
+        return doc.get().continueWithTask(task -> {
+            DocumentSnapshot snap = task.getResult();
+            if (!snap.exists()) {
+                return Tasks.forException(
+                        new IllegalArgumentException("User: " + userID + " not found."));
+            }
+
+            User user = buildUser(snap);
+
+            while (user.getRole() != role) {
+                if (user.getRole().hasHigherAuthority(role)) {
+                    user = user.demote();
+                } else {
+                    user = user.promote();
+                }
+            }
+
+            // Write updated user
+            User finalUser = user;
+            return doc.set(user).onSuccessTask((nothing) -> {
+                return Tasks.forResult(finalUser);
+            });
+        });
+    }
+
     /**
      * Permanently delete this user.
      * @param userID The user document ID
@@ -159,5 +219,18 @@ public class UserController implements UserControllerInterface {
      */
     public Task<Void> deleteUser(String userID) {
         return usersRef.document(userID).delete();
+    }
+
+    private User buildUser(DocumentSnapshot snap) {
+        Role role = snap.get("role", Role.class);
+
+        if (role == Role.ENTRANT) {
+            return snap.toObject(User.class);
+        } else if (role == Role.ORGANIZER) {
+            return snap.toObject(Organizer.class);
+        } else {
+            assert role == Role.ADMIN;
+            return snap.toObject(Admin.class);
+        }
     }
 }

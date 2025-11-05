@@ -19,7 +19,7 @@ public enum Role {
     ORGANIZER(1),
     ADMIN(2);
 
-    private Integer authority;
+    private final int authority;
 
     private Role(int authority) {
         this.authority = authority;
