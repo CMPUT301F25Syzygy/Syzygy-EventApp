@@ -2,135 +2,157 @@ package com.example.syzygy_eventapp;
 
 import static org.junit.Assert.*;
 
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
+import com.google.firebase.firestore.ListenerRegistration;
+
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.HashMap;
+import java.util.function.Consumer;
 
 /**
  * Unit tests for the {@link User} model class.
  * <p>
- *     These tests verify that the User class correctly handles field initialization, getter/setter methods, role validation, and flag updates.
+ * These tests verify that the User class correctly handles field initialization, getter/setter methods, role validation, and flag updates.
  * </p>
  */
 public class UserTest {
+    @Before
+    public void setup() {
+        UserController.overrideInstance(new UserControllerMock());
+    }
 
     /**
      * Tests that the full constructor correctly initializes all fields and getters return the expected values.
      */
     @Test
-    public void testConstructorAndGetters() {
-        User user = new User(
-                "Test123",
-                "Tester Testington",
-                "test@testmail.com",
-                "(123) 456-7890",
+    public void testConstructor() {
+        User user = new User();
+
+        assertNull(user.getUserID());
+        assertNotNull(user.getName());
+        assertTrue(user.getName().length() >= 8);
+        assertNull(user.getEmail());
+        assertNull(user.getPhone());
+        assertNull(user.getPhotoURL());
+        assertFalse(user.isPhotoHidden());
+        assertFalse(user.isDemoted());
+        assertEquals(Role.ENTRANT, user.getRole());
+    }
+
+    /**
+     * Tests that organizer is properly made from Admin.promote()
+     */
+    @Test
+    public void testFromOrganizerDemote() {
+        // make a base user to inherit from and compare against
+        Organizer organizer = new Organizer(
+                "U001",
+                "Test Organizer",
+                "organizer@example.com",
+                "123-456-7890",
                 "https://testphoto.com/test.jpg",
                 false,
                 false,
-                Arrays.asList(Role.ENTRANT, Role.ORGANIZER),
+                new ArrayList<String>(){{
+                    add("event1");
+                }},
                 Role.ORGANIZER
         );
 
-        assertEquals("Test123", user.getUserID());
-        assertEquals("Tester Testington", user.getName());
-        assertEquals("test@testmail.com", user.getEmail());
-        assertEquals("(123) 456-7890", user.getPhone());
-        assertEquals("https://testphoto.com/test.jpg", user.getPhotoURL());
-        assertFalse(user.isPhotoHidden());
-        assertFalse(user.isDemoted());
-        assertTrue(user.getRoles().contains(Role.ENTRANT));
-        assertTrue(user.getRoles().contains(Role.ORGANIZER));
-        assertEquals(Role.ORGANIZER, user.getActiveRole());
+        User user = organizer.demote();
+
+        assertEquals(organizer.getUserID(), user.getUserID());
+        assertEquals(organizer.getName(), user.getName());
+        assertEquals(organizer.getEmail(), user.getEmail());
+        assertEquals(Role.ENTRANT, user.getRole());
+
+        assertEquals(User.class, user.getClass());
     }
 
     /**
      * Tests that setter methods correctly assign values and that getters return those values.
      */
     @Test
-    public void testSetters() {
+    public void testSettersAndGetters() {
         User user = new User();
 
-        user.setUserID("user1");
+        user.setUserID("Alice543");
         user.setName("Alice");
         user.setEmail("lost@wonderland.queen");
         user.setPhone("(980) 765-4321");
         user.setPhotoURL(null);
         user.setPhotoHidden(true);
-        user.setDemoted(true);
-        user.setRoles(Collections.singletonList(Role.ENTRANT));
-        user.setActiveRole(Role.ENTRANT);
+        user.setRole(Role.ORGANIZER);
 
-        assertEquals("user1", user.getUserID());
+        assertEquals("Alice543", user.getUserID());
         assertEquals("Alice", user.getName());
         assertEquals("lost@wonderland.queen", user.getEmail());
         assertEquals("(980) 765-4321", user.getPhone());
         assertNull(user.getPhotoURL());
         assertTrue(user.isPhotoHidden());
-        assertTrue(user.isDemoted());
-        assertTrue(user.getRoles().contains(Role.ENTRANT));
-        assertEquals(Role.ENTRANT, user.getActiveRole());
+        assertFalse(user.isDemoted());
+        assertEquals(Role.ORGANIZER, user.getRole());
     }
 
     /**
-     * Tests that {@link User#hasValidActiveRole()} returns true when the user's active role is included in their assigned roles.
+     * Tests that users have the abilities of all their inferior roles.
+     * ie, organizers can do everything entrants can do
      */
     @Test
-    public void testValidActiveRole() {
+    public void testHasAbilitiesOfRole() {
         User user = new User();
-        user.setRoles(Arrays.asList(Role.ENTRANT, Role.ORGANIZER));
-        user.setActiveRole(Role.ORGANIZER);
+        user.setRole(Role.ENTRANT);
+        assertTrue(user.hasAbilitiesOfRole(Role.ENTRANT));
+        assertFalse(user.hasAbilitiesOfRole(Role.ORGANIZER));
 
-        assertTrue(user.hasValidActiveRole());
-    }
-
-    /**
-     * Tests that {@link User#hasValidActiveRole()} returns false when the active role is not part of the user's assigned roles.
-     */
-    @Test
-    public void testInvalidActiveRole() {
-        User user = new User();
-        user.setRoles(Collections.singletonList(Role.ENTRANT));
-        user.setActiveRole(Role.ADMIN);
-
-        assertFalse(user.hasValidActiveRole());
-    }
-
-    /**
-     * Tests that roles can be added and removed properly from the user's role set.
-     */
-    @Test
-    public void testAddDeleteRoles() {
-        User user = new User();
-        List<Role> roles = new ArrayList<>();
-        roles.add(Role.ENTRANT);
-        user.setRoles(roles);
-
-        // add new role
-        user.getRoles().add(Role.ORGANIZER);
-        assertTrue(user.getRoles().contains(Role.ORGANIZER));
+        // promote role
+        user = user.promote();
+        assertTrue(user.hasAbilitiesOfRole(Role.ENTRANT));
+        assertTrue(user.hasAbilitiesOfRole(Role.ORGANIZER));
+        assertFalse(user.hasAbilitiesOfRole(Role.ADMIN));
 
         // demote
-        boolean removed = user.getRoles().remove(Role.ORGANIZER);
-        assertTrue("remove(Role.ORGANIZER) should return true", removed);
-        assertFalse(user.getRoles().contains(Role.ORGANIZER));
+        user = user.demote();
+        assertTrue(user.hasAbilitiesOfRole(Role.ENTRANT));
+        assertFalse(user.hasAbilitiesOfRole(Role.ORGANIZER));
     }
 
     /**
-     * Tests that the {@code photoHidden} and {@code demoted} flags can be toggled and retrieved correctly.
+     * Tests that roles can be promoted and demoted properly.
      */
     @Test
-    public void testHiddenAndDemotedFlags() {
+    public void testPromoteDemoteRole() {
+        User user = new User();
+        assertEquals(Role.ENTRANT, user.getRole());
+        assertFalse(user.isDemoted());
+
+        // promote role
+        user = user.promote();
+        assertEquals(Role.ORGANIZER, user.getRole());
+        assertFalse(user.isDemoted());
+
+        // demote
+        user = user.demote();
+        assertEquals(Role.ENTRANT, user.getRole());
+        assertTrue(user.isDemoted());
+    }
+
+    /**
+     * Tests that the {@code photoHidden} flag can be toggled and retrieved correctly.
+     */
+    @Test
+    public void testHiddenFlag() {
         User user = new User();
         user.setPhotoHidden(false);
-        user.setDemoted(false);
+
+        assertFalse(user.isPhotoHidden());
 
         user.setPhotoHidden(true);
-        user.setDemoted(true);
 
         assertTrue(user.isPhotoHidden());
-        assertTrue(user.isDemoted());
     }
 }
