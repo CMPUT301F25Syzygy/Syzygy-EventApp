@@ -99,6 +99,23 @@ public class QRScanFragment extends Fragment {
     }
 
     private void bindCameraUseCases(@NonNull ProcessCameraProvider cameraProvider) {
+        PreviewView previewView = requireView().findViewById(R.id.previewView);
 
+        // unbind anything before rebinding to prevent crahses
+        cameraProvider.unbindAll();
+
+        // 1. Build the preview use case
+        androidx.camera.core.Preview preview = new androidx.camera.core.Preview.Builder().build();
+        preview.setSurfaceProvider(previewView.getSurfaceProvider());
+
+        // 2. Build the image analysis use case for barcode scanning (QR codes are considered as a type of barcode)
+        androidx.camera.core.ImageAnalysis imageAnalysis =
+                new androidx.camera.core.ImageAnalysis.Builder()
+                        .setBackpressureStrategy(androidx.camera.core.ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+                        .build();
+
+        // 3. Set up ML Kit Barcode Scanner
+        com.google.mlkit.vision.barcode.BarcodeScanner scanner =
+                com.google.mlkit.vision.barcode.BarcodeScanning.getClient();
     }
 }
