@@ -117,7 +117,7 @@ var pathtoroot = "../../../";
 public class <span class="typeNameLabel"><a href=ProfileFragment.html>ProfileFragment</a></span>
 
                     </pre>
-                    <div class="block"><p>A empty placeholder for ProfileFragment</p></div>
+                    <div class="block"><p>Fragment representing the user's profile screen. </p><p> Displays and allows editing of user information such as name, email, and phone number. Shows role badges and notification preferences. Data is synced with Firestore using the UserControllerInterface.</p></div>
 
                     <dl>
 
@@ -199,7 +199,7 @@ public class <span class="typeNameLabel"><a href=ProfileFragment.html>ProfileFra
                                             <tr class="altColor">
                                                 <th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a
                                                         href="#ProfileFragment()">ProfileFragment</a></span>()</code></th>
-                                                <td class="colLast"></td>
+                                                <td class="colLast">Default constructor.</td>
                                             </tr>
                                         
 
@@ -256,7 +256,31 @@ public class <span class="typeNameLabel"><a href=ProfileFragment.html>ProfileFra
                                             </td>
                                             <th class="colSecond" scope="row"><code><a href=ProfileFragment.html#onCreateView(LayoutInflater,ViewGroup,Bundle)>onCreateView</a>(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) </code>
                                             </th>
-                                            <td class="colLast"></td>
+                                            <td class="colLast">Inflates the fragment layout.</td>
+                                        </tr>
+                                        
+                                        <tr id="i1" class="rowColor">
+                                            <td class="colFirst"><code>void</code>
+                                            </td>
+                                            <th class="colSecond" scope="row"><code><a href=ProfileFragment.html#onViewCreated(View,Bundle)>onViewCreated</a>(View view, Bundle savedInstanceState) </code>
+                                            </th>
+                                            <td class="colLast">Called after the view has been created.</td>
+                                        </tr>
+                                        
+                                        <tr id="i2" class="altColor">
+                                            <td class="colFirst"><code>void</code>
+                                            </td>
+                                            <th class="colSecond" scope="row"><code><a href=ProfileFragment.html#onStart()>onStart</a>() </code>
+                                            </th>
+                                            <td class="colLast">Starts the fragment and ensures that a user exists for this device.</td>
+                                        </tr>
+                                        
+                                        <tr id="i3" class="rowColor">
+                                            <td class="colFirst"><code>void</code>
+                                            </td>
+                                            <th class="colSecond" scope="row"><code><a href=ProfileFragment.html#onStop()>onStop</a>() </code>
+                                            </th>
+                                            <td class="colLast">Stops the fragment and removes the UserController listener.</td>
                                         </tr>
                                         
                                         </tbody>
@@ -295,7 +319,7 @@ public class <span class="typeNameLabel"><a href=ProfileFragment.html>ProfileFra
                                     <li class="blockList">
                                         <h4>ProfileFragment</h4>
                                         <pre>ProfileFragment()</pre>
-                                        <div class="block"></div>
+                                        <div class="block">Default constructor.</div>
                                         
                                     </li>
                                 </ul>
@@ -317,12 +341,110 @@ public class <span class="typeNameLabel"><a href=ProfileFragment.html>ProfileFra
                                     <!--   -->
                                 </a>
                                 <ul class=
-                                              "blockListLast"
+                                              "blockList"
                                           >
                                     <li class="blockList">
                                         <h4>onCreateView</h4>
                                         <pre class="methodSignature"> View <a href=ProfileFragment.html#onCreateView(LayoutInflater,ViewGroup,Bundle)>onCreateView</a>(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)</pre>
-                                        <div class="block"></div>
+                                        <div class="block"><p>Inflates the fragment layout.</p></div>
+
+                                        <dl>
+
+                                        
+                                            <dt><span class="paramLabel">Parameters:</span></dt>
+                                            
+                                            
+                                            <dd><code>inflater</code> - LayoutInflater object used to inflate views.</dd>
+                                            
+                                            
+                                            
+                                            <dd><code>container</code> - Parent view that the fragment's UI should attach to.</dd>
+                                            
+                                            
+                                            
+                                            <dd><code>savedInstanceState</code> - Previously saved state (if any).</dd>
+                                            
+                                            
+                                        
+
+                                        
+                                            <dt><span class="returnLabel">Returns:</span></dt>
+                                            <dd><p>The root view of the fragment layout.</p></dd>
+                                        
+
+                                        
+
+                                        </dl>
+                                    </li>
+                                </ul>
+                                
+                                <a id="onViewCreated(View,Bundle)">
+                                    <!--   -->
+                                </a>
+                                <ul class=
+                                              "blockList"
+                                          >
+                                    <li class="blockList">
+                                        <h4>onViewCreated</h4>
+                                        <pre class="methodSignature"> void <a href=ProfileFragment.html#onViewCreated(View,Bundle)>onViewCreated</a>(View view, Bundle savedInstanceState)</pre>
+                                        <div class="block"><p>Called after the view has been created. Initializes all view references, retrieves the user ID, and sets up editable panels with click listeners.</p></div>
+
+                                        <dl>
+
+                                        
+                                            <dt><span class="paramLabel">Parameters:</span></dt>
+                                            
+                                            
+                                            <dd><code>view</code> - The fragment's root view.</dd>
+                                            
+                                            
+                                            
+                                            <dd><code>savedInstanceState</code> - Previously saved state (if any).</dd>
+                                            
+                                            
+                                        
+
+                                        
+
+                                        
+
+                                        </dl>
+                                    </li>
+                                </ul>
+                                
+                                <a id="onStart()">
+                                    <!--   -->
+                                </a>
+                                <ul class=
+                                              "blockList"
+                                          >
+                                    <li class="blockList">
+                                        <h4>onStart</h4>
+                                        <pre class="methodSignature"> void <a href=ProfileFragment.html#onStart()>onStart</a>()</pre>
+                                        <div class="block"><p>Starts the fragment and ensures that a user exists for this device. Begins listening for real-time updates to the user's data.</p></div>
+
+                                        <dl>
+
+                                        
+
+                                        
+
+                                        
+
+                                        </dl>
+                                    </li>
+                                </ul>
+                                
+                                <a id="onStop()">
+                                    <!--   -->
+                                </a>
+                                <ul class=
+                                              "blockListLast"
+                                          >
+                                    <li class="blockList">
+                                        <h4>onStop</h4>
+                                        <pre class="methodSignature"> void <a href=ProfileFragment.html#onStop()>onStop</a>()</pre>
+                                        <div class="block"><p>Stops the fragment and removes the UserController listener.</p></div>
 
                                         <dl>
 
