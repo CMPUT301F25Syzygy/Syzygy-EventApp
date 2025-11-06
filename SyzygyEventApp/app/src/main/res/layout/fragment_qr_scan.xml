@@ -14,12 +14,6 @@
         android:layout_height="match_parent"
         android:scaleType="fitCenter" />
 
-    <!-- Semi-transparent dark overlay -->
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#66000000" />
-
     <!-- Scanner box overlay -->
     <View
         android:id="@+id/scan_box"
