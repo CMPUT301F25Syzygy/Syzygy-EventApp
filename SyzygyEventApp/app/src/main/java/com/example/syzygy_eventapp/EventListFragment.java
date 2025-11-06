@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.firestore.ListenerRegistration;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
