@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView.OnItemSelectedListener;
@@ -159,7 +160,7 @@ public class NavigationStackFragment extends Fragment implements OnItemSelectedL
      * Calls {@link #setScreenNavMenu(int, int, OnItemSelectedListener)} with the index of 0 (the main menu)
      */
     public void setMainNavMenu(int menuResId, OnItemSelectedListener listener) {
-        setScreenNavMenu(screenStack.size() - 1, menuResId, listener);
+        setScreenNavMenu(0, menuResId, listener);
     }
 
     /**
