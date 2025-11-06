@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity implements OnItemSelectedLis
         profileFragment = new ProfileFragment();
         findFragment = new FindEventsFragment(navStack);
         joinedFragment = new JoinedEventsFragment();
-        organizerFragment = new OrganizerFragment();
+        organizerFragment = new OrganizerFragment(navStack, "eventID");
         adminFragment = new AdministratorFragment();
 
         navStack.setMainNavMenu(R.menu.entrant_nav_menu, this);
