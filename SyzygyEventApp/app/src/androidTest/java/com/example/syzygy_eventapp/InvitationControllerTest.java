@@ -9,10 +9,14 @@ import com.google.firebase.FirebaseApp;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import org.checkerframework.checker.units.qual.A;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -26,17 +30,19 @@ public class InvitationControllerTest {
 
     private static final int TIMEOUT_SEC = 10;
 
-    private FirebaseFirestore db;
-    private InvitationController controller;
+    private static FirebaseFirestore db;
+    private static InvitationController controller;
 
     // Unique values per run to avoid collisions across CI jobs
-    private String event;
-    private String organizerID;
-    private String recipientA;
-    private String recipientB;
+    private static String event;
+    private static String organizerID;
+    private static String recipientA;
+    private static String recipientB;
 
-    @Before
-    public void setUp() throws Exception {
+    static private final ArrayList<String> createdInviteIds = new ArrayList<>();
+
+    @BeforeClass
+    public static void setup() throws Exception {
         try {
             FirebaseApp.initializeApp(
                     InstrumentationRegistry.getInstrumentation().getTargetContext());
@@ -50,31 +56,16 @@ public class InvitationControllerTest {
         organizerID = "user001" + run;
         recipientA  = "user002" + run;
         recipientB  = "user003" + run;
-
-        cleanupInvites();
     }
 
-    @After
-    public void tearDown() throws Exception {
-        cleanupInvites();
-    }
-
-    private void cleanupInvites() throws Exception {
-        var byEvent = Tasks.await(
-                db.collection("invitations").whereEqualTo("event", event).get(),
-                TIMEOUT_SEC, TimeUnit.SECONDS);
-        for (var d : byEvent.getDocuments()) {
-            Tasks.await(d.getReference().delete(), TIMEOUT_SEC, TimeUnit.SECONDS);
-        }
-
-        var byRecipients = Tasks.await(
-                db.collection("invitations")
-                        .whereIn("recipientID", Arrays.asList(recipientA, recipientB))
-                        .get(),
-                TIMEOUT_SEC, TimeUnit.SECONDS);
-        for (var d : byRecipients.getDocuments()) {
-            Tasks.await(d.getReference().delete(), TIMEOUT_SEC, TimeUnit.SECONDS);
-        }
+    /**
+     * Delete all the invitations created during this test.
+     */
+    @AfterClass
+    public static void tearDown() throws Exception {
+        Tasks.await(
+            BatchDeleter.deleteCollectionIds("invitations", createdInviteIds),
+            30, TimeUnit.SECONDS);
     }
 
     private DocumentSnapshot getInvite(String invitation) throws Exception {
@@ -91,6 +82,7 @@ public class InvitationControllerTest {
         List<String> invitations = Tasks.await(
                 controller.createInvites(event, organizerID, Arrays.asList(recipientA)),
                 TIMEOUT_SEC, TimeUnit.SECONDS);
+        createdInviteIds.addAll(invitations);
 
         assertEquals(1, invitations.size());
         DocumentSnapshot snap = getInvite(invitations.get(0));
@@ -112,6 +104,7 @@ public class InvitationControllerTest {
         List<String> invitations = Tasks.await(
                 controller.createInvites(event, organizerID, Arrays.asList(recipientA, recipientB)),
                 TIMEOUT_SEC, TimeUnit.SECONDS);
+        createdInviteIds.addAll(invitations);
 
         assertEquals(2, invitations.size());
 
@@ -136,6 +129,7 @@ public class InvitationControllerTest {
         List<String> ids = Tasks.await(
                 controller.createInvites(event, organizerID, Arrays.asList(recipientA)),
                 TIMEOUT_SEC, TimeUnit.SECONDS);
+        createdInviteIds.addAll(ids);
         String inviteId = ids.get(0);
 
         // First accept succeeds
@@ -160,6 +154,7 @@ public class InvitationControllerTest {
         List<String> ids = Tasks.await(
                 controller.createInvites(event, organizerID, Arrays.asList(recipientA)),
                 TIMEOUT_SEC, TimeUnit.SECONDS);
+        createdInviteIds.addAll(ids);
         String inviteId = ids.get(0);
 
         Tasks.await(controller.reject(inviteId, recipientA),
@@ -178,6 +173,7 @@ public class InvitationControllerTest {
         List<String> ids = Tasks.await(
                 controller.createInvites(event, organizerID, Arrays.asList(recipientA)),
                 TIMEOUT_SEC, TimeUnit.SECONDS);
+        createdInviteIds.addAll(ids);
         String inviteId = ids.get(0);
 
         // Non-organizer should fail
