@@ -173,12 +173,7 @@ public class InvitationController {
                 return Tasks.forException(new IllegalStateException("Response already given."));
             }
 
-            return doc.update("accepted", false, "responseTime", FieldValue.serverTimestamp())
-                    .addOnSuccessListener(v -> {
-                        // Notify LotteryManager to refill slot
-                        LotteryManager lotteryManager = new LotteryManager();
-                        lotteryManager.onInvitationDeclined(eventID);
-                    });
+            return doc.update("accepted", false, "responseTime", FieldValue.serverTimestamp());
         });
     }
 
