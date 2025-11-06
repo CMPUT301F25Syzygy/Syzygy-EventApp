@@ -14,6 +14,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -26,6 +27,7 @@ public class UserControllerTest {
     private static final int TIMEOUT_SEC = 10;
 
     private static UserControllerInterface controller;
+    private static final ArrayList<String> createdUserIds = new ArrayList<>();
 
     @BeforeClass
     public static void setup() throws Exception {
@@ -36,14 +38,17 @@ public class UserControllerTest {
         } catch (IllegalStateException ignore) {
         }
 
-        BatchDeleter.deleteCollection("users");
-
         controller = UserController.getInstance();
     }
 
+    /**
+     * Delete all the users created during this test.
+     */
     @AfterClass
-    public static void teardown() {
-        BatchDeleter.deleteCollection("users");
+    public static void teardown() throws Exception {
+        Tasks.await(
+                BatchDeleter.deleteCollectionIds("users", createdUserIds),
+                30, TimeUnit.SECONDS);
     }
 
     /**
@@ -51,7 +56,7 @@ public class UserControllerTest {
      */
     @Test
     public void testCreateUser() throws Exception {
-        String userID1 = String.valueOf(UUID.randomUUID());
+        String userID1 = newUserId();
         User user = Tasks.await(controller.createEntrant(userID1), TIMEOUT_SEC, TimeUnit.SECONDS);
 
         assertNotNull(user);
@@ -66,10 +71,10 @@ public class UserControllerTest {
         assertFalse(user.isDemoted());
         assertEquals(Role.ENTRANT, user.getRole());
 
-        String userID2 = String.valueOf(UUID.randomUUID());
+        String userID2 = newUserId();
         Organizer organizer = Tasks.await(controller.createOrganizer(userID2), TIMEOUT_SEC, TimeUnit.SECONDS);
 
-        String userID3 = String.valueOf(UUID.randomUUID());
+        String userID3 = newUserId();
         Admin admin = Tasks.await(controller.createAdmin(userID3), TIMEOUT_SEC, TimeUnit.SECONDS);
 
         assertEquals(Role.ORGANIZER, organizer.getRole());
@@ -82,7 +87,7 @@ public class UserControllerTest {
     @Test
     public void testGetUser() throws Exception {
         // create user and set fields
-        String userID = String.valueOf(UUID.randomUUID());
+        String userID = newUserId();
         User user = Tasks.await(controller.createEntrant(userID), TIMEOUT_SEC, TimeUnit.SECONDS);
 
         // get user
@@ -98,7 +103,7 @@ public class UserControllerTest {
     @Test
     public void testGetUserException() throws Exception {
         // get userID that does not exist
-        String userID = String.valueOf(UUID.randomUUID());
+        String userID = newUserId();
 
         try {
             Tasks.await(controller.getUser(userID), TIMEOUT_SEC, TimeUnit.SECONDS);
@@ -115,7 +120,7 @@ public class UserControllerTest {
     @Test
     public void testUpdateFields() throws Exception {
         // create user and set fields
-        String userID = String.valueOf(UUID.randomUUID());
+        String userID = newUserId();
         User user = Tasks.await(controller.createEntrant(userID), TIMEOUT_SEC, TimeUnit.SECONDS);
 
         Task<Void> updateTask = controller.updateFields(userID, new HashMap<>() {{
@@ -138,7 +143,7 @@ public class UserControllerTest {
     @Test
     public void testUpdateFieldsException() throws Exception {
         // get userID that does not exist
-        String userID = String.valueOf(UUID.randomUUID());
+        String userID = newUserId();
 
         try {
             Task<Void> updateTask = controller.updateFields(userID, new HashMap<>() {{
@@ -160,7 +165,7 @@ public class UserControllerTest {
     @Test
     public void testUserSetters() throws Exception {
         // create user and set fields
-        String userID = String.valueOf(UUID.randomUUID());
+        String userID = newUserId();
         User user = Tasks.await(controller.createEntrant(userID), TIMEOUT_SEC, TimeUnit.SECONDS);
 
         Task<Void> setNameTask = user.setName("Test Testington");
@@ -182,7 +187,7 @@ public class UserControllerTest {
     @Test
     public void testSetUserRolePromote() throws Exception {
         // create user and set fields
-        String userID = String.valueOf(UUID.randomUUID());
+        String userID = newUserId();
         User entrant = Tasks.await(controller.createEntrant(userID), TIMEOUT_SEC, TimeUnit.SECONDS);
 
         // set role
@@ -207,7 +212,7 @@ public class UserControllerTest {
     @Test
     public void testSetUserRoleDemote() throws Exception {
         // create user and set fields
-        String userID = String.valueOf(UUID.randomUUID());
+        String userID = newUserId();
         User admin = Tasks.await(controller.createAdmin(userID), TIMEOUT_SEC, TimeUnit.SECONDS);
 
         // set role
@@ -232,7 +237,7 @@ public class UserControllerTest {
     @Test
     public void testDeleteUser() throws Exception {
         // create user
-        String userID = String.valueOf(UUID.randomUUID());
+        String userID = newUserId();
         User user = Tasks.await(controller.createEntrant(userID), TIMEOUT_SEC, TimeUnit.SECONDS);
 
         Task<Void> setNameTask = user.setName("Test Testington");
@@ -261,7 +266,7 @@ public class UserControllerTest {
     @Test
     public void testRefresh() throws Exception {
         // create user
-        String userID = String.valueOf(UUID.randomUUID());
+        String userID = newUserId();
         User user = Tasks.await(controller.createEntrant(userID), TIMEOUT_SEC, TimeUnit.SECONDS);
 
         user.setName("Alice");
@@ -282,5 +287,11 @@ public class UserControllerTest {
         assertEquals("Test Testington", user.getName());
         assertEquals("tester@gmail.com", user.getEmail());
         assertEquals("(980) 765-4321", user.getPhone());
+    }
+
+    private String newUserId() {
+        String id = String.valueOf(UUID.randomUUID());
+        createdUserIds.add(id);
+        return id;
     }
 }

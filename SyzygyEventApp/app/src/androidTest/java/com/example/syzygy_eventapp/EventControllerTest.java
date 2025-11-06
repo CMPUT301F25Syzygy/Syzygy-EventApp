@@ -11,7 +11,9 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.*;
@@ -23,16 +25,16 @@ import java.util.concurrent.TimeUnit;
  */
 public class EventControllerTest {
 
-    private static final int TIMEOUT_SEC = 20;
+    private static final int TIMEOUT_SEC = 10;
 
-    private FirebaseFirestore db;
-    private EventController controller;
+    private static FirebaseFirestore db;
+    private static EventController controller;
 
-    private String organizerID;
-    private String eventID;
+    private static String organizerID;
+    private static final ArrayList<String> createdEventIds = new ArrayList<>();
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeClass
+    public static void setUp() throws Exception {
         try {
             FirebaseApp.initializeApp(
                     InstrumentationRegistry.getInstrumentation().getTargetContext());
@@ -43,23 +45,16 @@ public class EventControllerTest {
 
         String run = UUID.randomUUID().toString().replace("-", "").substring(0, 8);
         organizerID = "organizer_" + run;
-        eventID = "event_" + run;
-
-        cleanupEvents();
     }
 
-    @After
-    public void tearDown() throws Exception {
-        cleanupEvents();
-    }
-
-    private void cleanupEvents() throws Exception {
-        var byOrganizer = Tasks.await(
-                db.collection("events").whereEqualTo("organizerID", organizerID).get(),
-                TIMEOUT_SEC, TimeUnit.SECONDS);
-        for (var d : byOrganizer.getDocuments()) {
-            Tasks.await(d.getReference().delete(), TIMEOUT_SEC, TimeUnit.SECONDS);
-        }
+    /**
+     * Delete all the events created during this test.
+     */
+    @AfterClass
+    public static void tearDown() throws Exception {
+        Tasks.await(
+                BatchDeleter.deleteCollectionIds("events", createdEventIds),
+                30, TimeUnit.SECONDS);
     }
 
     private DocumentSnapshot getEvent(String id) throws Exception {
@@ -90,6 +85,7 @@ public class EventControllerTest {
 
         String id = Tasks.await(controller.createEvent(event),
                 TIMEOUT_SEC, TimeUnit.SECONDS);
+        createdEventIds.add(id);
 
         assertNotNull(id);
         DocumentSnapshot snap = getEvent(id);
@@ -115,6 +111,7 @@ public class EventControllerTest {
         event.setOrganizerID(organizerID);
         String id = Tasks.await(controller.createEvent(event),
                 TIMEOUT_SEC, TimeUnit.SECONDS);
+        createdEventIds.add(id);
 
         // Initially empty
         int size = Tasks.await(controller.getWaitingListSize(id),
@@ -146,6 +143,7 @@ public class EventControllerTest {
         event.setOrganizerID(organizerID);
         String id = Tasks.await(controller.createEvent(event),
                 TIMEOUT_SEC, TimeUnit.SECONDS);
+        createdEventIds.add(id);
 
         Map<String, Object> updates = new HashMap<>();
         updates.put("description", "Updated Description");
@@ -168,6 +166,7 @@ public class EventControllerTest {
         event.setOrganizerID(organizerID);
         String id = Tasks.await(controller.createEvent(event),
                 TIMEOUT_SEC, TimeUnit.SECONDS);
+        createdEventIds.add(id);
 
         DocumentSnapshot before = getEvent(id);
         assertTrue(before.exists());
@@ -188,6 +187,7 @@ public class EventControllerTest {
         event.setOrganizerID(organizerID);
         String id = Tasks.await(controller.createEvent(event),
                 TIMEOUT_SEC, TimeUnit.SECONDS);
+        createdEventIds.add(id);
 
         // Add once
         Tasks.await(controller.addToWaitingList(id, "userA"),
