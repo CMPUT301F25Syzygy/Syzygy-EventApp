@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- res/drawable/qr_corner_box.xml -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="250dp"
+    android:height="250dp"
+    android:viewportWidth="250"
+    android:viewportHeight="250">
+    <path
+        android:strokeColor="#5059D5"
+        android:strokeWidth="4"
+        android:pathData="M10,60 L10,10 L60,10
+                          M190,10 L240,10 L240,60
+                          M240,190 L240,240 L190,240
+                          M60,240 L10,240 L10,190" />
+</vector>
