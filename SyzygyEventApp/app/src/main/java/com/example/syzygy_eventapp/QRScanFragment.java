@@ -25,9 +25,13 @@ import androidx.fragment.app.Fragment;
 
 import com.google.android.material.navigation.NavigationBarView;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.mlkit.vision.barcode.BarcodeScanner;
 import com.google.mlkit.vision.barcode.BarcodeScanning;
+import com.google.mlkit.vision.barcode.common.Barcode;
+import com.google.mlkit.vision.common.InputImage;
 
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -43,12 +47,20 @@ public class QRScanFragment extends Fragment {
     private NavigationStackFragment navStack;
     private ExecutorService cameraExecutor;
     private PreviewView previewView;
+    private boolean isProcessingQR = false;
 
     // permissions launcher
     private ActivityResultLauncher<String> requestPermissionLauncher;
 
     public QRScanFragment(NavigationStackFragment navStack) {
         this.navStack = navStack;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // allow scanning again when returning from an EventView
+        isProcessingQR = false;
     }
 
     @Override
@@ -155,9 +167,81 @@ public class QRScanFragment extends Fragment {
     /**
      * This method actually extracts and processes QR codes from the camera feed.
      */
+    @OptIn(markerClass = ExperimentalGetImage.class)
     private void analyzeImage(BarcodeScanner scanner, ImageProxy imageProxy) {
+        // Each image frame sent by CameraX comes as an ImageProxy that contains image (meta)data.
+        android.media.Image mediaImage = imageProxy.getImage();
 
+        // If image exists, process it, else close and skip
+        // Not closing the ImageProxy will cause CameraX to stall
+        if (mediaImage != null) {
+            // Get InputImage for ML Kit processing
+            InputImage image = InputImage.fromMediaImage(
+                    mediaImage,
+                    // Ensure barcode detection works even if the phone is rotated
+                    imageProxy.getImageInfo().getRotationDegrees()
+            );
+
+            // Send frame to ML Kit's barcode scanner, call handleDetectedBarcodes if a QR Code is detected
+            scanner.process(image)
+                    .addOnSuccessListener(barcodes -> handleDetectedBarcodes(barcodes))
+                    .addOnFailureListener(Throwable::printStackTrace)
+                    .addOnCompleteListener(task -> imageProxy.close());
+        } else {
+            imageProxy.close();
+        }
     }
 
+    /**
+     * Handles detected QR codes directly; Will scan and open events.
+     */
+    private void handleDetectedBarcodes(List<Barcode> barcodes) {
+        // Pause scanning so the same QR Code doesn't keep being processed
+        if (isProcessingQR) {
+            return;
+        }
+
+        for (Barcode barcode : barcodes) {
+            String eventID = barcode.getRawValue();
+            if (eventID != null && !eventID.isEmpty()) {
+                // set isProcessingQR to true
+                isProcessingQR = true;
+
+                // Toast indicating successful scan
+                Toast.makeText(requireContext(), "QR Code: " + eventID, Toast.LENGTH_SHORT).show();
+
+                // Get event from firestore
+                FirebaseFirestore db = FirebaseFirestore.getInstance();
+                db.collection("events").document(eventID)
+                        .get()
+                        .addOnSuccessListener(snapshot -> {
+                            if (snapshot.exists()) {
+                                // TODO: Event found, navigate to eventView
+                            }
+                            else {
+                                Toast.makeText(requireContext(), "Event not found for QR: " + eventID, Toast.LENGTH_SHORT).show();
+                            }
+                            // resume scanning
+                            isProcessingQR = false;
+                        })
+                        .addOnFailureListener(e -> {
+                            Toast.makeText(requireContext(), "Error loading event: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                            // resume scanning
+                            isProcessingQR = false;
+                        });
+
+                // Stop after first valid QR is scanned
+                break;
+            }
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (cameraExecutor != null) {
+            cameraExecutor.shutdown();
+        }
+    }
 
 }
