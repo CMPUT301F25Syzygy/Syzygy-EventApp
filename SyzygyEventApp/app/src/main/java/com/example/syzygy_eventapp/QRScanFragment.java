@@ -90,13 +90,13 @@ public class QRScanFragment extends Fragment {
     public void onStart() {
         super.onStart();
 
-        // back button menu
+        // Back button menu
         navStack.setScreenNavMenu(R.menu.back_nav_menu, (i) -> {
             navStack.popScreen();
             return true;
         });
 
-        // check if perms are granted, otherwise, launch the request (launcher set up in OnCreate)
+        // Check if perms are granted, otherwise, launch the request (launcher set up in OnCreate)
         if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA)
                 == android.content.pm.PackageManager.PERMISSION_GRANTED) {
             startCamera();
@@ -194,6 +194,7 @@ public class QRScanFragment extends Fragment {
 
     /**
      * Handles detected QR codes directly; Will scan and open events.
+     * TODO: Open an event view after a valid QR Code is processed.
      */
     private void handleDetectedBarcodes(List<Barcode> barcodes) {
         // Pause scanning so the same QR Code doesn't keep being processed
