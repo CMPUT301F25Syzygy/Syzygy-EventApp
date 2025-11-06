@@ -204,7 +204,7 @@ public class QRScanFragment extends Fragment {
 
         for (Barcode barcode : barcodes) {
             String eventID = barcode.getRawValue();
-            if (eventID != null && !eventID.isEmpty()) {
+            if (eventID != null && eventID.length() == 20) {
                 // set isProcessingQR to true
                 isProcessingQR = true;
 
@@ -216,8 +216,9 @@ public class QRScanFragment extends Fragment {
                 db.collection("events").document(eventID)
                         .get()
                         .addOnSuccessListener(snapshot -> {
-                            if (snapshot.exists()) {
+                            if (snapshot != null && snapshot.exists()) {
                                 // TODO: Event found, navigate to eventView
+                                // navStack.pushScreen(new EventSummaryViewFragment(snapshot.getId(), eventName, eventLocation, ...));
                             }
                             else {
                                 Toast.makeText(requireContext(), "Event not found for QR: " + eventID, Toast.LENGTH_SHORT).show();
