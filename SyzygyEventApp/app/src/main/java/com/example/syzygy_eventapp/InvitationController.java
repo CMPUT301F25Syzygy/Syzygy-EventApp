@@ -159,6 +159,7 @@ public class InvitationController {
             String recipient = snap.getString("recipientID");
             Boolean accepted = snap.getBoolean("accepted");
             Boolean cancelled = snap.getBoolean("cancelled");
+            String eventID = snap.getString("event");
 
             if (Boolean.TRUE.equals(cancelled)) {
                 return Tasks.forException(new IllegalStateException("Invitation has been cancelled."));
@@ -172,7 +173,12 @@ public class InvitationController {
                 return Tasks.forException(new IllegalStateException("Response already given."));
             }
 
-            return doc.update("accepted", false, "responseTime", FieldValue.serverTimestamp());
+            return doc.update("accepted", false, "responseTime", FieldValue.serverTimestamp())
+                    .addOnSuccessListener(v -> {
+                        // Notify LotteryManager to refill slot
+                        LotteryManager lotteryManager = new LotteryManager();
+                        lotteryManager.onInvitationDeclined(eventID);
+                    });
         });
     }
 
