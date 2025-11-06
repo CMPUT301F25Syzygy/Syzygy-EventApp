@@ -117,7 +117,7 @@ var pathtoroot = "../../../";
 public class <span class="typeNameLabel"><a href=EventController.html>EventController</a></span>
 
                     </pre>
-                    <div class="block"><p>Controller for reading/writing <a href=Event.html>Event</a> data in Firestore DB. EventViews will call this class to create, update, and observe events. Firestore is the source of truth; views have real-time listeners.</p></div>
+                    <div class="block"><p>Controller for reading/writing Invitation data in Firestore DB. EventViews will call this class to create, update, and observe events. Firestore is the source of truth; views have real-time listeners.</p></div>
 
                     <dl>
 
@@ -251,6 +251,78 @@ public class <span class="typeNameLabel"><a href=EventController.html>EventContr
                                             <th class="colLast" scope="col">Description</th>
                                         </tr>
                                         
+                                        <tr id="i0" class="altColor">
+                                            <td class="colFirst"><code>Task&lt;String&gt;</code>
+                                            </td>
+                                            <th class="colSecond" scope="row"><code><a href=EventController.html#createEvent(com.example.syzygy_eventapp.Event)>createEvent</a>(<a href=Event.html>Event</a> event) </code>
+                                            </th>
+                                            <td class="colLast">Create a new event with provided details.</td>
+                                        </tr>
+                                        
+                                        <tr id="i1" class="rowColor">
+                                            <td class="colFirst"><code>ListenerRegistration</code>
+                                            </td>
+                                            <th class="colSecond" scope="row"><code><a href=EventController.html#observeEvent(java.lang.String,java.util.function.Consumer,java.util.function.Consumer)>observeEvent</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> eventID, <a href=https://developer.android.com/reference/kotlin/java/util/function/Consumer.html>Consumer</a>&lt;<a href=Event.html>Event</a>&gt; onEventChange, <a href=https://developer.android.com/reference/kotlin/java/util/function/Consumer.html>Consumer</a>&lt;<a href=https://developer.android.com/reference/kotlin/java/lang/Exception.html>Exception</a>&gt; onError) </code>
+                                            </th>
+                                            <td class="colLast">Real time observers; observes a single event in real time</td>
+                                        </tr>
+                                        
+                                        <tr id="i2" class="altColor">
+                                            <td class="colFirst"><code>ListenerRegistration</code>
+                                            </td>
+                                            <th class="colSecond" scope="row"><code><a href=EventController.html#observeAllEvents(java.util.function.Consumer,java.util.function.Consumer)>observeAllEvents</a>(<a href=https://developer.android.com/reference/kotlin/java/util/function/Consumer.html>Consumer</a>&lt;<a href=https://developer.android.com/reference/kotlin/java/util/List.html>List</a>&lt;<a href=Event.html>Event</a>&gt;&gt; onChange, <a href=https://developer.android.com/reference/kotlin/java/util/function/Consumer.html>Consumer</a>&lt;<a href=https://developer.android.com/reference/kotlin/java/lang/Exception.html>Exception</a>&gt; onError) </code>
+                                            </th>
+                                            <td class="colLast">Observe all events in real time.</td>
+                                        </tr>
+                                        
+                                        <tr id="i3" class="rowColor">
+                                            <td class="colFirst"><code>ListenerRegistration</code>
+                                            </td>
+                                            <th class="colSecond" scope="row"><code><a href=EventController.html#observeOrganizerEvents(java.lang.String,java.util.function.Consumer,java.util.function.Consumer)>observeOrganizerEvents</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> organizerID, <a href=https://developer.android.com/reference/kotlin/java/util/function/Consumer.html>Consumer</a>&lt;<a href=https://developer.android.com/reference/kotlin/java/util/List.html>List</a>&lt;<a href=Event.html>Event</a>&gt;&gt; onChange, <a href=https://developer.android.com/reference/kotlin/java/util/function/Consumer.html>Consumer</a>&lt;<a href=https://developer.android.com/reference/kotlin/java/lang/Exception.html>Exception</a>&gt; onError) </code>
+                                            </th>
+                                            <td class="colLast">Observe all events owned by an organizer in real time.</td>
+                                        </tr>
+                                        
+                                        <tr id="i4" class="altColor">
+                                            <td class="colFirst"><code>Task&lt;Integer&gt;</code>
+                                            </td>
+                                            <th class="colSecond" scope="row"><code><a href=EventController.html#getWaitingListSize(java.lang.String)>getWaitingListSize</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> eventID) </code>
+                                            </th>
+                                            <td class="colLast">Get the current number of Entrants on a waiting list for an event.</td>
+                                        </tr>
+                                        
+                                        <tr id="i5" class="rowColor">
+                                            <td class="colFirst"><code>Task&lt;Void&gt;</code>
+                                            </td>
+                                            <th class="colSecond" scope="row"><code><a href=EventController.html#addToWaitingList(java.lang.String,java.lang.String)>addToWaitingList</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> eventID, <a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> userID) </code>
+                                            </th>
+                                            <td class="colLast">Add a user to the waiting list for an event.</td>
+                                        </tr>
+                                        
+                                        <tr id="i6" class="altColor">
+                                            <td class="colFirst"><code>Task&lt;Void&gt;</code>
+                                            </td>
+                                            <th class="colSecond" scope="row"><code><a href=EventController.html#removeFromWaitingList(java.lang.String,java.lang.String)>removeFromWaitingList</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> eventID, <a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> userID) </code>
+                                            </th>
+                                            <td class="colLast">Remove a user from the waiting list for an event.</td>
+                                        </tr>
+                                        
+                                        <tr id="i7" class="rowColor">
+                                            <td class="colFirst"><code>Task&lt;Void&gt;</code>
+                                            </td>
+                                            <th class="colSecond" scope="row"><code><a href=EventController.html#updateEvent(java.lang.String,java.util.Map)>updateEvent</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> eventID, <a href=https://developer.android.com/reference/kotlin/java/util/Map.html>Map</a>&lt;<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a>, <a href=https://developer.android.com/reference/kotlin/java/lang/Object.html>Object</a>&gt; updates) </code>
+                                            </th>
+                                            <td class="colLast">Update event details.</td>
+                                        </tr>
+                                        
+                                        <tr id="i8" class="altColor">
+                                            <td class="colFirst"><code>Task&lt;Void&gt;</code>
+                                            </td>
+                                            <th class="colSecond" scope="row"><code><a href=EventController.html#deleteEvent(java.lang.String)>deleteEvent</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> eventID) </code>
+                                            </th>
+                                            <td class="colLast"></td>
+                                        </tr>
+                                        
                                         </tbody>
                                     </table>
                                 </div>
@@ -304,6 +376,325 @@ public class <span class="typeNameLabel"><a href=EventController.html>EventContr
                                 <!--   -->
                             </a>
                                 <h3>Method Detail</h3>
+                                
+                                <a id="createEvent(com.example.syzygy_eventapp.Event)">
+                                    <!--   -->
+                                </a>
+                                <ul class=
+                                              "blockList"
+                                          >
+                                    <li class="blockList">
+                                        <h4>createEvent</h4>
+                                        <pre class="methodSignature"> Task&lt;String&gt; <a href=EventController.html#createEvent(com.example.syzygy_eventapp.Event)>createEvent</a>(<a href=Event.html>Event</a> event)</pre>
+                                        <div class="block"><p>Create a new event with provided details.</p></div>
+
+                                        <dl>
+
+                                        
+                                            <dt><span class="paramLabel">Parameters:</span></dt>
+                                            
+                                            
+                                            <dd><code>event</code> - Event object with the details filled in.</dd>
+                                            
+                                            
+                                        
+
+                                        
+                                            <dt><span class="returnLabel">Returns:</span></dt>
+                                            <dd><p>Task that completes when the document is created.</p></dd>
+                                        
+
+                                        
+
+                                        </dl>
+                                    </li>
+                                </ul>
+                                
+                                <a id="observeEvent(java.lang.String,java.util.function.Consumer,java.util.function.Consumer)">
+                                    <!--   -->
+                                </a>
+                                <ul class=
+                                              "blockList"
+                                          >
+                                    <li class="blockList">
+                                        <h4>observeEvent</h4>
+                                        <pre class="methodSignature"> ListenerRegistration <a href=EventController.html#observeEvent(java.lang.String,java.util.function.Consumer,java.util.function.Consumer)>observeEvent</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> eventID, <a href=https://developer.android.com/reference/kotlin/java/util/function/Consumer.html>Consumer</a>&lt;<a href=Event.html>Event</a>&gt; onEventChange, <a href=https://developer.android.com/reference/kotlin/java/util/function/Consumer.html>Consumer</a>&lt;<a href=https://developer.android.com/reference/kotlin/java/lang/Exception.html>Exception</a>&gt; onError)</pre>
+                                        <div class="block"><p>Real time observers; observes a single event in real time</p></div>
+
+                                        <dl>
+
+                                        
+                                            <dt><span class="paramLabel">Parameters:</span></dt>
+                                            
+                                            
+                                            <dd><code>eventID</code> - Event document ID to observe</dd>
+                                            
+                                            
+                                            
+                                            <dd><code>onEventChange</code> - Callback invoked with the latest Event object</dd>
+                                            
+                                            
+                                            
+                                            <dd><code>onError</code> - Callback invoked on listener errors</dd>
+                                            
+                                            
+                                        
+
+                                        
+                                            <dt><span class="returnLabel">Returns:</span></dt>
+                                            <dd><p>ListenerRegistration that must be removed when no longer needed</p></dd>
+                                        
+
+                                        
+
+                                        </dl>
+                                    </li>
+                                </ul>
+                                
+                                <a id="observeAllEvents(java.util.function.Consumer,java.util.function.Consumer)">
+                                    <!--   -->
+                                </a>
+                                <ul class=
+                                              "blockList"
+                                          >
+                                    <li class="blockList">
+                                        <h4>observeAllEvents</h4>
+                                        <pre class="methodSignature"> ListenerRegistration <a href=EventController.html#observeAllEvents(java.util.function.Consumer,java.util.function.Consumer)>observeAllEvents</a>(<a href=https://developer.android.com/reference/kotlin/java/util/function/Consumer.html>Consumer</a>&lt;<a href=https://developer.android.com/reference/kotlin/java/util/List.html>List</a>&lt;<a href=Event.html>Event</a>&gt;&gt; onChange, <a href=https://developer.android.com/reference/kotlin/java/util/function/Consumer.html>Consumer</a>&lt;<a href=https://developer.android.com/reference/kotlin/java/lang/Exception.html>Exception</a>&gt; onError)</pre>
+                                        <div class="block"><p>Observe all events in real time.</p></div>
+
+                                        <dl>
+
+                                        
+                                            <dt><span class="paramLabel">Parameters:</span></dt>
+                                            
+                                            
+                                            <dd><code>onChange</code> - Callback invoked with the latest list of Event objects</dd>
+                                            
+                                            
+                                            
+                                            <dd><code>onError</code> - Callback invoked on listener errors</dd>
+                                            
+                                            
+                                        
+
+                                        
+                                            <dt><span class="returnLabel">Returns:</span></dt>
+                                            <dd><p>ListenerRegistration that must be removed when no longer needed</p></dd>
+                                        
+
+                                        
+
+                                        </dl>
+                                    </li>
+                                </ul>
+                                
+                                <a id="observeOrganizerEvents(java.lang.String,java.util.function.Consumer,java.util.function.Consumer)">
+                                    <!--   -->
+                                </a>
+                                <ul class=
+                                              "blockList"
+                                          >
+                                    <li class="blockList">
+                                        <h4>observeOrganizerEvents</h4>
+                                        <pre class="methodSignature"> ListenerRegistration <a href=EventController.html#observeOrganizerEvents(java.lang.String,java.util.function.Consumer,java.util.function.Consumer)>observeOrganizerEvents</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> organizerID, <a href=https://developer.android.com/reference/kotlin/java/util/function/Consumer.html>Consumer</a>&lt;<a href=https://developer.android.com/reference/kotlin/java/util/List.html>List</a>&lt;<a href=Event.html>Event</a>&gt;&gt; onChange, <a href=https://developer.android.com/reference/kotlin/java/util/function/Consumer.html>Consumer</a>&lt;<a href=https://developer.android.com/reference/kotlin/java/lang/Exception.html>Exception</a>&gt; onError)</pre>
+                                        <div class="block"><p>Observe all events owned by an organizer in real time.</p></div>
+
+                                        <dl>
+
+                                        
+                                            <dt><span class="paramLabel">Parameters:</span></dt>
+                                            
+                                            
+                                            <dd><code>organizerID</code> - Organizer document ID to observe</dd>
+                                            
+                                            
+                                            
+                                            <dd><code>onChange</code> - Callback invoked with the latest list of Event objects</dd>
+                                            
+                                            
+                                            
+                                            <dd><code>onError</code> - Callback invoked on listener errors</dd>
+                                            
+                                            
+                                        
+
+                                        
+                                            <dt><span class="returnLabel">Returns:</span></dt>
+                                            <dd><p>ListenerRegistration that must be removed when no longer needed</p></dd>
+                                        
+
+                                        
+
+                                        </dl>
+                                    </li>
+                                </ul>
+                                
+                                <a id="getWaitingListSize(java.lang.String)">
+                                    <!--   -->
+                                </a>
+                                <ul class=
+                                              "blockList"
+                                          >
+                                    <li class="blockList">
+                                        <h4>getWaitingListSize</h4>
+                                        <pre class="methodSignature"> Task&lt;Integer&gt; <a href=EventController.html#getWaitingListSize(java.lang.String)>getWaitingListSize</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> eventID)</pre>
+                                        <div class="block"><p>Get the current number of Entrants on a waiting list for an event.</p></div>
+
+                                        <dl>
+
+                                        
+                                            <dt><span class="paramLabel">Parameters:</span></dt>
+                                            
+                                            
+                                            <dd><code>eventID</code> - Event document ID</dd>
+                                            
+                                            
+                                        
+
+                                        
+                                            <dt><span class="returnLabel">Returns:</span></dt>
+                                            <dd><p>Task that completes with the count of users on the waiting list</p></dd>
+                                        
+
+                                        
+
+                                        </dl>
+                                    </li>
+                                </ul>
+                                
+                                <a id="addToWaitingList(java.lang.String,java.lang.String)">
+                                    <!--   -->
+                                </a>
+                                <ul class=
+                                              "blockList"
+                                          >
+                                    <li class="blockList">
+                                        <h4>addToWaitingList</h4>
+                                        <pre class="methodSignature"> Task&lt;Void&gt; <a href=EventController.html#addToWaitingList(java.lang.String,java.lang.String)>addToWaitingList</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> eventID, <a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> userID)</pre>
+                                        <div class="block"><p>Add a user to the waiting list for an event.</p></div>
+
+                                        <dl>
+
+                                        
+                                            <dt><span class="paramLabel">Parameters:</span></dt>
+                                            
+                                            
+                                            <dd><code>eventID</code> - Event document ID</dd>
+                                            
+                                            
+                                            
+                                            <dd><code>userID</code> - User document ID</dd>
+                                            
+                                            
+                                        
+
+                                        
+                                            <dt><span class="returnLabel">Returns:</span></dt>
+                                            <dd><p>Task that completes when the user is added to the waiting list</p></dd>
+                                        
+
+                                        
+
+                                        </dl>
+                                    </li>
+                                </ul>
+                                
+                                <a id="removeFromWaitingList(java.lang.String,java.lang.String)">
+                                    <!--   -->
+                                </a>
+                                <ul class=
+                                              "blockList"
+                                          >
+                                    <li class="blockList">
+                                        <h4>removeFromWaitingList</h4>
+                                        <pre class="methodSignature"> Task&lt;Void&gt; <a href=EventController.html#removeFromWaitingList(java.lang.String,java.lang.String)>removeFromWaitingList</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> eventID, <a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> userID)</pre>
+                                        <div class="block"><p>Remove a user from the waiting list for an event.</p></div>
+
+                                        <dl>
+
+                                        
+                                            <dt><span class="paramLabel">Parameters:</span></dt>
+                                            
+                                            
+                                            <dd><code>eventID</code> - Event document ID</dd>
+                                            
+                                            
+                                            
+                                            <dd><code>userID</code> - User document ID</dd>
+                                            
+                                            
+                                        
+
+                                        
+                                            <dt><span class="returnLabel">Returns:</span></dt>
+                                            <dd><p>Task that completes when the user is removed from the waiting list</p></dd>
+                                        
+
+                                        
+
+                                        </dl>
+                                    </li>
+                                </ul>
+                                
+                                <a id="updateEvent(java.lang.String,java.util.Map)">
+                                    <!--   -->
+                                </a>
+                                <ul class=
+                                              "blockList"
+                                          >
+                                    <li class="blockList">
+                                        <h4>updateEvent</h4>
+                                        <pre class="methodSignature"> Task&lt;Void&gt; <a href=EventController.html#updateEvent(java.lang.String,java.util.Map)>updateEvent</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> eventID, <a href=https://developer.android.com/reference/kotlin/java/util/Map.html>Map</a>&lt;<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a>, <a href=https://developer.android.com/reference/kotlin/java/lang/Object.html>Object</a>&gt; updates)</pre>
+                                        <div class="block"><p>Update event details.</p></div>
+
+                                        <dl>
+
+                                        
+                                            <dt><span class="paramLabel">Parameters:</span></dt>
+                                            
+                                            
+                                            <dd><code>eventID</code> - Event document ID</dd>
+                                            
+                                            
+                                            
+                                            <dd><code>updates</code> - Map of field names to new values</dd>
+                                            
+                                            
+                                        
+
+                                        
+                                            <dt><span class="returnLabel">Returns:</span></dt>
+                                            <dd><p>Task that completes when the event is updated</p></dd>
+                                        
+
+                                        
+
+                                        </dl>
+                                    </li>
+                                </ul>
+                                
+                                <a id="deleteEvent(java.lang.String)">
+                                    <!--   -->
+                                </a>
+                                <ul class=
+                                              "blockListLast"
+                                          >
+                                    <li class="blockList">
+                                        <h4>deleteEvent</h4>
+                                        <pre class="methodSignature"> Task&lt;Void&gt; <a href=EventController.html#deleteEvent(java.lang.String)>deleteEvent</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> eventID)</pre>
+                                        <div class="block"></div>
+
+                                        <dl>
+
+                                        
+
+                                        
+
+                                        
+
+                                        </dl>
+                                    </li>
+                                </ul>
                                 
                             </li>
                         </ul>
