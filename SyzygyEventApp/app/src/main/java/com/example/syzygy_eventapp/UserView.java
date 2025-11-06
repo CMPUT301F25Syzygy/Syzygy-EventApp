@@ -1,68 +1,128 @@
 package com.example.syzygy_eventapp;
 
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+
+import com.google.android.material.chip.Chip;
+import com.google.android.material.imageview.ShapeableImageView;
+import com.google.firebase.firestore.ListenerRegistration;
+
 
 /**
- * A simple {@link Fragment} subclass.
+ * A view representing info about a given {@link User}.
  * Use the {@link UserView#newInstance} factory method to
  * create an instance of this fragment.
  */
 public class UserView extends Fragment {
 
-    private static final String ARG_USERNAME = "userName";
-    private static final String ARG_EMAIL = "email";
-    private static final String ARG_PHONENUMBER = "phoneNumber";
-    private static final String ARG_ROLE = "role";
+    /// The argument key for the user ID.
+    private static final String ARG_USER_ID = "userId";
+    /// The ID of the user to display.
+    private String userID;
 
-    private String userName;
-    private String email;
-    private String phoneNumber;
-    private String role;
+    /// The text view for the user's name.
+    private TextView nameText;
+    /// The text view for the user's email.
+    private TextView emailText;
+    /// The text view for the user's phone number.
+    private TextView phoneText;
+    /// The chip displaying the user's role.
+    private Chip roleChip;
+    /// The image view for the user's profile picture.
+    private ShapeableImageView profileImage;
 
+    /// Listener registration for user data updates.
+    private ListenerRegistration listenerRegistration;
+
+    /**
+     * Required empty public constructor.
+     */
     public UserView() {
-        // Required empty public constructor
     }
 
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param user The {@link User} to construct this fragment from.
+     * @param userID The ID of the {@link User} to construct
+     *               this fragment from.
      * @return A new instance of fragment UserView.
      */
-    // TODO: Rename and change types and number of parameters
-    public static UserView newInstance(User user) {
+    public static UserView newInstance(String userID) {
         UserView fragment = new UserView();
         Bundle args = new Bundle();
-        args.putString(ARG_USERNAME, user.getName());
-        args.putString(ARG_EMAIL, user.getEmail());
-        args.putString(ARG_PHONENUMBER, user.getPhone());
-        args.putString(ARG_ROLE, user.getRole().toString());
+        args.putString(ARG_USER_ID, userID);
         fragment.setArguments(args);
         return fragment;
     }
 
+    /**
+     * Initializes the fragment and retrieves the user ID from arguments.
+     */
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            this.userName = getArguments().getString(ARG_USERNAME);
-            this.email = getArguments().getString(ARG_EMAIL);
-            this.phoneNumber = getArguments().getString(ARG_PHONENUMBER);
-            this.role = getArguments().getString(ARG_ROLE);
+            this.userID = getArguments().getString(ARG_USER_ID);
         }
     }
 
+    /**
+     * Inflates the layout and initializes UI components.
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_user_view, container, false);
+        View view = inflater.inflate(R.layout.fragment_user_view, container, false);
+
+        // Initialize UI components
+        nameText = view.findViewById(R.id.user_name);
+        emailText = view.findViewById(R.id.user_email);
+        phoneText = view.findViewById(R.id.user_phone);
+        roleChip = view.findViewById(R.id.user_role_chip);
+        profileImage = view.findViewById(R.id.user_profile_image);
+
+        fetchUser();
+
+        return view;
+    }
+
+    /**
+     * Fetches the user data and sets up a listener for real-time updates.
+     */
+    private void fetchUser() {
+        if (userID == null) return;
+
+        UserController.getInstance().observeUser(userID, user -> {
+            // Update UI when user changes
+            nameText.setText(user.getName());
+            emailText.setText(user.getEmail());
+            phoneText.setText(user.getPhone());
+            roleChip.setText(user.getRole().toString());
+            // TODO: set profile image if available
+        }, () -> {
+            // Handle user deleted
+            Toast.makeText(getContext(), "User deleted", Toast.LENGTH_SHORT).show();
+        });
+    }
+
+    /**
+     * Cleans up the listener when the view is destroyed.
+     */
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        // Remove listener if needed
+        if (listenerRegistration != null) {
+            listenerRegistration.remove();
+        }
     }
 }
