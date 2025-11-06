@@ -144,12 +144,9 @@ public class ProfileFragment extends Fragment {
         super.onStart();
 
         // Ensure user exists before observing
-        userController.getUser(userID).addOnSuccessListener(user -> startUserListener(userID))
-                .addOnFailureListener(e ->
-                        userController.createEntrant(userID)
-                                .addOnSuccessListener(newUser -> startUserListener(userID))
-                                .addOnFailureListener(err -> showError("Failed to create user: " + err.getMessage()))
-                );
+        userController.getUser(userID)
+                .addOnSuccessListener(user -> startUserListener(userID))
+                .addOnFailureListener(err -> showError("Failed to find user: " + err.getMessage()));
     }
 
     /**

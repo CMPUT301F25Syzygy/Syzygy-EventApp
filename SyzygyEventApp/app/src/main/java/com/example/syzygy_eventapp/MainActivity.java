@@ -24,6 +24,7 @@ public class MainActivity extends AppCompatActivity implements OnItemSelectedLis
     private Fragment joinedFragment;
     private Fragment organizerFragment;
     private Fragment adminFragment;
+    private UserControllerInterface userController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,23 +50,30 @@ public class MainActivity extends AppCompatActivity implements OnItemSelectedLis
         organizerFragment = new OrganizerFragment();
         adminFragment = new AdministratorFragment();
 
-        // set as entrant initially until role has been fetched
-
         String userID = AppInstallationId.get(this);
-        UserControllerInterface userController = UserController.getInstance();
+        userController = UserController.getInstance();
 
-        userController.getUser(userID).addOnSuccessListener((user) -> {
-            this.updateMainNavBar(user);
-            navStack.selectNavItem(R.id.profile_nav_button);
-            
-            userController.observeUser(userID,
-                    this::updateMainNavBar, // update bar on changes
-                    null);
-        });
+        // Ensure user exists before observing
+        userController.getUser(userID)
+                .addOnSuccessListener(this::setupMainNavBar)
+                .addOnFailureListener(e ->
+                        userController.createEntrant(userID)
+                                .addOnSuccessListener(this::setupMainNavBar)
+                );
+    }
+
+    private void setupMainNavBar(User user) {
+        this.updateMainNavBar(user);
+        navStack.selectNavItem(R.id.profile_nav_button);
+
+        userController.observeUser(user.getUserID(),
+                this::updateMainNavBar, // update bar on changes
+                null);
     }
 
     private void updateMainNavBar(User user) {
         Role role = user.getRole();
+
         if (role == Role.ENTRANT) {
             navStack.setMainNavMenu(R.menu.entrant_nav_menu, this);
         } else if (role == Role.ORGANIZER) {
