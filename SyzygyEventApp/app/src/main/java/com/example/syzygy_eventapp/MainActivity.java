@@ -3,12 +3,19 @@ package com.example.syzygy_eventapp;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+
+import com.google.android.gms.tasks.Tasks;
 import com.google.android.material.navigation.NavigationBarView.OnItemSelectedListener;
+
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 public class MainActivity extends AppCompatActivity implements OnItemSelectedListener {
     private NavigationStackFragment navStack;
@@ -42,11 +49,31 @@ public class MainActivity extends AppCompatActivity implements OnItemSelectedLis
         organizerFragment = new OrganizerFragment(navStack, "eventID");
         adminFragment = new AdministratorFragment();
 
-        navStack.setMainNavMenu(R.menu.entrant_nav_menu, this);
-        // navStack.setMainNavMenu(R.menu.organizer_nav_menu, this);
-        // navStack.setMainNavMenu(R.menu.admin_nav_menu, this);
+        // set as entrant initially until role has been fetched
 
-        navStack.selectNavItem(R.id.profile_nav_button);
+        String userID = AppInstallationId.get(this);
+        UserControllerInterface userController = UserController.getInstance();
+
+        userController.getUser(userID).addOnSuccessListener((user) -> {
+            this.updateMainNavBar(user);
+            navStack.selectNavItem(R.id.profile_nav_button);
+            
+            userController.observeUser(userID,
+                    this::updateMainNavBar, // update bar on changes
+                    null);
+        });
+    }
+
+    private void updateMainNavBar(User user) {
+        Role role = user.getRole();
+        if (role == Role.ENTRANT) {
+            navStack.setMainNavMenu(R.menu.entrant_nav_menu, this);
+        } else if (role == Role.ORGANIZER) {
+            navStack.setMainNavMenu(R.menu.organizer_nav_menu, this);
+        } else {
+            assert role == Role.ADMIN;
+            navStack.setMainNavMenu(R.menu.admin_nav_menu, this);
+        }
     }
 
     public boolean onNavigationItemSelected(MenuItem item) {
