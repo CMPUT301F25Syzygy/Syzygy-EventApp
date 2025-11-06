@@ -159,7 +159,6 @@ public class InvitationController {
             String recipient = snap.getString("recipientID");
             Boolean accepted = snap.getBoolean("accepted");
             Boolean cancelled = snap.getBoolean("cancelled");
-            String eventID = snap.getString("event");
 
             if (Boolean.TRUE.equals(cancelled)) {
                 return Tasks.forException(new IllegalStateException("Invitation has been cancelled."));
