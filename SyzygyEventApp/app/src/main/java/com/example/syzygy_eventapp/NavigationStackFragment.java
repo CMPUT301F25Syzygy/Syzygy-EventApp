@@ -15,6 +15,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView.OnItemSelectedListener;
 
 import java.util.Stack;
+import java.util.UUID;
 
 /**
  * Manages a stack of different screens (fragments) that can be pushed and popped.
@@ -27,6 +28,7 @@ public class NavigationStackFragment extends Fragment implements OnItemSelectedL
         public OnItemSelectedListener listener = null;
         public Integer menuResId = null;
         public Integer menuSelectedItemId = null;
+        public UUID uuid = UUID.randomUUID();
 
         Screen(Fragment fragment) {
             this.fragment = fragment;
@@ -36,7 +38,7 @@ public class NavigationStackFragment extends Fragment implements OnItemSelectedL
     final private Stack<Screen> screenStack;
     private OnBackPressedCallback backCallback;
     private BottomNavigationView navBar;
-    private Screen displayedScreen = null;
+    private UUID displayedScreenUUID = null;
 
     NavigationStackFragment() {
         screenStack = new Stack<Screen>();
@@ -159,7 +161,7 @@ public class NavigationStackFragment extends Fragment implements OnItemSelectedL
      * Calls {@link #setScreenNavMenu(int, int, OnItemSelectedListener)} with the index of 0 (the main menu)
      */
     public void setMainNavMenu(int menuResId, OnItemSelectedListener listener) {
-        setScreenNavMenu(screenStack.size() - 1, menuResId, listener);
+        setScreenNavMenu(0, menuResId, listener);
     }
 
     /**
@@ -175,6 +177,7 @@ public class NavigationStackFragment extends Fragment implements OnItemSelectedL
         Screen screen = screenStack.get(index);
         screen.listener = listener;
         screen.menuResId = menuResId;
+        screen.uuid = UUID.randomUUID();
 
         refreshNavBar();
     }
@@ -207,7 +210,7 @@ public class NavigationStackFragment extends Fragment implements OnItemSelectedL
         if (navBar != null) {
             if (menuScreen == null) {
                 clearNavBar();
-            } else if (displayedScreen == null || !displayedScreen.equals(menuScreen)) {
+            } else if (displayedScreenUUID == null || displayedScreenUUID != menuScreen.uuid) {
                 inflateIntoNavBar(menuScreen);
             }
         }
@@ -219,7 +222,7 @@ public class NavigationStackFragment extends Fragment implements OnItemSelectedL
     private void inflateIntoNavBar(Screen screen) {
         clearNavBar();
         navBar.inflateMenu(screen.menuResId);
-        displayedScreen = screen;
+        displayedScreenUUID = screen.uuid;
 
         if (screen.menuSelectedItemId != null) {
             // wait for the nav bar to finish setting up
@@ -238,7 +241,7 @@ public class NavigationStackFragment extends Fragment implements OnItemSelectedL
      */
     private void clearNavBar() {
         navBar.getMenu().clear();
-        displayedScreen = null;
+        displayedScreenUUID = null;
     }
 
     /**
