@@ -60,17 +60,55 @@ public class LotteryManager {
             Log.d("LotteryManager", "No entrants to process for event: " + event.getEventID());
             return;
         }
-        // no maxAttendees set, can't draw
+        // No maxAttendees set, can't draw
         if (maxAttendees == null || maxAttendees <= 0) {
             Log.d("LotteryManager", "Event has no attendee limit set, skipping lottery.");
             return;
         }
 
-        // randomize waiting list using a new ArrayList and Collections
+        // Randomize waiting list using a new ArrayList and Collections
         List<String> shuffled = new ArrayList<>(waitingList);
         Collections.shuffle(shuffled);
 
-        // select winners by making a sublist of the shuffled list from 0 to i, where i is the maxAttendees
+        // Select winners by making a sublist of the shuffled list from 0 to i, where i is the maxAttendees
         List<String> selected = shuffled.subList(0, Math.min(maxAttendees, shuffled.size()));
+
+        // Create invitations for the selected users
+        invitationController.createInvites(event.getEventID(), event.getOrganizerID(), selected)
+                .addOnSuccessListener(inviteIDs -> {
+                    Log.d("LotteryManager", "Invitations created: " + inviteIDs.size());
+
+                    // Mark the event as complete if fully invited
+                    eventController.updateEvent(event.getEventID(), Collections.singletonMap("lotteryComplete", true))
+                            .addOnSuccessListener(v -> Log.d("LotteryManager", "Lottery completed for event: " + event.getEventID()))
+                            .addOnFailureListener(e -> Log.e("LotteryManager", "Failed to mark lottery complete: " + e.getMessage()));
+                })
+                .addOnFailureListener(e -> Log.e("LotteryManager", "Failed to create invitations: " + e.getMessage()));
+    }
+
+    /**
+     * Called automatically when someone declines their invitation to an event
+     * Triggers another random draw to fill the open slot
+     * @param eventID
+     */
+    public void onInvitationDeclined(String eventID) {
+        // null event, can't draw
+        if (eventID == null || eventID.isEmpty()) {
+            return;
+        }
+
+        eventController.observeEvent(eventID, event -> {
+            if (event == null) {
+                return;
+            }
+
+            if (!event.isLotteryComplete()) {
+                Log.d("LotteryManager", "Re-running lottery for declined invitation in event: " + eventID);
+                processEventLottery(event);
+            }
+            else {
+                Log.d("LotteryManager", "Lottery already complete; no rerun needed.");
+            }
+        }, error -> Log.e("LotteryManager", "Error fetching event for decline: " + error.getMessage()));
     }
 }
