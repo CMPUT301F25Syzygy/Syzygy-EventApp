@@ -22,10 +22,18 @@ public class LotteryManager {
     private final InvitationController invitationController;
     private final FirebaseFirestore db;
 
+    // DEFAULT CONSTRUCTOR
     public LotteryManager() {
         this.eventController = new EventController();
         this.invitationController = new InvitationController();
         this.db = FirebaseFirestore.getInstance();
+    }
+
+    // TEST CONSTRUCTOR
+    public LotteryManager(EventController eventController, InvitationController invitationController) {
+        this.eventController = eventController;
+        this.invitationController = invitationController;
+        this.db = null;
     }
 
     /**
@@ -110,5 +118,16 @@ public class LotteryManager {
                 Log.d("LotteryManager", "Lottery already complete; no rerun needed.");
             }
         }, error -> Log.e("LotteryManager", "Error fetching event for decline: " + error.getMessage()));
+    }
+
+    // This function just separates out the shuffling and selecting logic so I can test it without the firebase portion
+    // Picks a list of winners based on the waiting list and max attendees
+    public List<String> selectWinners(List<String> waitingList, int maxAttendees) {
+        if (waitingList == null || waitingList.isEmpty() || maxAttendees <= 0) {
+            return new ArrayList<>();
+        }
+        List<String> shuffled = new ArrayList<>(waitingList);
+        Collections.shuffle(shuffled);
+        return new ArrayList<>(shuffled.subList(0, Math.min(maxAttendees, shuffled.size())));
     }
 }
