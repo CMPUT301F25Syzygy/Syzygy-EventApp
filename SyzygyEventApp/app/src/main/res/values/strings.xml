@@ -3,4 +3,15 @@
     <string name="events_found">Events Found</string>
     <string name="upcoming">Upcoming</string>
     <string name="history">History</string>
+    <string name="event_title">John Doe’s Super Cool Event</string>
+    <string name="Organizer">John Doe</string>
+    <string name="location_text">10800 97 Ave NW, Edmonton, AB T5K 2B6</string>
+    <string name="time_text">5:00pm - 8:00pm</string>
+    <string name="event_detail_time">DD/MM/YY at 00:00 AM - 00:00 PM</string>
+    <string name="event_details_description">A brief description of the event goes here!</string>
+    <string name="event_details_num_people">You’re currently joining NumEntrants other people!</string>
+    <string name="event_details_num_entrants">xxxxx entrants (max)</string>
+    <string name="event_detail_location">10800 97 Ave NW, Edmonton, AB T5K 2B6</string>
+    <string name="event_detail_orginizer">By John Doe</string>
+    <string name="event_detail_event_title">John Doe’s Super Cool Event</string>
 </resources>

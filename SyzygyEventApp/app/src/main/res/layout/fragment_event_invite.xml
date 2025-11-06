@@ -95,7 +95,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
             android:background="#F1F1F1"
-            android:backgroundTint="#EAEAEA"
+            android:backgroundTint="#E9E9E9"
             android:gravity="center_vertical"
             android:orientation="horizontal"
             android:padding="12dp">
@@ -124,6 +124,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
             android:background="#F1F1F1"
+            android:backgroundTint="#E9E9E9"
             android:gravity="center_vertical"
             android:orientation="horizontal"
             android:padding="12dp">
@@ -137,7 +138,7 @@
 
             <TextView
                 android:id="@+id/event_time"
-                android:layout_width="wrap_content"
+                android:layout_width="272dp"
                 android:layout_height="wrap_content"
                 android:text="@string/time_text"
                 android:textColor="#000000"
