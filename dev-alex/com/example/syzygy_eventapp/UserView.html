@@ -117,7 +117,7 @@ var pathtoroot = "../../../";
 public class <span class="typeNameLabel"><a href=UserView.html>UserView</a></span>
 
                     </pre>
-                    <div class="block"><p>A simple Fragment subclass. Use the <a href=UserView.html#newInstance(com.example.syzygy_eventapp.User)>newInstance</a> factory method to create an instance of this fragment.</p></div>
+                    <div class="block"><p>A view representing info about a given <a href=User.html>User</a>. Use the <a href=UserView.html#newInstance(java.lang.String)>newInstance</a> factory method to create an instance of this fragment.</p></div>
 
                     <dl>
 
@@ -199,7 +199,7 @@ public class <span class="typeNameLabel"><a href=UserView.html>UserView</a></spa
                                             <tr class="altColor">
                                                 <th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a
                                                         href="#UserView()">UserView</a></span>()</code></th>
-                                                <td class="colLast"></td>
+                                                <td class="colLast">Required empty public constructor.</td>
                                             </tr>
                                         
 
@@ -254,7 +254,7 @@ public class <span class="typeNameLabel"><a href=UserView.html>UserView</a></spa
                                         <tr id="i0" class="altColor">
                                             <td class="colFirst"><code>static <a href=UserView.html>UserView</a></code>
                                             </td>
-                                            <th class="colSecond" scope="row"><code><a href=UserView.html#newInstance(com.example.syzygy_eventapp.User)>newInstance</a>(<a href=User.html>User</a> user) </code>
+                                            <th class="colSecond" scope="row"><code><a href=UserView.html#newInstance(java.lang.String)>newInstance</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> userID) </code>
                                             </th>
                                             <td class="colLast">Use this factory method to create a new instance of this fragment using the provided parameters.</td>
                                         </tr>
@@ -264,7 +264,7 @@ public class <span class="typeNameLabel"><a href=UserView.html>UserView</a></spa
                                             </td>
                                             <th class="colSecond" scope="row"><code><a href=UserView.html#onCreate(Bundle)>onCreate</a>(Bundle savedInstanceState) </code>
                                             </th>
-                                            <td class="colLast"></td>
+                                            <td class="colLast">Initializes the fragment and retrieves the user ID from arguments.</td>
                                         </tr>
                                         
                                         <tr id="i2" class="altColor">
@@ -272,7 +272,15 @@ public class <span class="typeNameLabel"><a href=UserView.html>UserView</a></spa
                                             </td>
                                             <th class="colSecond" scope="row"><code><a href=UserView.html#onCreateView(LayoutInflater,ViewGroup,Bundle)>onCreateView</a>(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) </code>
                                             </th>
-                                            <td class="colLast"></td>
+                                            <td class="colLast">Inflates the layout and initializes UI components.</td>
+                                        </tr>
+                                        
+                                        <tr id="i3" class="rowColor">
+                                            <td class="colFirst"><code>void</code>
+                                            </td>
+                                            <th class="colSecond" scope="row"><code><a href=UserView.html#onDestroyView()>onDestroyView</a>() </code>
+                                            </th>
+                                            <td class="colLast">Cleans up the listener when the view is destroyed.</td>
                                         </tr>
                                         
                                         </tbody>
@@ -311,7 +319,7 @@ public class <span class="typeNameLabel"><a href=UserView.html>UserView</a></spa
                                     <li class="blockList">
                                         <h4>UserView</h4>
                                         <pre>UserView()</pre>
-                                        <div class="block"></div>
+                                        <div class="block">Required empty public constructor.</div>
                                         
                                     </li>
                                 </ul>
@@ -329,7 +337,7 @@ public class <span class="typeNameLabel"><a href=UserView.html>UserView</a></spa
                             </a>
                                 <h3>Method Detail</h3>
                                 
-                                <a id="newInstance(com.example.syzygy_eventapp.User)">
+                                <a id="newInstance(java.lang.String)">
                                     <!--   -->
                                 </a>
                                 <ul class=
@@ -337,7 +345,7 @@ public class <span class="typeNameLabel"><a href=UserView.html>UserView</a></spa
                                           >
                                     <li class="blockList">
                                         <h4>newInstance</h4>
-                                        <pre class="methodSignature"> static <a href=UserView.html>UserView</a> <a href=UserView.html#newInstance(com.example.syzygy_eventapp.User)>newInstance</a>(<a href=User.html>User</a> user)</pre>
+                                        <pre class="methodSignature"> static <a href=UserView.html>UserView</a> <a href=UserView.html#newInstance(java.lang.String)>newInstance</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> userID)</pre>
                                         <div class="block"><p>Use this factory method to create a new instance of this fragment using the provided parameters.</p></div>
 
                                         <dl>
@@ -346,7 +354,7 @@ public class <span class="typeNameLabel"><a href=UserView.html>UserView</a></spa
                                             <dt><span class="paramLabel">Parameters:</span></dt>
                                             
                                             
-                                            <dd><code>user</code> - The <a href=User.html>User</a> to construct this fragment from.</dd>
+                                            <dd><code>userID</code> - The ID of the <a href=User.html>User</a> to construct this fragment from.</dd>
                                             
                                             
                                         
@@ -371,7 +379,7 @@ public class <span class="typeNameLabel"><a href=UserView.html>UserView</a></spa
                                     <li class="blockList">
                                         <h4>onCreate</h4>
                                         <pre class="methodSignature"> void <a href=UserView.html#onCreate(Bundle)>onCreate</a>(Bundle savedInstanceState)</pre>
-                                        <div class="block"></div>
+                                        <div class="block"><p>Initializes the fragment and retrieves the user ID from arguments.</p></div>
 
                                         <dl>
 
@@ -389,12 +397,35 @@ public class <span class="typeNameLabel"><a href=UserView.html>UserView</a></spa
                                     <!--   -->
                                 </a>
                                 <ul class=
-                                              "blockListLast"
+                                              "blockList"
                                           >
                                     <li class="blockList">
                                         <h4>onCreateView</h4>
                                         <pre class="methodSignature"> View <a href=UserView.html#onCreateView(LayoutInflater,ViewGroup,Bundle)>onCreateView</a>(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)</pre>
-                                        <div class="block"></div>
+                                        <div class="block"><p>Inflates the layout and initializes UI components.</p></div>
+
+                                        <dl>
+
+                                        
+
+                                        
+
+                                        
+
+                                        </dl>
+                                    </li>
+                                </ul>
+                                
+                                <a id="onDestroyView()">
+                                    <!--   -->
+                                </a>
+                                <ul class=
+                                              "blockListLast"
+                                          >
+                                    <li class="blockList">
+                                        <h4>onDestroyView</h4>
+                                        <pre class="methodSignature"> void <a href=UserView.html#onDestroyView()>onDestroyView</a>()</pre>
+                                        <div class="block"><p>Cleans up the listener when the view is destroyed.</p></div>
 
                                         <dl>
 
