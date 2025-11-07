@@ -117,7 +117,7 @@ var pathtoroot = "../../../";
 public class <span class="typeNameLabel"><a href=OrganizerEventEditDetailsFragment.html>OrganizerEventEditDetailsFragment</a></span>
 
                     </pre>
-                    <div class="block"><p>OrganizerEventEditDetailsFragment</p></div>
+                    <div class="block"><p>Fragment class that allows an organizer to create or edit an event’s details. All the TBAs are there because it seems to be required but theres no option for it in the UI mockup Or current XMLs</p></div>
 
                     <dl>
 
@@ -256,7 +256,7 @@ public class <span class="typeNameLabel"><a href=OrganizerEventEditDetailsFragme
                                             </td>
                                             <th class="colSecond" scope="row"><code><a href=OrganizerEventEditDetailsFragment.html#newInstance(com.example.syzygy_eventapp.Event,com.example.syzygy_eventapp.Organizer)>newInstance</a>(<a href=Event.html>Event</a> existingEvent, <a href=Organizer.html>Organizer</a> organizer) </code>
                                             </th>
-                                            <td class="colLast"></td>
+                                            <td class="colLast">Factory method for creating a new instance of this fragment</td>
                                         </tr>
                                         
                                         <tr id="i1" class="rowColor">
@@ -264,7 +264,7 @@ public class <span class="typeNameLabel"><a href=OrganizerEventEditDetailsFragme
                                             </td>
                                             <th class="colSecond" scope="row"><code><a href=OrganizerEventEditDetailsFragment.html#onCreateView(LayoutInflater,ViewGroup,Bundle)>onCreateView</a>(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) </code>
                                             </th>
-                                            <td class="colLast"></td>
+                                            <td class="colLast">Inflates the layout for this fragment and initializes UI components</td>
                                         </tr>
                                         
                                         </tbody>
@@ -330,12 +330,26 @@ public class <span class="typeNameLabel"><a href=OrganizerEventEditDetailsFragme
                                     <li class="blockList">
                                         <h4>newInstance</h4>
                                         <pre class="methodSignature"> static <a href=OrganizerEventEditDetailsFragment.html>OrganizerEventEditDetailsFragment</a> <a href=OrganizerEventEditDetailsFragment.html#newInstance(com.example.syzygy_eventapp.Event,com.example.syzygy_eventapp.Organizer)>newInstance</a>(<a href=Event.html>Event</a> existingEvent, <a href=Organizer.html>Organizer</a> organizer)</pre>
-                                        <div class="block"></div>
+                                        <div class="block"><p>Factory method for creating a new instance of this fragment</p></div>
 
                                         <dl>
 
                                         
+                                            <dt><span class="paramLabel">Parameters:</span></dt>
+                                            
+                                            
+                                            <dd><code>existingEvent</code> - The event to edit (if any).</dd>
+                                            
+                                            
+                                            
+                                            <dd><code>organizer</code> - The organizer creating or editing the event</dd>
+                                            
+                                            
+                                        
 
+                                        
+                                            <dt><span class="returnLabel">Returns:</span></dt>
+                                            <dd><p>A new instance of <a href=OrganizerEventEditDetailsFragment.html>OrganizerEventEditDetailsFragment</a>.</p></dd>
                                         
 
                                         
@@ -353,12 +367,15 @@ public class <span class="typeNameLabel"><a href=OrganizerEventEditDetailsFragme
                                     <li class="blockList">
                                         <h4>onCreateView</h4>
                                         <pre class="methodSignature"> View <a href=OrganizerEventEditDetailsFragment.html#onCreateView(LayoutInflater,ViewGroup,Bundle)>onCreateView</a>(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)</pre>
-                                        <div class="block"></div>
+                                        <div class="block"><p>Inflates the layout for this fragment and initializes UI components</p></div>
 
                                         <dl>
 
                                         
 
+                                        
+                                            <dt><span class="returnLabel">Returns:</span></dt>
+                                            <dd><p>The root view of the fragment</p></dd>
                                         
 
                                         
