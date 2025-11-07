@@ -42,14 +42,16 @@ public class EventListFragment extends Fragment {
     private final String organizerID;
 
     // UI Components
-    private EventSummaryListView summaryList;
-    private EditText searchBar;
+    private RecyclerView eventsRecyclerView;
+    private EventListAdapter adapter;
     private ProgressBar loadingSpinner;
     private View emptyStateView;
 
     private ListenerRegistration eventListener;
     private List<Event> allEvents;
     private List<Event> filteredEvents;
+
+    private String currentQuery;
 
     /**
      * Constructor for browsing all events (entrant view)
@@ -88,8 +90,8 @@ public class EventListFragment extends Fragment {
         // Initialize UI components
         initializeViews(view);
 
-        // Set up search functionality
-        setupSearch();
+        // Set up RecyclerView
+        setupRecyclerView();
 
         return view;
     }
@@ -132,35 +134,12 @@ public class EventListFragment extends Fragment {
      * Initialize all view components
      */
     private void initializeViews(View view) {
-        summaryList = view.findViewById(R.id.event_summary_list);
-        searchBar = view.findViewById(R.id.search_bar);
+        eventsRecyclerView = view.findViewById(R.id.events_recycler_view);
         loadingSpinner = view.findViewById(R.id.loading_spinner);
         emptyStateView = view.findViewById(R.id.empty_state_view);
 
         summaryList.setTitle(isOrganizerView ? "My Events" : "Events");
         summaryList.setExpanded(false);
-    }
-
-    /**
-     * Set up search bar functionality
-     */
-    private void setupSearch() {
-        searchBar.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                // Not needed
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                filterEvents(s.toString());
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                // Not needed
-            }
-        });
     }
 
     /**
@@ -172,13 +151,14 @@ public class EventListFragment extends Fragment {
         loadingSpinner.setVisibility(View.GONE);
 
         this.allEvents = events;
-        filterEvents(searchBar.getText().toString());
+        filterEvents(currentQuery);
     }
 
     /**
      * Filter events based on search query
      */
     private void filterEvents(String query) {
+        currentQuery = query;
         if (query == null || query.trim().isEmpty()) {
             filteredEvents.clear();
             filteredEvents.addAll(allEvents);
