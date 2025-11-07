@@ -86,7 +86,12 @@ public class FindEventsFragment extends Fragment {
                     Event event = doc.toObject(Event.class);
                     if (event != null) {
                         event.setEventID(doc.getId());
-                        events.add(event);
+
+                        // only include events that are still open
+                        boolean isOpen = !event.isLotteryComplete() && event.getRegistrationEnd() != null && event.getRegistrationEnd().toDate().after(new Date());
+                        if (isOpen) {
+                            events.add(event);
+                        }
                     }
                 }
             }
