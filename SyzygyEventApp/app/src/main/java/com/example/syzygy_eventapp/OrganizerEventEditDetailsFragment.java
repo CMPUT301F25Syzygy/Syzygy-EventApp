@@ -2,7 +2,6 @@ package com.example.syzygy_eventapp;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
-import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -18,17 +17,18 @@ import com.google.firebase.Timestamp;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
- * OrganizerEventEditDetailsFragment
- *
+ * Fragment class that allows an organizer to create or edit an event’s details.
+ * All the TBAs are there because it seems to be required but theres no option for it in the UI mockup
+ * Or current XMLs
  */
 public class OrganizerEventEditDetailsFragment extends Fragment {
 
     private EditText titleInput, locationInput, entrantLimitInput, descriptionInput;
     private Button lotteryTimeButton, startTimeButton, endTimeButton;
     private Button importPosterButton;
-    private Switch showContactSwitch;
     private ImageView posterPreview;
 
     private Button createButton, cancelButton, updateButton, deleteButton, revertButton;
@@ -45,6 +45,13 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
         // Required empty public constructor
     }
 
+    /**
+     * Factory method for creating a new instance of this fragment
+     *
+     * @param existingEvent The event to edit (if any). If null, a new event will be created
+     * @param organizer     The organizer creating or editing the event
+     * @return A new instance of {@link OrganizerEventEditDetailsFragment}.
+     */
     public static OrganizerEventEditDetailsFragment newInstance(@Nullable Event existingEvent, @NonNull Organizer organizer) {
         OrganizerEventEditDetailsFragment fragment = new OrganizerEventEditDetailsFragment();
         Bundle args = new Bundle();
@@ -59,19 +66,22 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
         return fragment;
     }
 
+    /**
+     * Inflates the layout for this fragment and initializes UI components
+     * @return The root view of the fragment
+     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_edit_event, container, false);
 
-        // --- Initialize Views ---
         titleInput = view.findViewById(R.id.edit_event_name);
         locationInput = view.findViewById(R.id.edit_location);
         descriptionInput = view.findViewById(R.id.edit_description);
         posterPreview = view.findViewById(R.id.edit_poster);
         importPosterButton = view.findViewById(R.id.btnUpload);
 
-        //TBA
+        //TBA in the future, this is based of CRC cards
         //lotteryTimeButton = view.findViewById(R.id.btn_lottery_time);
         //startTimeButton = view.findViewById(R.id.btn_start_time);
         //endTimeButton = view.findViewById(R.id.btn_end_time);
@@ -89,6 +99,9 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
         return view;
     }
 
+    /**
+     * Sets button visibility depending on whether the fragment is in create or edit mode
+     */
     private void setupButtonVisibility() {
         if (isEditMode) {
             createButton.setVisibility(View.GONE);
@@ -105,10 +118,13 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
         }
     }
 
+    /**
+     * Listeners for buttons and UI
+     */
     private void setupListeners() {
         importPosterButton.setOnClickListener(v -> {
-            // TODO: launch file chooser or image picker
-            Toast.makeText(getContext(), "Import poster not implemented", Toast.LENGTH_SHORT).show();
+            //TODO: launch file chooser or image picker
+            Toast.makeText(getContext(), "Import poster not implemented :(", Toast.LENGTH_SHORT).show();
         });
 
         lotteryTimeButton.setOnClickListener(v -> showDateTimePicker(time -> lotteryTime = time));
@@ -117,21 +133,28 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
 
         createButton.setOnClickListener(v -> createEvent());
         updateButton.setOnClickListener(v -> updateEvent());
-        deleteButton.setOnClickListener(v -> deleteEvent());
         revertButton.setOnClickListener(v -> populateFields(event));
         cancelButton.setOnClickListener(v -> requireActivity().onBackPressed());
     }
 
+    /**
+     * Populates UI fields with an existing event’s data when editing
+     * @param e The {@link Event} object containing existing data.
+     */
     private void populateFields(Event e) {
         titleInput.setText(e.getName());
         locationInput.setText(e.getLocationName());
-        entrantLimitInput.setText(e.getMaxAttendees() != null ? String.valueOf(e.getMaxAttendees()) : "");
         descriptionInput.setText(e.getDescription());
-        showContactSwitch.setChecked(!e.isGeolocationRequired());
+        //TBA
+        //entrantLimitInput.setText(e.getMaxAttendees() != null ? String.valueOf(e.getMaxAttendees()) : "");
+        //showContactSwitch.setChecked(!e.isGeolocationRequired());
     }
 
+    /**
+     * Validates user inputs, creates a new {@link Event}, and stores it in Firestore via {@link EventController}
+     */
     private void createEvent() {
-        if (!validateInputs()) return;
+        if (validateInputs()) return;
 
         Event newEvent = new Event();
         newEvent.setName(titleInput.getText().toString());
@@ -148,47 +171,44 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
                 Toast.makeText(getContext(), "Event created!", Toast.LENGTH_SHORT).show();
                 requireActivity().onBackPressed();
             } else {
-                Toast.makeText(getContext(), "Failed: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                Toast.makeText(getContext(), "Failed: " + Objects.requireNonNull(task.getException()).getMessage(), Toast.LENGTH_LONG).show();
             }
         });
     }
 
+    /**
+     * Updates an existing {@link Event} in Firestore with the modified input data
+     */
     private void updateEvent() {
         if (event == null || TextUtils.isEmpty(event.getEventID())) return;
-        if (!validateInputs()) return;
+        if (validateInputs()) return;
 
         Map<String, Object> updates = new HashMap<>();
         updates.put("name", titleInput.getText().toString());
         updates.put("description", descriptionInput.getText().toString());
         updates.put("locationName", locationInput.getText().toString());
-        updates.put("maxAttendees", Integer.parseInt(entrantLimitInput.getText().toString()));
-        updates.put("registrationStart", startTime);
-        updates.put("registrationEnd", endTime);
+        //TBA
+        //updates.put("maxAttendees", Integer.parseInt(entrantLimitInput.getText().toString()));
+        //updates.put("registrationStart", startTime);
+        //updates.put("registrationEnd", endTime);
 
         eventController.updateEvent(event.getEventID(), updates).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 Toast.makeText(getContext(), "Event updated!", Toast.LENGTH_SHORT).show();
             } else {
-                Toast.makeText(getContext(), "Failed to update: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                Toast.makeText(getContext(), "Failed to update: " + Objects.requireNonNull(task.getException()).getMessage(), Toast.LENGTH_LONG).show();
             }
         });
     }
 
-    private void deleteEvent() {
-        if (event == null || TextUtils.isEmpty(event.getEventID())) return;
-        eventController.deleteEvent(event.getEventID()).addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                Toast.makeText(getContext(), "Event deleted", Toast.LENGTH_SHORT).show();
-                requireActivity().onBackPressed();
-            } else {
-                Toast.makeText(getContext(), "Delete failed: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
-            }
-        });
-    }
-
+    /**
+     * Displays a combined DatePicker and TimePicker dialog to select a {@link Timestamp}
+     *
+     * @param callback Callback function called once the user selects a date
+     */
     private void showDateTimePicker(TimeSelectionCallback callback) {
         final Calendar calendar = Calendar.getInstance();
-        new DatePickerDialog(getContext(), (view, year, month, day) -> {
+        new DatePickerDialog(requireContext(), (view, year, month, day) -> {
             new TimePickerDialog(getContext(), (timePicker, hour, minute) -> {
                 calendar.set(year, month, day, hour, minute);
                 callback.onTimeSelected(new Timestamp(calendar.getTime()));
@@ -196,22 +216,31 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
         }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show();
     }
 
+    /**
+     * Validates all required text fields before performing create or update operations cause people
+     * are dum dums
+     *
+     * @return {@code true} if all required fields are filled; otherwise {@code false}
+     */
     private boolean validateInputs() {
         if (TextUtils.isEmpty(titleInput.getText())) {
             titleInput.setError("Required");
-            return false;
+            return true;
         }
         if (TextUtils.isEmpty(locationInput.getText())) {
             locationInput.setError("Required");
-            return false;
+            return true;
         }
         if (TextUtils.isEmpty(entrantLimitInput.getText())) {
             entrantLimitInput.setError("Required");
-            return false;
+            return true;
         }
-        return true;
+        return false;
     }
 
+    /**
+     * Interface for time selection callbacks
+     */
     private interface TimeSelectionCallback {
         void onTimeSelected(Timestamp time);
     }
