@@ -237,7 +237,7 @@ public class QRScanFragment extends Fragment {
                                 }
                                 else {
                                     // Event was found and is within registration period, use the navStack to navigate to the scanned event's details
-                                    navStack.pushScreen(new EventFragment(navStack, eventID));
+                                    navStack.replaceScreen(new EventFragment(navStack, eventID));
                                 }
                             }
                             else {
