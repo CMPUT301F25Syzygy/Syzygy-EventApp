@@ -14,4 +14,8 @@
     <string name="event_detail_location">10800 97 Ave NW, Edmonton, AB T5K 2B6</string>
     <string name="event_detail_orginizer">By John Doe</string>
     <string name="event_detail_event_title">John Doe’s Super Cool Event</string>
+    <string name="edit_max_entrant_num">30</string>
+    <string name="edit_waiting_count">34</string>
+    <string name="edit_pending_count">3</string>
+    <string name="edit_accepted_count">27</string>
 </resources>
