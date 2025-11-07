@@ -25,12 +25,14 @@ import androidx.fragment.app.Fragment;
 
 import com.google.android.material.navigation.NavigationBarView;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.mlkit.vision.barcode.BarcodeScanner;
 import com.google.mlkit.vision.barcode.BarcodeScanning;
 import com.google.mlkit.vision.barcode.common.Barcode;
 import com.google.mlkit.vision.common.InputImage;
 
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -216,8 +218,15 @@ public class QRScanFragment extends Fragment {
                         .get()
                         .addOnSuccessListener(snapshot -> {
                             if (snapshot != null && snapshot.exists()) {
-                                // Event was found, use the navStack to navigate to the scanned event's details
-                                navStack.pushScreen(new EventFragment(navStack, eventID));
+                                // Check if event is expired
+                                Timestamp endTime = snapshot.getTimestamp("endTime");
+                                if (endTime != null && endTime.toDate().before(new Date())) {
+                                    Toast.makeText(requireContext(), "This event's QR code has expired.", Toast.LENGTH_SHORT).show();
+                                }
+                                else {
+                                    // Event was found, use the navStack to navigate to the scanned event's details
+                                    navStack.pushScreen(new EventFragment(navStack, eventID));
+                                }
                             }
                             else {
                                 Toast.makeText(requireContext(), "Event not found for QR: " + eventID, Toast.LENGTH_SHORT).show();
