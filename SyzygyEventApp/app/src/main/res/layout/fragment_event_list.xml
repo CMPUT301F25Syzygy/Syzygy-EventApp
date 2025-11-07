@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="12dp"
-    android:background="#FFFFFF">
+    android:background="?android:attr/colorBackground">
 
     <!-- Search Bar -->
     <EditText
@@ -14,7 +14,7 @@
         android:layout_height="45dp"
         android:hint="Search events..."
         android:padding="12dp"
-        android:background="#E6E6E6"
+        android:background="@drawable/field_box_background"
         android:textSize="16sp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -39,7 +39,7 @@
         android:layout_height="wrap_content"
         android:text="No events found"
         android:textSize="18sp"
-        android:textColor="#666666"
+        android:textColor="?attr/colorSecondary"
         android:visibility="gone"
         app:layout_constraintTop_toBottomOf="@id/search_bar"
         app:layout_constraintBottom_toBottomOf="parent"

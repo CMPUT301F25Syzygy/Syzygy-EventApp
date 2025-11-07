@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF"
+    android:background="?android:attr/colorBackground"
     android:padding="10dp"
     android:id="@+id/event_invite">
 
@@ -23,7 +23,7 @@
             android:layout_marginBottom="4dp"
             android:text="You're invited!"
             android:textAlignment="center"
-            android:textColor="#555555"
+            android:textColor="?attr/colorSecondary"
             android:textSize="18sp" />
 
         <TextView
@@ -33,7 +33,7 @@
             android:layout_marginBottom="16dp"
             android:text="@string/event_title"
             android:textAlignment="center"
-            android:textColor="#000000"
+            android:textColor="?android:attr/colorForeground"
             android:textSize="28sp"
             android:textStyle="bold" />
 
@@ -50,7 +50,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
-            android:background="#F8F8F8"
+            android:background="@drawable/field_box_background"
             android:elevation="2dp"
             android:gravity="center_vertical"
             android:orientation="horizontal"
@@ -74,7 +74,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Organized by"
-                    android:textColor="#888888"
+                    android:textColor="?attr/colorSecondary"
                     android:textSize="12sp" />
 
                 <!-- Placeholder text, use stirng resource to change-->
@@ -83,7 +83,7 @@
                     android:layout_width="153dp"
                     android:layout_height="34dp"
                     android:text="@string/Organizer"
-                    android:textColor="#000000"
+                    android:textColor="?android:attr/colorForeground"
                     android:textSize="20sp"
                     android:textStyle="bold" />
             </LinearLayout>
@@ -94,8 +94,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
-            android:background="#F1F1F1"
-            android:backgroundTint="#E9E9E9"
+            android:background="@drawable/field_box_background"
             android:gravity="center_vertical"
             android:orientation="horizontal"
             android:padding="12dp">
@@ -106,14 +105,14 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="6dp"
                 android:src="@drawable/location_outline"
-                app:tint="#000000" />
+                app:tint="?android:attr/colorForeground" />
 
             <TextView
                 android:id="@+id/location_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/location_text"
-                android:textColor="#000000"
+                android:textColor="?android:attr/colorForeground"
                 android:textSize="14sp"
                 android:textStyle="bold" />
         </LinearLayout>
@@ -123,8 +122,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            android:background="#F1F1F1"
-            android:backgroundTint="#E9E9E9"
+            android:background="@drawable/field_box_background"
             android:gravity="center_vertical"
             android:orientation="horizontal"
             android:padding="12dp">
@@ -134,14 +132,14 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="6dp"
                 android:src="@drawable/clock_outline"
-                app:tint="#000000" />
+                app:tint="?android:attr/colorForeground" />
 
             <TextView
                 android:id="@+id/event_time"
                 android:layout_width="272dp"
                 android:layout_height="wrap_content"
                 android:text="@string/time_text"
-                android:textColor="#000000"
+                android:textColor="?android:attr/colorForeground"
                 android:textSize="14sp"
                 android:textStyle="bold" />
         </LinearLayout>
@@ -152,11 +150,10 @@
             android:layout_width="match_parent"
             android:layout_height="59dp"
             android:layout_marginTop="8dp"
-            android:backgroundTint="#5059D5"
+            android:backgroundTint="?android:attr/textColorLink"
             android:text="More Details"
             app:icon="@drawable/outline_organize_24"
-            app:iconSize="24dp"
-            app:iconTint="#FFFFFF" />
+            app:iconSize="24dp"/>
 
 
         <!-- Accept / Decline Buttons -->
@@ -172,11 +169,11 @@
                 android:layout_height="58dp"
                 android:layout_marginEnd="8dp"
                 android:layout_weight="1"
-                android:backgroundTint="#D0351D"
+                android:backgroundTint="@color/red"
                 android:padding="10dp"
                 android:radius="20dp"
                 android:text="Decline"
-                android:textColor="#FFFFFF"
+                android:textColor="?android:attr/colorBackground"
                 app:icon="@drawable/ic_x_mark"
                 app:iconSize="32dp" />
 
@@ -186,10 +183,10 @@
                 android:layout_height="58dp"
                 android:layout_marginStart="8dp"
                 android:layout_weight="1"
-                android:backgroundTint="#36A212"
+                android:backgroundTint="@color/green"
                 android:padding="10dp"
                 android:text="Accept"
-                android:textColor="#FFFFFF"
+                android:textColor="?android:attr/colorBackground"
                 app:icon="@drawable/ic_check"
                 app:iconSize="32dp" />
         </LinearLayout>

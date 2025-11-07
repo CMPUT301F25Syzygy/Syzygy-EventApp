@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF"
+    android:background="?android:attr/colorBackground"
     android:padding="20dp">
 
     <LinearLayout
@@ -44,7 +44,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/event_detail_orginizer"
-                    android:textColor="#000000"
+                    android:textColor="?android:attr/colorForeground"
                     android:textSize="14sp" />
             </LinearLayout>
         </LinearLayout>
@@ -55,7 +55,7 @@
             android:layout_width="match_parent"
             android:layout_height="150dp"
             android:layout_marginTop="16dp"
-            android:background="#EAEAEA"
+            android:background="@drawable/field_box_background"
             android:src="@drawable/image_placeholder"/>
 
         <!-- Description -->
@@ -65,7 +65,7 @@
             android:layout_height="wrap_content"
             android:text="@string/event_details_description"
             android:textAlignment="center"
-            android:textColor="#666666"
+            android:textColor="?attr/colorSecondary"
             android:textSize="14sp"
             android:layout_marginTop="12dp" />
 
@@ -84,22 +84,20 @@
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
                 android:padding="10dp"
-                android:backgroundTint="#E9E9E9"
-                >
+                android:background="@drawable/field_box_background">
 
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="8dp"
-                    android:src="@drawable/location_outline"
-                    app:tint="#000000" />
+                    android:src="@drawable/location_outline" />
 
                 <TextView
                     android:id="@+id/event_location"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/event_detail_location"
-                    android:textColor="#000000"
+                    android:textColor="?android:attr/colorForeground"
                     android:textSize="14sp"
                     android:textStyle="bold"
                     />
@@ -111,21 +109,21 @@
                 android:layout_marginTop="8dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:padding="10dp">
+                android:padding="10dp"
+                android:background="@drawable/field_box_background">
 
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="8dp"
-                    android:src="@drawable/clock_outline"
-                    app:tint="#000000" />
+                    android:src="@drawable/clock_outline"/>
 
                 <TextView
                     android:id="@+id/event_time"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/event_detail_time"
-                    android:textColor="#000000"
+                    android:textColor="?android:attr/colorForeground"
                     android:textSize="14sp"
                     android:textStyle="bold" />
             </LinearLayout>
@@ -134,6 +132,7 @@
                 android:layout_width="336dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
+                android:background="@drawable/field_box_background"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
                 android:padding="10dp">
@@ -142,15 +141,14 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="8dp"
-                    android:src="@drawable/outline_profile_24"
-                    app:tint="#000000" />
+                    android:src="@drawable/outline_profile_24"/>
 
                 <TextView
                     android:id="@+id/eventEntrants"
                     android:layout_width="230dp"
                     android:layout_height="wrap_content"
                     android:text="@string/event_details_num_entrants"
-                    android:textColor="#000000"
+                    android:textColor="?android:attr/colorForeground"
                     android:textSize="14sp"
                     android:textStyle="bold" />
             </LinearLayout>
@@ -161,9 +159,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
-            android:backgroundTint="#333333"
+            android:backgroundTint="@color/green"
             android:text="Join Waiting List"
-            android:textColor="#FFFFFF" />
+            android:textColor="?android:attr/colorBackground" />
 
         <TextView
             android:id="@+id/joining_status"
@@ -171,7 +169,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
             android:text="@string/event_details_num_people"
-            android:textColor="#777777"
+            android:textColor="?attr/colorSecondary"
             android:textSize="13sp" />
 
 
