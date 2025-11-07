@@ -133,6 +133,26 @@ public class ProfileFragment extends Fragment {
                     }
                 }
         ));
+
+        profileRoleBadge.setOnClickListener(v -> {
+            if (currentUser == null || currentUser.getRole() == null) {
+                showError("User data not loaded yet.");
+                return;
+            }
+
+            Role currentRole = currentUser.getRole();
+            Role newRole = (currentRole == Role.ENTRANT)
+                    ? Role.ORGANIZER
+                    : Role.ENTRANT;
+
+            userController.setUserRole(userID, newRole)
+                    .addOnSuccessListener(updatedUser ->
+                            Toast.makeText(getContext(),
+                                    "Role changed to " + newRole.name(),
+                                    Toast.LENGTH_SHORT).show())
+                    .addOnFailureListener(err ->
+                            showError("Failed to change role: " + err.getMessage()));
+        });
     }
 
     /**
