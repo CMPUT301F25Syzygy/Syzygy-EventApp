@@ -46,13 +46,12 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- RecyclerView for Events -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/events_recycler_view"
+    <!-- Event Summary List -->
+    <com.example.syzygy_eventapp.EventSummaryListView
+        android:id="@+id/event_summary_list"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="12dp"
-        android:scrollbars="vertical"
         app:layout_constraintTop_toBottomOf="@id/search_bar"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"

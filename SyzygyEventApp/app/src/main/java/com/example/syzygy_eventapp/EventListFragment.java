@@ -42,8 +42,7 @@ public class EventListFragment extends Fragment {
     private final String organizerID;
 
     // UI Components
-    private RecyclerView eventsRecyclerView;
-    private EventListAdapter adapter;
+    private EventSummaryListView summaryList;
     private EditText searchBar;
     private ProgressBar loadingSpinner;
     private View emptyStateView;
@@ -89,9 +88,6 @@ public class EventListFragment extends Fragment {
         // Initialize UI components
         initializeViews(view);
 
-        // Set up RecyclerView
-        setupRecyclerView();
-
         // Set up search functionality
         setupSearch();
 
@@ -136,19 +132,13 @@ public class EventListFragment extends Fragment {
      * Initialize all view components
      */
     private void initializeViews(View view) {
-        eventsRecyclerView = view.findViewById(R.id.events_recycler_view);
+        summaryList = view.findViewById(R.id.event_summary_list);
         searchBar = view.findViewById(R.id.search_bar);
         loadingSpinner = view.findViewById(R.id.loading_spinner);
         emptyStateView = view.findViewById(R.id.empty_state_view);
-    }
 
-    /**
-     * Set up the RecyclerView with adapter
-     */
-    private void setupRecyclerView() {
-        adapter = new EventListAdapter(filteredEvents, this::onEventClicked);
-        eventsRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-        eventsRecyclerView.setAdapter(adapter);
+        summaryList.setTitle(isOrganizerView ? "My Events" : "Events");
+        summaryList.setExpanded(false);
     }
 
     /**
@@ -190,11 +180,9 @@ public class EventListFragment extends Fragment {
      */
     private void filterEvents(String query) {
         if (query == null || query.trim().isEmpty()) {
-            // No filter, show all events
             filteredEvents.clear();
             filteredEvents.addAll(allEvents);
         } else {
-            // Filter by name, description, or location
             String lowerQuery = query.toLowerCase().trim();
             filteredEvents.clear();
             filteredEvents.addAll(
@@ -204,8 +192,17 @@ public class EventListFragment extends Fragment {
             );
         }
 
-        // Update UI
-        adapter.notifyDataSetChanged();
+        View.OnClickListener rowClick = v -> {
+            Event e = (Event) v.getTag();
+            onEventClicked(e);
+        };
+
+        summaryList.setItems(
+                filteredEvents,
+                isOrganizerView,
+                rowClick
+        );
+
         updateEmptyState();
     }
 
@@ -237,10 +234,10 @@ public class EventListFragment extends Fragment {
     private void updateEmptyState() {
         if (filteredEvents.isEmpty()) {
             emptyStateView.setVisibility(View.VISIBLE);
-            eventsRecyclerView.setVisibility(View.GONE);
+            summaryList.setVisibility(View.GONE);
         } else {
             emptyStateView.setVisibility(View.GONE);
-            eventsRecyclerView.setVisibility(View.VISIBLE);
+            summaryList.setVisibility(View.VISIBLE);
         }
     }
 
