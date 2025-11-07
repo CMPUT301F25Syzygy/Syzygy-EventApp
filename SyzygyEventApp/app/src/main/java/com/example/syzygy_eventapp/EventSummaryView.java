@@ -15,6 +15,13 @@ import com.google.android.material.chip.Chip;
 import java.text.DateFormat;
 import java.util.Date;
 
+/**
+ * A custom view that displays a compact summary of an event, including its title,
+ * location, date, time, and status. It adapts its appearance based on whether the
+ * viewer is an entrant or an admin, showing different status indicators and action
+ * buttons accordingly. Used within event lists to give users a quick overview before
+ * viewing full event details.
+ */
 public class EventSummaryView extends LinearLayout {
 
     private TextView titleText, timeText, locationText, dateText;
@@ -23,25 +30,47 @@ public class EventSummaryView extends LinearLayout {
     private Chip statusChip;
     private LinearLayout adminButtons;
 
+    /**
+     * Represents the status of an entrant for a given event.
+     */
     public enum AttendeeStatus { WAITLIST, NOT_SELECTED, PENDING, ACCEPTED, REJECTED }
 
+    /**
+     * Default constructor for inflating via code.
+     * @param context the current {@link Context}.
+     */
     public EventSummaryView(Context context) {
         super(context);
         init(context);
     }
 
+    /**
+     * Constructor called when inflating from XML.
+     * @param context the current {@link Context}.
+     * @param attrs the {@link AttributeSet} from XML.
+     */
     public EventSummaryView(Context context, AttributeSet attrs) {
         super(context, attrs);
         init(context);
     }
 
+    /**
+     * Constructor called when inflating from XML with a style attribute.
+     * @param context the current {@link Context}.
+     * @param attrs the {@link AttributeSet} from XML.
+     * @param defStyleAttr the default style to apply to this view.
+     */
     public EventSummaryView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init(context);
     }
 
+    /**
+     * Initializes and inflates the layout, binding all child views.
+     * @param context the current {@link Context}.
+     */
     private void init(Context context) {
-        LayoutInflater.from(context).inflate(R.layout.fragment_event_summary_view, this, true);
+        LayoutInflater.from(context).inflate(R.layout.view_event_summary, this, true);
 
         titleText = findViewById(R.id.event_title);
         timeText = findViewById(R.id.event_time);
@@ -54,6 +83,14 @@ public class EventSummaryView extends LinearLayout {
         adminButtons = findViewById(R.id.layout_admin_buttons);
     }
 
+    /**
+     * Binds an {@link Event} object to the summary view, updating text fields and chip color.
+     * Also controls admin button visibility.
+     *
+     * @param event the {@link Event} to display.
+     * @param attendeeStatus the status of the current entrant, or {@code null} if admin view.
+     * @param isAdmin whether the current user has admin privileges.
+     */
     public void bind(Event event, AttendeeStatus attendeeStatus, boolean isAdmin) {
         titleText.setText(event.getName());
         locationText.setText(event.getLocationName());
@@ -73,7 +110,12 @@ public class EventSummaryView extends LinearLayout {
         adminButtons.setVisibility(isAdmin ? VISIBLE : GONE);
     }
 
-    /** For entrant-side view (colored by status) */
+    /**
+     * Sets the color and label of the status chip based on the entrant’s event status.
+     * Used for entrant-facing summaries.
+     *
+     * @param status the {@link AttendeeStatus} of the user in the event.
+     */
     private void setAttendeeChipColor(AttendeeStatus status) {
         int color;
         String label;
@@ -108,7 +150,13 @@ public class EventSummaryView extends LinearLayout {
         statusChip.setTextColor(ContextCompat.getColor(getContext(), R.color.white));
     }
 
-    /** For admin-side view (colored by state of event) */
+    /**
+     * Sets the color and label of the status chip based on the event’s administrative state.
+     * Used for organizer/admin-facing summaries.
+     *
+     * @param lotteryComplete whether the lottery for the event has been completed.
+     * @param registrationEnd the registration end date of the event.
+     */
     private void setAdminChipColor(boolean lotteryComplete, Date registrationEnd) {
         int color;
         String label;
@@ -131,14 +179,27 @@ public class EventSummaryView extends LinearLayout {
         statusChip.setTextColor(ContextCompat.getColor(getContext(), R.color.white));
     }
 
+    /**
+     * Sets a click listener for when the user taps the event card
+     * to open event details.
+     * @param listener the {@link OnClickListener} to invoke when the card is clicked.
+     */
     public void setOnOpenDetailsClickListener(OnClickListener listener) {
         card.setOnClickListener(listener);
     }
 
+    /**
+     * Sets a click listener for when the admin toggles an event’s banner.
+     * @param listener the {@link OnClickListener} to invoke when the banner button is clicked.
+     */
     public void setOnToggleBannerClickListener(OnClickListener listener) {
         toggleBannerButton.setOnClickListener(listener);
     }
 
+    /**
+     * Sets a click listener for when the admin removes an event.
+     * @param listener the {@link OnClickListener} to invoke when the remove button is clicked.
+     */
     public void setOnRemoveClickListener(OnClickListener listener) {
         removeButton.setOnClickListener(listener);
     }
