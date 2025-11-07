@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF"
+    android:background="?android:attr/colorBackground"
     android:padding="16dp">
 
     <LinearLayout
@@ -16,31 +16,31 @@
             android:id="@+id/event_name_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
             android:text="Event Name"
+            android:textColor="?android:attr/colorForeground"
             android:textSize="28sp"
-            android:textStyle="bold"
-            android:textColor="#000000"
-            android:layout_marginBottom="8dp" />
+            android:textStyle="bold" />
 
         <!-- Event Description -->
         <TextView
             android:id="@+id/event_description_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
             android:text="Event description goes here..."
-            android:textSize="16sp"
-            android:textColor="#000000"
-            android:layout_marginBottom="16dp" />
+            android:textColor="?android:attr/colorForeground"
+            android:textSize="16sp" />
 
         <!-- Location Section -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
+            android:layout_marginBottom="12dp"
             android:background="@drawable/field_box_background"
-            android:padding="12dp"
-            android:layout_marginBottom="12dp">
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="12dp">
 
             <TextView
                 android:id="@+id/location_text"
@@ -48,16 +48,16 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Location"
-                android:textColor="#000000"
+                android:textColor="?android:attr/colorForeground"
                 android:textSize="16sp" />
 
             <Button
                 android:id="@+id/open_map_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:backgroundTint="?android:attr/textColorLink"
                 android:text="Open Map"
-                android:textSize="14sp"
-                android:backgroundTint="#5059D5" />
+                android:textSize="14sp" />
         </LinearLayout>
 
         <!-- Waiting List Count -->
@@ -65,18 +65,18 @@
             android:id="@+id/waiting_list_count_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
             android:text="Waiting List: 0 entrants"
+            android:textColor="?android:attr/colorForeground"
             android:textSize="16sp"
-            android:textStyle="bold"
-            android:textColor="#000000"
-            android:layout_marginBottom="8dp" />
+            android:textStyle="bold" />
 
         <ImageView
             android:id="@+id/poster_image"
             android:layout_width="match_parent"
             android:layout_height="300dp"
             android:layout_marginBottom="16dp"
-            android:background="#E6E6E6"
+            android:background="@drawable/field_box_background"
             android:scaleType="centerCrop"
             android:src="@android:drawable/ic_menu_gallery"
             android:visibility="visible" />
@@ -86,10 +86,10 @@
             android:id="@+id/max_attendees_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Maximum Attendees: 50"
-            android:textSize="14sp"
-            android:textColor="#666666"
             android:layout_marginBottom="8dp"
+            android:text="Maximum Attendees: 50"
+            android:textColor="?attr/colorSecondary"
+            android:textSize="14sp"
             android:visibility="gone" />
 
         <!-- Registration Period -->
@@ -97,10 +97,10 @@
             android:id="@+id/registration_period_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Registration Period"
-            android:textSize="14sp"
-            android:textColor="#666666"
             android:layout_marginBottom="16dp"
+            android:text="Registration Period"
+            android:textColor="?attr/colorSecondary"
+            android:textSize="14sp"
             android:visibility="gone" />
 
         <!-- Join Waiting List Button -->
@@ -108,25 +108,22 @@
             android:id="@+id/join_waiting_list_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:backgroundTint="?android:attr/textColorLink"
             android:text="Join Waiting List"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:backgroundTint="#5059D5"
-            android:textColor="#FFFFFF"
-            android:layout_marginBottom="12dp" />
+            android:textColor="?android:attr/colorBackground"
+            android:visibility="visible" />
 
         <!-- Leave Waiting List Button -->
         <Button
             android:id="@+id/leave_waiting_list_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:backgroundTint="@color/red"
             android:text="Leave Waiting List"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:backgroundTint="#D55050"
-            android:textColor="#FFFFFF"
-            android:visibility="gone"
-            android:layout_marginBottom="12dp" />
+            android:textColor="?android:attr/colorBackground"
+            android:visibility="visible" />
 
     </LinearLayout>
 </ScrollView>
