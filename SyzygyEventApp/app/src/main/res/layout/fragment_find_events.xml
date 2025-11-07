@@ -11,7 +11,7 @@
     <!--  use resource file to change num  for events found-->
     <LinearLayout
         android:id="@+id/searchLayout"
-        android:layout_width="377dp"
+        android:layout_width="fill_parent"
         android:layout_height="45dp"
         android:layout_marginTop="20dp"
         android:background="@drawable/field_box_background"
@@ -31,7 +31,7 @@
 
         <Button
             android:id="@+id/filterButton"
-            android:layout_width="100dp"
+            android:layout_width="98dp"
             android:layout_height="38dp"
             android:backgroundTint="@color/grey"
             android:text="Filter"
@@ -40,7 +40,7 @@
 
     <Button
         android:id="@+id/open_qr_scan_button"
-        android:layout_width="377dp"
+        android:layout_width="fill_parent"
         android:layout_height="44dp"
         android:layout_marginTop="8dp"
         android:backgroundTint="?android:attr/textColorLink"
@@ -57,7 +57,7 @@
 
     <TextView
         android:id="@+id/eventsFound"
-        android:layout_width="326dp"
+        android:layout_width="wrap_content"
         android:layout_height="48dp"
         android:layout_marginStart="5dp"
         android:layout_marginTop="8dp"
@@ -69,8 +69,8 @@
 
     <ListView
         android:id="@+id/listSearch"
-        android:layout_width="381dp"
-        android:layout_height="512dp"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
         android:layout_marginStart="5dp"
         android:layout_marginTop="12dp"
         android:dividerHeight="8dp"

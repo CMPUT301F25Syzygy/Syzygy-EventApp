@@ -28,7 +28,7 @@
                 android:src="@drawable/arrow_down" />
 
             <TextView
-                android:layout_width="190dp"
+                android:layout_width="wrap_content"
                 android:layout_height="40dp"
                 android:text="@string/upcoming"
                 android:textSize="24sp"
@@ -40,7 +40,7 @@
         <ListView
             android:id="@+id/listUpcoming"
             android:layout_width="match_parent"
-            android:layout_height="271dp"
+            android:layout_height="wrap_content"
             android:dividerHeight="8dp"
             android:nestedScrollingEnabled="true"
             android:scrollbars="none" />
@@ -63,7 +63,7 @@
                 android:src="@drawable/arrow_down" />
 
             <TextView
-                android:layout_width="216dp"
+                android:layout_width="wrap_content"
                 android:layout_height="41dp"
                 android:text="@string/history"
                 android:textSize="24sp"
@@ -75,7 +75,7 @@
         <ListView
             android:id="@+id/listHistory"
             android:layout_width="match_parent"
-            android:layout_height="299dp"
+            android:layout_height="wrap_content"
             android:dividerHeight="8dp"
             android:nestedScrollingEnabled="true"
             android:scrollbars="none" />

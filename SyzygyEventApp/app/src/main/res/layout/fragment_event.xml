@@ -74,11 +74,10 @@
         <ImageView
             android:id="@+id/poster_image"
             android:layout_width="match_parent"
-            android:layout_height="300dp"
+            android:layout_height="180dp"
             android:layout_marginBottom="16dp"
             android:background="@drawable/field_box_background"
-            android:scaleType="centerCrop"
-            android:src="@android:drawable/ic_menu_gallery"
+            android:src="@drawable/image_placeholder"
             android:visibility="visible" />
 
         <!-- Max Attendees (Lottery Criteria) -->
