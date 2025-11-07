@@ -21,8 +21,6 @@ import java.util.Objects;
 
 /**
  * Fragment class that allows an organizer to create or edit an event’s details.
- * All the TBAs are there because it seems to be required but theres no option for it in the UI mockup
- * Or current XMLs
  */
 public class OrganizerEventEditDetailsFragment extends Fragment {
 
@@ -30,15 +28,11 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
     private Button lotteryTimeButton, startTimeButton, endTimeButton;
     private Button importPosterButton;
     private ImageView posterPreview;
-
     private Button createButton, cancelButton, updateButton, deleteButton, revertButton;
-
     private EventController eventController;
     private Organizer organizer;
     private Event event;
-
     private boolean isEditMode = false;
-
     private Timestamp lotteryTime, startTime, endTime;
 
     public OrganizerEventEditDetailsFragment() {
@@ -81,11 +75,10 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
         posterPreview = view.findViewById(R.id.edit_poster);
         importPosterButton = view.findViewById(R.id.btnUpload);
 
-        //TBA in the future, this is based of CRC cards
         //lotteryTimeButton = view.findViewById(R.id.btn_lottery_time);
-        //startTimeButton = view.findViewById(R.id.btn_start_time);
-        //endTimeButton = view.findViewById(R.id.btn_end_time);
-        //entrantLimitInput = view.findViewById(R.id.edit_entrant_num);
+        startTimeButton = view.findViewById(R.id.btnStartDate);
+        endTimeButton = view.findViewById(R.id.btnEndDate);
+        entrantLimitInput = view.findViewById(R.id.max_entrants);
 
         eventController = new EventController();
 
@@ -145,8 +138,7 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
         titleInput.setText(e.getName());
         locationInput.setText(e.getLocationName());
         descriptionInput.setText(e.getDescription());
-        //TBA
-        //entrantLimitInput.setText(e.getMaxAttendees() != null ? String.valueOf(e.getMaxAttendees()) : "");
+        entrantLimitInput.setText(e.getMaxAttendees() != null ? String.valueOf(e.getMaxAttendees()) : "");
         //showContactSwitch.setChecked(!e.isGeolocationRequired());
     }
 
@@ -187,10 +179,9 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
         updates.put("name", titleInput.getText().toString());
         updates.put("description", descriptionInput.getText().toString());
         updates.put("locationName", locationInput.getText().toString());
-        //TBA
-        //updates.put("maxAttendees", Integer.parseInt(entrantLimitInput.getText().toString()));
-        //updates.put("registrationStart", startTime);
-        //updates.put("registrationEnd", endTime);
+        updates.put("maxAttendees", Integer.parseInt(entrantLimitInput.getText().toString()));
+        updates.put("registrationStart", startTime);
+        updates.put("registrationEnd", endTime);
 
         eventController.updateEvent(event.getEventID(), updates).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
