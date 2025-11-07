@@ -31,6 +31,7 @@ public class FindEventsFragment extends Fragment {
     final private NavigationStackFragment navStack;
     private QRScanFragment qrFragment;
     private EventSummaryListView summaryListView;
+    private List<Event> allEvents = new ArrayList<>();
 
     FindEventsFragment(NavigationStackFragment navStack) {
         super();
@@ -74,15 +75,55 @@ public class FindEventsFragment extends Fragment {
                 }
             }
 
-            // Populate EventSummaryListView
-            summaryListView.setTitle("Available Events");
-            summaryListView.setItems(events, false, v -> {
-                Event clickedEvent = (Event) v.getTag();
-                navStack.pushScreen(new EventFragment(navStack, clickedEvent.getEventID()));
+            // store all events, and call the helper applySearchFilter to show events based on the search text
+            allEvents = events;
+            applySearchFilter(searchBox.getText().toString());
+
+            searchBox.addTextChangedListener(new android.text.TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    applySearchFilter(s.toString());
+                }
+
+                @Override
+                public void afterTextChanged(android.text.Editable s) {}
             });
+
         });
 
         return view;
+    }
+
+    /**
+     * Filters the list of all events based on a user-provided search query and updates the {@link EventSummaryListView} to display only the matching results.
+     * <p>
+     *     The search is case-insensitive and matches against the event's name, description, and location name (if available).
+     * </p>
+     *
+     * @param query The search text entered by the user. If empty, all events are displayed.
+     */
+    private void applySearchFilter(String query) {
+        if (summaryListView == null) return;
+
+        List<Event> filtered = new ArrayList<>();
+        String lowerQuery = query.toLowerCase().trim();
+
+        for (Event e : allEvents) {
+            if (e.getName().toLowerCase().contains(lowerQuery) ||
+                    (e.getDescription() != null && e.getDescription().toLowerCase().contains(lowerQuery)) ||
+                    (e.getLocationName() != null && e.getLocationName().toLowerCase().contains(lowerQuery))) {
+                filtered.add(e);
+            }
+        }
+
+        summaryListView.setTitle("Available Events");
+        summaryListView.setItems(filtered, false, v -> {
+            Event clickedEvent = (Event) v.getTag();
+            navStack.pushScreen(new EventFragment(navStack, clickedEvent.getEventID()));
+        });
     }
 
 }
