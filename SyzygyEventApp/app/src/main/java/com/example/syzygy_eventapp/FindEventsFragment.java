@@ -25,7 +25,7 @@ import java.util.List;
  * Displays the Find Events screen:
  * - Lets the user search for events
  * - Opens the QR scanner
- * - Embeds EventListFragment to display event results
+ * - Uses the EventSummaryListView to display events
  */
 public class FindEventsFragment extends Fragment {
     final private NavigationStackFragment navStack;
@@ -56,7 +56,7 @@ public class FindEventsFragment extends Fragment {
         });
 
         // SEED FAKE EVENTS, ALSO FOR TESTING/DEMO PLEASE IGNORE
-        seedFakeEventsOnce();
+        // seedFakeEventsOnce();
 
         // Load events from Firestore
         FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -83,52 +83,6 @@ public class FindEventsFragment extends Fragment {
         });
 
         return view;
-    }
-
-    // ------------------- IGNORE THESE FUNCTIONS, THEY'RE ONLY FOR TESTING/DEMO --------------------
-    private void seedFakeEvents() {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-
-        List<Event> fakeEvents = new ArrayList<>();
-
-        Event e1 = new Event();
-        e1.setEventID("FAKE_EVENT_1");
-        e1.setName("Fake Event 1");
-        e1.setDescription("This is a test event for demo purposes.");
-        e1.setLocationName("Heaven");
-        e1.setRegistrationEnd(new Timestamp(new Date(System.currentTimeMillis() + 86400000))); // tomorrow
-        e1.setOrganizerID("FAKE_ORG_1");
-        fakeEvents.add(e1);
-
-        Event e2 = new Event();
-        e2.setEventID("FAKE_EVENT_2");
-        e2.setName("Fake Event 2");
-        e2.setDescription("Another test event for demo purposes.");
-        e2.setLocationName("Edmonton");
-        e2.setRegistrationEnd(new Timestamp(new Date(System.currentTimeMillis() + 172800000))); // in 2 days
-        e2.setOrganizerID("FAKE_ORG_2");
-        fakeEvents.add(e2);
-
-        for (Event e : fakeEvents) {
-            db.collection("events")
-                    .document(e.getEventID())
-                    .set(e)
-                    .addOnSuccessListener(aVoid -> Log.d("FirestoreSeed", "Event added: " + e.getName()))
-                    .addOnFailureListener(ex -> Log.e("FirestoreSeed", "Failed to add event: " + e.getName(), ex));
-        }
-
-        Toast.makeText(getContext(), "Fake events seeded", Toast.LENGTH_SHORT).show();
-    }
-
-    private void seedFakeEventsOnce() {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-
-        db.collection("events").document("FAKE_EVENT_1").get()
-                .addOnSuccessListener(snapshot -> {
-                    if (!snapshot.exists()) {
-                        seedFakeEvents(); // Only add them if they don’t exist
-                    }
-                });
     }
 
 }
