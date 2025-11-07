@@ -226,4 +226,18 @@ public class User {
         }
         return UserController.getInstance().updateFields(userID, fields);
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof User)) return false;
+        User other = (User) obj;
+        return userID != null && userID.equals(other.userID);
+    }
+
+    @Override
+    public int hashCode() {
+        return userID != null ? userID.hashCode() : 0;
+    }
+
 }
