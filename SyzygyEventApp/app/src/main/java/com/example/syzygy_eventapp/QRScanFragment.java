@@ -194,7 +194,6 @@ public class QRScanFragment extends Fragment {
 
     /**
      * Handles detected QR codes directly; Will scan and open events.
-     * TODO: Open an event view after a valid QR Code is processed.
      */
     private void handleDetectedBarcodes(List<Barcode> barcodes) {
         // Pause scanning so the same QR Code doesn't keep being processed
@@ -217,8 +216,8 @@ public class QRScanFragment extends Fragment {
                         .get()
                         .addOnSuccessListener(snapshot -> {
                             if (snapshot != null && snapshot.exists()) {
-                                // TODO: Event found, navigate to eventView
-                                // navStack.pushScreen(new EventSummaryViewFragment(snapshot.getId(), eventName, eventLocation, ...));
+                                // Event was found, use the navStack to navigate to the scanned event's details
+                                navStack.pushScreen(new EventFragment(navStack, eventID));
                             }
                             else {
                                 Toast.makeText(requireContext(), "Event not found for QR: " + eventID, Toast.LENGTH_SHORT).show();
