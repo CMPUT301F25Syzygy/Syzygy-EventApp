@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FFFFFF">
-
+<!-- TO DO: drop done for "see more"-->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -134,20 +134,6 @@
             android:textStyle="bold"
             android:textSize="16sp"
              />
-
-        <EditText
-            android:id="@+id/edit_date"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:backgroundTint="#CCCCCC"
-            android:drawableEnd="@drawable/ic_edit"
-            android:clickable="true"
-            android:focusable="true"
-            android:foreground="?attr/selectableItemBackground"
-            android:hint="8:04 pm, March 30"
-            android:inputType="date"
-            android:padding="8dp" />
 
         <TextView
             android:layout_width="match_parent"
