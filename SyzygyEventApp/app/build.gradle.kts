@@ -59,6 +59,10 @@ android {
         }
     }
 
+    buildFeatures {
+        dataBinding = true
+    }
+
     testOptions {
         unitTests {
             isIncludeAndroidResources = true
@@ -91,8 +95,6 @@ dependencies {
     implementation("androidx.camera:camera-extensions:1.3.0")
     implementation("com.google.guava:guava:31.1-android")
     implementation("com.google.mlkit:barcode-scanning:17.2.0")
-    implementation(libs.legacy.support.v4)
-    implementation(libs.recyclerview)
     implementation("com.squareup.picasso:picasso:2.8")
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.0.1")

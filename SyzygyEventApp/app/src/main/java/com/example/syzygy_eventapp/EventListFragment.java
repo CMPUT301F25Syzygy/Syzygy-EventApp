@@ -44,13 +44,14 @@ public class EventListFragment extends Fragment {
     // UI Components
     private RecyclerView eventsRecyclerView;
     private EventListAdapter adapter;
-    private EditText searchBar;
     private ProgressBar loadingSpinner;
     private View emptyStateView;
 
     private ListenerRegistration eventListener;
     private List<Event> allEvents;
     private List<Event> filteredEvents;
+
+    private String currentQuery;
 
     /**
      * Constructor for browsing all events (entrant view)
@@ -91,9 +92,6 @@ public class EventListFragment extends Fragment {
 
         // Set up RecyclerView
         setupRecyclerView();
-
-        // Set up search functionality
-        setupSearch();
 
         return view;
     }
@@ -137,7 +135,6 @@ public class EventListFragment extends Fragment {
      */
     private void initializeViews(View view) {
         eventsRecyclerView = view.findViewById(R.id.events_recycler_view);
-        searchBar = view.findViewById(R.id.search_bar);
         loadingSpinner = view.findViewById(R.id.loading_spinner);
         emptyStateView = view.findViewById(R.id.empty_state_view);
     }
@@ -152,28 +149,6 @@ public class EventListFragment extends Fragment {
     }
 
     /**
-     * Set up search bar functionality
-     */
-    private void setupSearch() {
-        searchBar.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                // Not needed
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                filterEvents(s.toString());
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                // Not needed
-            }
-        });
-    }
-
-    /**
      * Called when events are updated from Firestore
      */
     private void onEventsUpdated(List<Event> events) {
@@ -182,13 +157,14 @@ public class EventListFragment extends Fragment {
         loadingSpinner.setVisibility(View.GONE);
 
         this.allEvents = events;
-        filterEvents(searchBar.getText().toString());
+        filterEvents(currentQuery);
     }
 
     /**
      * Filter events based on search query
      */
     private void filterEvents(String query) {
+        currentQuery = query;
         if (query == null || query.trim().isEmpty()) {
             // No filter, show all events
             filteredEvents.clear();
