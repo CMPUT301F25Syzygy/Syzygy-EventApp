@@ -11,73 +11,22 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!-- Upcoming Section Header -->
+        <!-- Upcoming Event List -->
         <LinearLayout
-            android:id="@+id/sectionUpcoming"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:paddingVertical="4dp">
-
-            <ImageView
-                android:id="@+id/iconUpcoming"
-                android:layout_width="48dp"
-                android:layout_height="35dp"
-                android:layout_marginEnd="6dp"
-                android:src="@drawable/arrow_down" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="40dp"
-                android:text="@string/upcoming"
-                android:textSize="24sp"
-                android:textStyle="bold" />
-
+            android:layout_height="wrap_content">
+            <include
+                layout="@layout/fragment_event_list"
+                android:id="@+id/upcoming_event_list" />
         </LinearLayout>
 
-        <!-- Upcoming ListView -->
-        <ListView
-            android:id="@+id/listUpcoming"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:dividerHeight="8dp"
-            android:nestedScrollingEnabled="true"
-            android:scrollbars="none" />
-
-        <!-- History Section Header -->
+        <!-- History Event List -->
         <LinearLayout
-            android:id="@+id/sectionHistory"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:layout_marginTop="12dp"
-            android:paddingVertical="4dp">
-
-            <ImageView
-                android:id="@+id/iconHistory"
-                android:layout_width="48dp"
-                android:layout_height="40dp"
-                android:layout_marginEnd="6dp"
-                android:src="@drawable/arrow_down" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="41dp"
-                android:text="@string/history"
-                android:textSize="24sp"
-                android:textStyle="bold" />
-
+            android:layout_height="wrap_content">
+            <include
+                layout="@layout/fragment_event_list"
+                android:id="@+id/history_event_list" />
         </LinearLayout>
-
-        <!-- History ListView -->
-        <ListView
-            android:id="@+id/listHistory"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:dividerHeight="8dp"
-            android:nestedScrollingEnabled="true"
-            android:scrollbars="none" />
     </LinearLayout>
 </ScrollView>

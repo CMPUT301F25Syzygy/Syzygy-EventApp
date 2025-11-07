@@ -59,6 +59,10 @@ android {
         }
     }
 
+    buildFeatures {
+        dataBinding = true
+    }
+
     testOptions {
         unitTests {
             isIncludeAndroidResources = true
