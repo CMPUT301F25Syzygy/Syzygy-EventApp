@@ -218,13 +218,25 @@ public class QRScanFragment extends Fragment {
                         .get()
                         .addOnSuccessListener(snapshot -> {
                             if (snapshot != null && snapshot.exists()) {
-                                // Check if event is expired
-                                Timestamp endTime = snapshot.getTimestamp("endTime");
-                                if (endTime != null && endTime.toDate().before(new Date())) {
-                                    Toast.makeText(requireContext(), "This event's QR code has expired.", Toast.LENGTH_SHORT).show();
+                                // Check if event is within the registration period
+                                Timestamp registrationStart = snapshot.getTimestamp("registrationStart");
+                                Timestamp registrationEnd = snapshot.getTimestamp("registrationEnd");
+                                Date now = new Date();
+
+                                // No registration date provided
+                                if (registrationStart == null || registrationEnd == null) {
+                                    Toast.makeText(requireContext(), "This event has incomplete registration info.", Toast.LENGTH_SHORT).show();
+                                }
+                                // Too early
+                                else if (now.before(registrationStart.toDate())) {
+                                    Toast.makeText(requireContext(), "Registration for this event has not started yet.", Toast.LENGTH_SHORT).show();
+                                }
+                                // Too late/expired
+                                else if (now.after(registrationEnd.toDate())) {
+                                    Toast.makeText(requireContext(), "Registration for this event has ended.", Toast.LENGTH_SHORT).show();
                                 }
                                 else {
-                                    // Event was found, use the navStack to navigate to the scanned event's details
+                                    // Event was found and is within registration period, use the navStack to navigate to the scanned event's details
                                     navStack.pushScreen(new EventFragment(navStack, eventID));
                                 }
                             }
