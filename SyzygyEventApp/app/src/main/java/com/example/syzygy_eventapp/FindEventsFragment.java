@@ -16,6 +16,7 @@ import android.widget.Toast;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.ListenerRegistration;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -32,6 +33,7 @@ public class FindEventsFragment extends Fragment {
     private QRScanFragment qrFragment;
     private EventSummaryListView summaryListView;
     private List<Event> allEvents = new ArrayList<>();
+    private ListenerRegistration eventsListener;
 
     FindEventsFragment(NavigationStackFragment navStack) {
         super();
@@ -59,6 +61,20 @@ public class FindEventsFragment extends Fragment {
         // SEED FAKE EVENTS, ALSO FOR TESTING/DEMO PLEASE IGNORE
         // seedFakeEventsOnce();
 
+        // Set up the text watcher
+        searchBox.addTextChangedListener(new android.text.TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                applySearchFilter(s.toString());
+            }
+
+            @Override
+            public void afterTextChanged(android.text.Editable s) {}
+        });
+
         // Load events from Firestore
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("events").addSnapshotListener((snapshots, e) -> {
@@ -78,19 +94,6 @@ public class FindEventsFragment extends Fragment {
             // store all events, and call the helper applySearchFilter to show events based on the search text
             allEvents = events;
             applySearchFilter(searchBox.getText().toString());
-
-            searchBox.addTextChangedListener(new android.text.TextWatcher() {
-                @Override
-                public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-
-                @Override
-                public void onTextChanged(CharSequence s, int start, int before, int count) {
-                    applySearchFilter(s.toString());
-                }
-
-                @Override
-                public void afterTextChanged(android.text.Editable s) {}
-            });
 
         });
 
@@ -124,6 +127,15 @@ public class FindEventsFragment extends Fragment {
             Event clickedEvent = (Event) v.getTag();
             navStack.pushScreen(new EventFragment(navStack, clickedEvent.getEventID()));
         });
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (eventsListener != null) {
+            eventsListener.remove();
+            eventsListener = null;
+        }
     }
 
 }
