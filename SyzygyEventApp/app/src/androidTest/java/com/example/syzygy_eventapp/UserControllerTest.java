@@ -98,6 +98,22 @@ public class UserControllerTest {
     }
 
     /**
+     * Tests that equality comparisons between users with the same
+     * UserIDs are correct.
+     */
+    @Test
+    public void testUserIsSame() throws Exception {
+        // create user and set fields
+        String userID = newUserId();
+        User user = Tasks.await(controller.createEntrant(userID), TIMEOUT_SEC, TimeUnit.SECONDS);
+
+        // get user
+        User retrievedUser = Tasks.await(controller.getUser(userID), TIMEOUT_SEC, TimeUnit.SECONDS);
+
+        assertEquals(user, retrievedUser);
+    }
+
+    /**
      * Make sure getUser() throws when the userID doesn't exist
      */
     @Test
