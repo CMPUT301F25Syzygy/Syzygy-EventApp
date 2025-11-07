@@ -1,5 +1,5 @@
 $dokka.format:javadoc-v1
 $dokka.linkExtension:html
-
+$dokka.location:com.example.syzygy_eventapp/EventSummaryView.AttendeeStatus///PointingToDeclaration/com/example/syzygy_eventapp/EventSummaryView.AttendeeStatus.html
 com.example.syzygy_eventapp
 
