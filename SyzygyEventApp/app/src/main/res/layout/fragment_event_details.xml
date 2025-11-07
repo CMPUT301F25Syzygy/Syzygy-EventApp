@@ -33,7 +33,7 @@
 
                 <TextView
                     android:id="@+id/event_title"
-                    android:layout_width="292dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/event_detail_event_title"
                     android:textSize="16sp"
@@ -79,7 +79,7 @@
             android:showDividers="none">
 
             <LinearLayout
-                android:layout_width="333dp"
+                android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
@@ -104,7 +104,7 @@
             </LinearLayout>
 
             <LinearLayout
-                android:layout_width="333dp"
+                android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:gravity="center_vertical"
@@ -129,7 +129,7 @@
             </LinearLayout>
 
             <LinearLayout
-                android:layout_width="336dp"
+                android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:background="@drawable/field_box_background"
@@ -145,7 +145,7 @@
 
                 <TextView
                     android:id="@+id/eventEntrants"
-                    android:layout_width="230dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/event_details_num_entrants"
                     android:textColor="?android:attr/colorForeground"
