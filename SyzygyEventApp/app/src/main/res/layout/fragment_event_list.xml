@@ -2,24 +2,40 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="12dp"
     android:background="?android:attr/colorBackground">
 
-    <!-- Search Bar -->
-    <EditText
-        android:id="@+id/search_bar"
-        android:layout_width="0dp"
-        android:layout_height="45dp"
-        android:hint="Search events..."
-        android:padding="12dp"
-        android:background="@drawable/field_box_background"
-        android:textSize="16sp"
+    <!-- Accordion Title -->
+    <LinearLayout
+        android:id="@+id/header_section"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingTop="4dp"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginBottom="12dp" />
+        tools:layout_editor_absoluteX="12dp">
+
+        <ImageView
+            android:id="@+id/accordion_icon"
+            android:layout_width="48dp"
+            android:layout_height="35dp"
+            android:layout_marginEnd="6dp"
+            android:src="@drawable/arrow_down" />
+
+        <!-- THE TITLE TEXT SHOULD BE RENAMED BY CODE. DO NOT CHANGE XML. -->
+        <!-- THERE IS NOT ANOTHER WAY TO SHARE THIS ELEMENT EVERYWHERE ELSE -->
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:text="Event List"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
 
     <!-- Loading Spinner -->
     <ProgressBar
@@ -27,7 +43,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:visibility="gone"
-        app:layout_constraintTop_toBottomOf="@id/search_bar"
+        app:layout_constraintTop_toBottomOf="@id/header_section"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
@@ -41,20 +57,24 @@
         android:textSize="18sp"
         android:textColor="?attr/colorSecondary"
         android:visibility="gone"
-        app:layout_constraintTop_toBottomOf="@id/search_bar"
+        app:layout_constraintTop_toBottomOf="@id/header_section"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Event Summary List -->
-    <com.example.syzygy_eventapp.EventSummaryListView
-        android:id="@+id/event_summary_list"
+    <!-- RecyclerView for Events -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/events_recycler_view"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="12dp"
-        app:layout_constraintTop_toBottomOf="@id/search_bar"
+        android:scrollbars="vertical"
+        android:padding="4dp"
+        android:clipToPadding="false"
+        app:layout_constraintTop_toBottomOf="@id/header_section"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:listitem="@layout/fragment_item_event"
+        tools:itemCount="2"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
