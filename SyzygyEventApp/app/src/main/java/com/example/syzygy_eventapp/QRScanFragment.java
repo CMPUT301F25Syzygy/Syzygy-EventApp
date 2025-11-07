@@ -25,12 +25,14 @@ import androidx.fragment.app.Fragment;
 
 import com.google.android.material.navigation.NavigationBarView;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.mlkit.vision.barcode.BarcodeScanner;
 import com.google.mlkit.vision.barcode.BarcodeScanning;
 import com.google.mlkit.vision.barcode.common.Barcode;
 import com.google.mlkit.vision.common.InputImage;
 
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -194,7 +196,6 @@ public class QRScanFragment extends Fragment {
 
     /**
      * Handles detected QR codes directly; Will scan and open events.
-     * TODO: Open an event view after a valid QR Code is processed.
      */
     private void handleDetectedBarcodes(List<Barcode> barcodes) {
         // Pause scanning so the same QR Code doesn't keep being processed
@@ -217,8 +218,27 @@ public class QRScanFragment extends Fragment {
                         .get()
                         .addOnSuccessListener(snapshot -> {
                             if (snapshot != null && snapshot.exists()) {
-                                // TODO: Event found, navigate to eventView
-                                // navStack.pushScreen(new EventSummaryViewFragment(snapshot.getId(), eventName, eventLocation, ...));
+                                // Check if event is within the registration period
+                                Timestamp registrationStart = snapshot.getTimestamp("registrationStart");
+                                Timestamp registrationEnd = snapshot.getTimestamp("registrationEnd");
+                                Date now = new Date();
+
+                                // No registration date provided
+                                if (registrationStart == null || registrationEnd == null) {
+                                    Toast.makeText(requireContext(), "This event has incomplete registration info.", Toast.LENGTH_SHORT).show();
+                                }
+                                // Too early
+                                else if (now.before(registrationStart.toDate())) {
+                                    Toast.makeText(requireContext(), "Registration for this event has not started yet.", Toast.LENGTH_SHORT).show();
+                                }
+                                // Too late/expired
+                                else if (now.after(registrationEnd.toDate())) {
+                                    Toast.makeText(requireContext(), "Registration for this event has ended.", Toast.LENGTH_SHORT).show();
+                                }
+                                else {
+                                    // Event was found and is within registration period, use the navStack to navigate to the scanned event's details
+                                    navStack.replaceScreen(new EventFragment(navStack, eventID));
+                                }
                             }
                             else {
                                 Toast.makeText(requireContext(), "Event not found for QR: " + eventID, Toast.LENGTH_SHORT).show();
