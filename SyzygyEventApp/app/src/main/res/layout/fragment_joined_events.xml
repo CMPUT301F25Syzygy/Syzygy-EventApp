@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="12dp">
+    android:padding="36dp">
 
     <!-- Use the strong resources to change num for upcoming and history aa-->
     <LinearLayout
@@ -12,21 +12,16 @@
         android:orientation="vertical">
 
         <!-- Upcoming Event List -->
-        <LinearLayout
+        <com.example.syzygy_eventapp.EventSummaryListView
+            android:id="@+id/upcoming_event_list"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            <include
-                layout="@layout/fragment_event_list"
-                android:id="@+id/upcoming_event_list" />
-        </LinearLayout>
+            android:layout_height="wrap_content" />
 
         <!-- History Event List -->
-        <LinearLayout
+        <com.example.syzygy_eventapp.EventSummaryListView
+            android:id="@+id/history_event_list"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            <include
-                layout="@layout/fragment_event_list"
-                android:id="@+id/history_event_list" />
-        </LinearLayout>
+            android:layout_height="wrap_content" />
+
     </LinearLayout>
 </ScrollView>
