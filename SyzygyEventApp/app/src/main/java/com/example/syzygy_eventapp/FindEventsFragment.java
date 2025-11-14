@@ -23,23 +23,51 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * Displays the Find Events screen:
- * - Lets the user search for events
- * - Opens the QR scanner
- * - Uses the EventSummaryListView to display events
+ * Displays the Find Events screen.
+ * <p>
+ *     Provides:
+ *     <ul>
+ *         <li>Search bar that filters open events by [TODO] </li>
+ *         <li>A button to open the QR code scanner</li>
+ *         <li>An {@link EventSummaryListView} that displays all currently open events</li>
+ * </ul>
+ * </p>
+ *
+ * Only events that meet the following criteria are shown:
+ * <ul>
+ *     <li>Are not past their registration deadline</li>
+ *     <li>Have not completed their lottery</li>
+ * </ul>
+ *
+ * Clicking an event opens the Event Details page using the {@link NavigationStackFragment}
  */
 public class FindEventsFragment extends Fragment {
-    final private NavigationStackFragment navStack;
+    private NavigationStackFragment navStack;
     private QRScanFragment qrFragment;
     private EventSummaryListView summaryListView;
     private List<Event> allEvents = new ArrayList<>();
     private ListenerRegistration eventsListener;
 
+    // required empty constructor
+    public FindEventsFragment() {
+        this.navStack = null;
+    }
+
     FindEventsFragment(NavigationStackFragment navStack) {
-        super();
         this.navStack = navStack;
     }
 
+    /**
+     * Inflates the layout and intializes all UI elements.
+     * Sets up the search bar, QR scan button, and attaches a real-time listener to Firestore
+     * @param inflater The LayoutInflater object that can be used to inflate
+     * any views in the fragment,
+     * @param container If non-null, this is the parent view that the fragment's
+     * UI should be attached to.  The fragment should not add the view itself,
+     * but this can be used to generate the LayoutParams of the view.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed
+     * from a previous saved state as given here.
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
@@ -54,6 +82,7 @@ public class FindEventsFragment extends Fragment {
         Button filterButton = view.findViewById(R.id.filterButton);
         Button qrButton = view.findViewById(R.id.open_qr_scan_button);
 
+        // Open the QR scanner when the button is clicked
         view.findViewById(R.id.open_qr_scan_button).setOnClickListener((v) -> {
             navStack.pushScreen(qrFragment);
         });
@@ -61,7 +90,7 @@ public class FindEventsFragment extends Fragment {
         // SEED FAKE EVENTS, ALSO FOR TESTING/DEMO PLEASE IGNORE
         // seedFakeEventsOnce();
 
-        // Set up the text watcher
+        // Set up the text watcher to update the search results as it changes
         searchBox.addTextChangedListener(new android.text.TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
@@ -77,7 +106,7 @@ public class FindEventsFragment extends Fragment {
 
         // Load events from Firestore
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("events").addSnapshotListener((snapshots, e) -> {
+        eventsListener = db.collection("events").addSnapshotListener((snapshots, e) -> {
             if (e != null) return;
 
             List<Event> events = new ArrayList<>();
@@ -134,6 +163,9 @@ public class FindEventsFragment extends Fragment {
         });
     }
 
+    /**
+     * Cleans up the Firestore listener to avoid leaks and duplicate listeners
+     */
     @Override
     public void onDestroyView() {
         super.onDestroyView();

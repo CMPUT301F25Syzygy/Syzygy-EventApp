@@ -18,9 +18,10 @@ import java.util.List;
  * Shows the events the user has joined:
  *    - Upcoming events that the user is in the waiting list for, which are still open or awaiting lottery
  *    - History of events the user has interacted with or participated in
- *
+ * <p>
  *    Uses EventSummaryListView for both lists, and real-time listeners keep them updated whenever
  *    event docs change on Firestore
+ * </p>
  */
 public class JoinedEventsFragment extends Fragment {
 
@@ -31,9 +32,9 @@ public class JoinedEventsFragment extends Fragment {
     private ListenerRegistration allEventsListener;
 
     private String userID;
-    private final NavigationStackFragment navStack;
+    private NavigationStackFragment navStack;
 
-    // required default constructor
+    // required empty constructor
     public JoinedEventsFragment() {
         this.navStack = null;
     }
@@ -53,8 +54,6 @@ public class JoinedEventsFragment extends Fragment {
      * but this can be used to generate the LayoutParams of the view.
      * @param savedInstanceState If non-null, this fragment is being re-constructed
      * from a previous saved state as given here.
-     *
-     * @return
      */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -81,12 +80,12 @@ public class JoinedEventsFragment extends Fragment {
 
     /**
      * Starts the Firestore real-time listener that monitors all events
-     *
+     *<p>
      * When events update, the callback will:
      *    - Filter events to show only the ones that the user is associated with
      *    - Splits the events into "upcoming" and "past"
      *    - Updates the list views, including click behavior, for upcoming events
-     *
+     * </p>
      * ListenerRegistration is stored so it can be removed in onDestroyView
      */
     private void startObserver() {
