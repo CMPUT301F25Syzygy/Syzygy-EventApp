@@ -117,7 +117,7 @@ var pathtoroot = "../../../";
 public class <span class="typeNameLabel"><a href=FindEventsFragment.html>FindEventsFragment</a></span>
 
                     </pre>
-                    <div class="block"><p>Displays the Find Events screen: - Lets the user search for events - Opens the QR scanner - Uses the EventSummaryListView to display events</p></div>
+                    <div class="block"><p>Displays the Find Events screen. </p><p> Provides: </p><ul><li>Search bar that filters open events by [TODO] </li><li>A button to open the QR code scanner</li><li>An <a href=EventSummaryListView.html>EventSummaryListView</a> that displays all currently open events</li></ul> Only events that meet the following criteria are shown: <ul><li>Are not past their registration deadline</li><li>Have not completed their lottery</li></ul> Clicking an event opens the Event Details page using the <a href=NavigationStackFragment.html>NavigationStackFragment</a></div>
 
                     <dl>
 
@@ -196,6 +196,12 @@ public class <span class="typeNameLabel"><a href=FindEventsFragment.html>FindEve
                                         </tr>
 
                                         
+                                            <tr class="altColor">
+                                                <th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a
+                                                        href="#FindEventsFragment()">FindEventsFragment</a></span>()</code></th>
+                                                <td class="colLast"></td>
+                                            </tr>
+                                        
 
                                         </tbody>
                                     </table>
@@ -250,7 +256,7 @@ public class <span class="typeNameLabel"><a href=FindEventsFragment.html>FindEve
                                             </td>
                                             <th class="colSecond" scope="row"><code><a href=FindEventsFragment.html#onCreateView(LayoutInflater,ViewGroup,Bundle)>onCreateView</a>(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) </code>
                                             </th>
-                                            <td class="colLast"></td>
+                                            <td class="colLast">Inflates the layout and intializes all UI elements.</td>
                                         </tr>
                                         
                                         <tr id="i1" class="rowColor">
@@ -258,7 +264,7 @@ public class <span class="typeNameLabel"><a href=FindEventsFragment.html>FindEve
                                             </td>
                                             <th class="colSecond" scope="row"><code><a href=FindEventsFragment.html#onDestroyView()>onDestroyView</a>() </code>
                                             </th>
-                                            <td class="colLast"></td>
+                                            <td class="colLast">Cleans up the Firestore listener to avoid leaks and duplicate listeners</td>
                                         </tr>
                                         
                                         </tbody>
@@ -292,6 +298,16 @@ public class <span class="typeNameLabel"><a href=FindEventsFragment.html>FindEve
                             </a>
                                 <h3>Constructor Detail</h3>
                                 
+                                <a name="FindEventsFragment()"></a>
+                                <ul class="blockList">
+                                    <li class="blockList">
+                                        <h4>FindEventsFragment</h4>
+                                        <pre>FindEventsFragment()</pre>
+                                        <div class="block"></div>
+                                        
+                                    </li>
+                                </ul>
+                                
                             </li>
                         </ul>
                     </section>
@@ -314,10 +330,25 @@ public class <span class="typeNameLabel"><a href=FindEventsFragment.html>FindEve
                                     <li class="blockList">
                                         <h4>onCreateView</h4>
                                         <pre class="methodSignature"> View <a href=FindEventsFragment.html#onCreateView(LayoutInflater,ViewGroup,Bundle)>onCreateView</a>(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)</pre>
-                                        <div class="block"></div>
+                                        <div class="block"><p>Inflates the layout and intializes all UI elements. Sets up the search bar, QR scan button, and attaches a real-time listener to Firestore</p></div>
 
                                         <dl>
 
+                                        
+                                            <dt><span class="paramLabel">Parameters:</span></dt>
+                                            
+                                            
+                                            <dd><code>inflater</code> - The LayoutInflater object that can be used to inflate any views in the fragment,</dd>
+                                            
+                                            
+                                            
+                                            <dd><code>container</code> - If non-null, this is the parent view that the fragment's UI should be attached to.</dd>
+                                            
+                                            
+                                            
+                                            <dd><code>savedInstanceState</code> - If non-null, this fragment is being re-constructed from a previous saved state as given here.</dd>
+                                            
+                                            
                                         
 
                                         
@@ -337,7 +368,7 @@ public class <span class="typeNameLabel"><a href=FindEventsFragment.html>FindEve
                                     <li class="blockList">
                                         <h4>onDestroyView</h4>
                                         <pre class="methodSignature"> void <a href=FindEventsFragment.html#onDestroyView()>onDestroyView</a>()</pre>
-                                        <div class="block"></div>
+                                        <div class="block"><p>Cleans up the Firestore listener to avoid leaks and duplicate listeners</p></div>
 
                                         <dl>
 
