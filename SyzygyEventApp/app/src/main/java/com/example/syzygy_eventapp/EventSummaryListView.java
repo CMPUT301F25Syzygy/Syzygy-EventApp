@@ -27,7 +27,7 @@ public class EventSummaryListView extends LinearLayout {
     private ImageView arrow;
     private TextView titleText;
     private TextView countText;
-    private boolean expanded = false;
+    private boolean expanded = true;
 
     /**
      * Constructs the view programmatically.
