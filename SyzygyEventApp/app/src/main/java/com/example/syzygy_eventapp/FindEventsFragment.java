@@ -32,7 +32,7 @@ import java.util.List;
  * <p>
  *     Provides:
  *     <ul>
- *         <li>Search bar that filters open events by soonest (registration date closest to farthest), popularity, and location. </li>
+ *         <li>Search bar that filters open events by soonest (registration date closest to farthest) or popularity. </li>
  *         <li>A button to open the QR code scanner</li>
  *         <li>An {@link EventSummaryListView} that displays all currently open events</li>
  * </ul>
