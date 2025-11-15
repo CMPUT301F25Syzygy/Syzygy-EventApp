@@ -1,5 +1,6 @@
 package com.example.syzygy_eventapp;
 
+import android.app.DatePickerDialog;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -10,7 +11,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import com.google.firebase.Timestamp;
@@ -18,7 +21,9 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -27,7 +32,7 @@ import java.util.List;
  * <p>
  *     Provides:
  *     <ul>
- *         <li>Search bar that filters open events by [TODO] </li>
+ *         <li>Search bar that filters open events by soonest (registration date closest to farthest), popularity, and location. </li>
  *         <li>A button to open the QR code scanner</li>
  *         <li>An {@link EventSummaryListView} that displays all currently open events</li>
  * </ul>
@@ -47,6 +52,7 @@ public class FindEventsFragment extends Fragment {
     private EventSummaryListView summaryListView;
     private List<Event> allEvents = new ArrayList<>();
     private ListenerRegistration eventsListener;
+    private EventFilters currentFilters = new EventFilters();
 
     // required empty constructor
     public FindEventsFragment() {
@@ -86,6 +92,8 @@ public class FindEventsFragment extends Fragment {
         view.findViewById(R.id.open_qr_scan_button).setOnClickListener((v) -> {
             navStack.pushScreen(qrFragment);
         });
+        // Open the filter dialog when it's clicked
+        filterButton.setOnClickListener(v -> openFilter());
 
         // SEED FAKE EVENTS, ALSO FOR TESTING/DEMO PLEASE IGNORE
         // seedFakeEventsOnce();
@@ -160,6 +168,103 @@ public class FindEventsFragment extends Fragment {
         summaryListView.setItems(filtered, false, v -> {
             Event clickedEvent = (Event) v.getTag();
             navStack.pushScreen(new EventFragment(navStack, clickedEvent.getEventID()));
+        });
+    }
+
+    /**
+     * A basic filter holder to let us know what filters to apply
+     * <p>
+     *     0 = none
+     *     1 = popularity
+     *     2 = soonest
+     * </p>
+     */
+    private static class EventFilters {
+        int sortType = 0;
+    }
+
+    /**
+     * A dialog to open the filter chooser
+     */
+    private void openFilter() {
+
+        // Inflate the layout and set up buttons + check boxes
+        View dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.filter_dialog, null);
+        RadioGroup sortGroup = dialogView.findViewById(R.id.sortRadioGroup);
+
+        // Set the currently selected option
+        if (currentFilters.sortType == 1) {
+            sortGroup.check(R.id.popularityRadio);
+        } else if (currentFilters.sortType == 2) {
+            sortGroup.check(R.id.soonestRadio);
+        } else {
+            sortGroup.check(R.id.noSortRadio);
+        }
+
+        // Make an alert dialog for choosing the filter(s)
+        new android.app.AlertDialog.Builder(requireContext())
+                .setTitle("Filter Events")
+                .setView(dialogView)
+                .setPositiveButton("Apply", (d, w) -> {
+                    int checkedId = sortGroup.getCheckedRadioButtonId();
+                    if (checkedId == R.id.popularityRadio) {
+                        currentFilters.sortType = 1;
+                    } else if (checkedId == R.id.soonestRadio) {
+                        currentFilters.sortType = 2;
+                    } else {
+                        currentFilters.sortType = 0;
+                    }
+                    applyFullFilter();
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+
+    /**
+     * Applies all active filters (search text + sorting option) to the list of open events, and
+     * updates the {@link EventSummaryListView} with the resulting list.
+     */
+    private void applyFullFilter() {
+        // Start with all events
+        List<Event> filtered = new ArrayList<>(allEvents);
+
+        // Apply search text filter if there's text in the search box
+        EditText searchBox = getView() != null ? getView().findViewById(R.id.searchEvents) : null;
+        if (searchBox != null) {
+            String query = searchBox.getText().toString().toLowerCase().trim();
+            if (!query.isEmpty()) {
+                filtered.removeIf(e -> {
+                    boolean matchesName = e.getName() != null && e.getName().toLowerCase().contains(query);
+                    boolean matchesDesc = e.getDescription() != null && e.getDescription().toLowerCase().contains(query);
+                    boolean matchesLocation = e.getLocationName() != null && e.getLocationName().toLowerCase().contains(query);
+                    return !(matchesName || matchesDesc || matchesLocation);
+                });
+            }
+        }
+
+        // Apply sorting based on selected type
+        if (currentFilters.sortType == 1) {
+            // Sort by popularity (most entrants first)
+            filtered.sort((a, b) -> {
+                int sizeA = a.getWaitingList() != null ? a.getWaitingList().size() : 0;
+                int sizeB = b.getWaitingList() != null ? b.getWaitingList().size() : 0;
+                return Integer.compare(sizeB, sizeA);
+            });
+        }
+
+        else if (currentFilters.sortType == 2) {
+            // Sort by soonest registration end date (closing soonest first)
+            filtered.sort((a, b) -> {
+                Date dateA = a.getRegistrationEnd() != null ? a.getRegistrationEnd().toDate() : new Date(Long.MAX_VALUE);
+                Date dateB = b.getRegistrationEnd() != null ? b.getRegistrationEnd().toDate() : new Date(Long.MAX_VALUE);
+                return dateA.compareTo(dateB);
+            });
+        }
+
+        // Update the list view with the filtered results
+        summaryListView.setItems(filtered, false, v -> {
+            Event clicked = (Event) v.getTag();
+            navStack.pushScreen(new EventFragment(navStack, clicked.getEventID()));
         });
     }
 
