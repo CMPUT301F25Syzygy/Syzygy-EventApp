@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.google.firebase.firestore.ListenerRegistration;
 
@@ -113,6 +114,21 @@ public class JoinedEventsFragment extends Fragment {
                     upcoming.add(event);
                 }
             }
+
+            // Update the event count text
+            TextView countText = getView().findViewById(R.id.event_count_text);
+            int totalEvents = upcoming.size() + past.size();
+            if (totalEvents == 1) {
+                countText.setText("You're registered for 1 event");
+            } else {
+                countText.setText("You're registered for " + totalEvents + " events");
+            }
+
+            // Show/hide empty messages
+            TextView upcomingEmpty = getView().findViewById(R.id.upcoming_empty_message);
+            TextView historyEmpty = getView().findViewById(R.id.history_empty_message);
+
+            upcomingEmpty.setVisibility(upcoming.isEmpty() ? View.VISIBLE : View.GONE);
 
             // Populate the upcoming events list. Upcoming events should be clickable and take the user to the event details
             upcomingListView.setItems(upcoming, false, v -> {
