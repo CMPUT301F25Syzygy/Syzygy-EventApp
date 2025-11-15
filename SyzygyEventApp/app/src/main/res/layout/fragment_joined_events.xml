@@ -17,6 +17,7 @@
             android:orientation="vertical"
             android:padding="16dp"
             android:elevation="2dp"
+            android:background="@drawable/field_box_background"
             android:layout_marginBottom="16dp">
 
             <TextView
@@ -25,7 +26,7 @@
                 android:text="My Events"
                 android:textSize="24sp"
                 android:textStyle="bold"
-                android:textColor="#333333"/>
+                android:textColor="?android:attr/colorForeground"/>
 
             <TextView
                 android:id="@+id/event_count_text"
@@ -33,7 +34,7 @@
                 android:layout_height="wrap_content"
                 android:text="You're registered for 0 events"
                 android:textSize="14sp"
-                android:textColor="#666666"
+                android:textColor="?android:attr/colorForeground"
                 android:layout_marginTop="4dp"/>
         </LinearLayout>
 
