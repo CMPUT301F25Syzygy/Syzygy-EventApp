@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <!-- NewPage -->
 <html lang="en"><head>
-    <title>OrganizerFragment </title>
+    <title>OrganizerEventSummaryFragment </title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta name="dc.created" content="2020-03-25">
     <link rel="stylesheet" type="text/css" href="../../../stylesheet.css" title="Style">
@@ -89,7 +89,7 @@ var pathtoroot = "../../../";
 <main role="main">
     <div class="header">
         <div class="subTitle"><span class="packageLabelInType">Package</span>&nbsp;<a href="package-summary.html">com.example.syzygy_eventapp</a></div>
-        <h2 title="Class OrganizerFragment" class="title">Class OrganizerFragment</h2>
+        <h2 title="Class OrganizerEventSummaryFragment" class="title">Class OrganizerEventSummaryFragment</h2>
     </div>
     <div class="contentContainer">
         <!-- <ul class="inheritance">
@@ -114,10 +114,10 @@ var pathtoroot = "../../../";
                     <hr>
                     <pre class="wrap-overflow">
 
-public class <span class="typeNameLabel"><a href=OrganizerFragment.html>OrganizerFragment</a></span>
+public class <span class="typeNameLabel"><a href=OrganizerEventSummaryFragment.html>OrganizerEventSummaryFragment</a></span>
 
                     </pre>
-                    <div class="block"><p>Displays the Find Events screen. </p><p> Provides: </p><ul><li>Search bar that filters open events by soonest (registration date closest to farthest) or popularity. </li><li>A button to open the QR code scanner</li><li>An <a href=EventSummaryListView.html>EventSummaryListView</a> that displays all currently open events</li></ul> Only events that meet the following criteria are shown: <ul><li>Are not past their registration deadline</li><li>Have not completed their lottery</li></ul> Clicking an event opens the Event Details page using the <a href=NavigationStackFragment.html>NavigationStackFragment</a></div>
+                    <div class="block"><p>A custom view that displays a compact summary of an event, including its title, location, date, time, and status. It adapts its appearance based on whether the viewer is an entrant or an admin, showing different status indicators and action buttons accordingly. Used within event lists to give users a quick overview before viewing full event details.</p></div>
 
                     <dl>
 
@@ -147,6 +147,13 @@ public class <span class="typeNameLabel"><a href=OrganizerFragment.html>Organize
                                             <th class="colFirst" scope="col">Modifier and Type</th>
                                             <th class="colSecond" scope="col">Class</th>
                                             <th class="colLast" scope="col">Description</th>
+                                        </tr>
+                                        
+                                        <tr class="altColor">
+                                            <td class="colFirst"><code>public enum</code></td>
+                                            <th class="colSecond" scope="row"><code><a href="OrganizerEventSummaryFragment.AttendeeStatus.html">OrganizerEventSummaryFragment.AttendeeStatus</a></span></code>
+                                            </th>
+                                            <td class="colLast"><p>Represents the status of an entrant for a given event.</p></td>
                                         </tr>
                                         
                                     </table>
@@ -198,8 +205,20 @@ public class <span class="typeNameLabel"><a href=OrganizerFragment.html>Organize
                                         
                                             <tr class="altColor">
                                                 <th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a
-                                                        href="#OrganizerFragment()">OrganizerFragment</a></span>()</code></th>
-                                                <td class="colLast"></td>
+                                                        href="#OrganizerEventSummaryFragment(Context)">OrganizerEventSummaryFragment</a></span>(Context context)</code></th>
+                                                <td class="colLast">Default constructor for inflating via code.</td>
+                                            </tr>
+                                        
+                                            <tr class="rowColor">
+                                                <th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a
+                                                        href="#OrganizerEventSummaryFragment(Context,AttributeSet)">OrganizerEventSummaryFragment</a></span>(Context context, AttributeSet attrs)</code></th>
+                                                <td class="colLast">Constructor called when inflating from XML.</td>
+                                            </tr>
+                                        
+                                            <tr class="altColor">
+                                                <th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a
+                                                        href="#OrganizerEventSummaryFragment(Context,AttributeSet,int)">OrganizerEventSummaryFragment</a></span>(Context context, AttributeSet attrs, int defStyleAttr)</code></th>
+                                                <td class="colLast">Constructor called when inflating from XML with a style attribute.</td>
                                             </tr>
                                         
 
@@ -252,19 +271,19 @@ public class <span class="typeNameLabel"><a href=OrganizerFragment.html>Organize
                                         </tr>
                                         
                                         <tr id="i0" class="altColor">
-                                            <td class="colFirst"><code>View</code>
+                                            <td class="colFirst"><code>void</code>
                                             </td>
-                                            <th class="colSecond" scope="row"><code><a href=OrganizerFragment.html#onCreateView(LayoutInflater,ViewGroup,Bundle)>onCreateView</a>(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) </code>
+                                            <th class="colSecond" scope="row"><code><a href=OrganizerEventSummaryFragment.html#bind(com.example.syzygy_eventapp.Event,com.example.syzygy_eventapp.OrganizerEventSummaryFragment.AttendeeStatus)>bind</a>(<a href=Event.html>Event</a> event, <a href=OrganizerEventSummaryFragment.AttendeeStatus.html>OrganizerEventSummaryFragment.AttendeeStatus</a> attendeeStatus) </code>
                                             </th>
-                                            <td class="colLast">Inflates the layout and intializes all UI elements.</td>
+                                            <td class="colLast">Binds an <a href=Event.html>Event</a> object to the summary view, updating text fields and chip color.</td>
                                         </tr>
                                         
                                         <tr id="i1" class="rowColor">
                                             <td class="colFirst"><code>void</code>
                                             </td>
-                                            <th class="colSecond" scope="row"><code><a href=OrganizerFragment.html#onDestroyView()>onDestroyView</a>() </code>
+                                            <th class="colSecond" scope="row"><code><a href=OrganizerEventSummaryFragment.html#setOnOpenDetailsClickListener(OnClickListener)>setOnOpenDetailsClickListener</a>(OnClickListener listener) </code>
                                             </th>
-                                            <td class="colLast">Cleans up the Firestore listener to avoid leaks and duplicate listeners</td>
+                                            <td class="colLast">Sets a click listener for when the user taps the event card to open event details.</td>
                                         </tr>
                                         
                                         </tbody>
@@ -298,12 +317,71 @@ public class <span class="typeNameLabel"><a href=OrganizerFragment.html>Organize
                             </a>
                                 <h3>Constructor Detail</h3>
                                 
-                                <a name="OrganizerFragment()"></a>
+                                <a name="OrganizerEventSummaryFragment(Context)"></a>
                                 <ul class="blockList">
                                     <li class="blockList">
-                                        <h4>OrganizerFragment</h4>
-                                        <pre>OrganizerFragment()</pre>
-                                        <div class="block"></div>
+                                        <h4>OrganizerEventSummaryFragment</h4>
+                                        <pre>OrganizerEventSummaryFragment(Context context)</pre>
+                                        <div class="block">Default constructor for inflating via code.</div>
+                                        
+                                        <dl>
+                                            <dt><span class="paramLabel">Parameters:</span></dt>
+                                            
+                                            
+                                            <dd><code>context</code> - the current Context.</dd>
+                                            
+                                            
+                                        </dl>
+                                        
+                                    </li>
+                                </ul>
+                                
+                                <a name="OrganizerEventSummaryFragment(Context,AttributeSet)"></a>
+                                <ul class="blockList">
+                                    <li class="blockList">
+                                        <h4>OrganizerEventSummaryFragment</h4>
+                                        <pre>OrganizerEventSummaryFragment(Context context, AttributeSet attrs)</pre>
+                                        <div class="block">Constructor called when inflating from XML.</div>
+                                        
+                                        <dl>
+                                            <dt><span class="paramLabel">Parameters:</span></dt>
+                                            
+                                            
+                                            <dd><code>context</code> - the current Context.</dd>
+                                            
+                                            
+                                            
+                                            <dd><code>attrs</code> - the AttributeSet from XML.</dd>
+                                            
+                                            
+                                        </dl>
+                                        
+                                    </li>
+                                </ul>
+                                
+                                <a name="OrganizerEventSummaryFragment(Context,AttributeSet,int)"></a>
+                                <ul class="blockList">
+                                    <li class="blockList">
+                                        <h4>OrganizerEventSummaryFragment</h4>
+                                        <pre>OrganizerEventSummaryFragment(Context context, AttributeSet attrs, int defStyleAttr)</pre>
+                                        <div class="block">Constructor called when inflating from XML with a style attribute.</div>
+                                        
+                                        <dl>
+                                            <dt><span class="paramLabel">Parameters:</span></dt>
+                                            
+                                            
+                                            <dd><code>context</code> - the current Context.</dd>
+                                            
+                                            
+                                            
+                                            <dd><code>attrs</code> - the AttributeSet from XML.</dd>
+                                            
+                                            
+                                            
+                                            <dd><code>defStyleAttr</code> - the default style to apply to this view.</dd>
+                                            
+                                            
+                                        </dl>
                                         
                                     </li>
                                 </ul>
@@ -321,16 +399,16 @@ public class <span class="typeNameLabel"><a href=OrganizerFragment.html>Organize
                             </a>
                                 <h3>Method Detail</h3>
                                 
-                                <a id="onCreateView(LayoutInflater,ViewGroup,Bundle)">
+                                <a id="bind(com.example.syzygy_eventapp.Event,com.example.syzygy_eventapp.OrganizerEventSummaryFragment.AttendeeStatus)">
                                     <!--   -->
                                 </a>
                                 <ul class=
                                               "blockList"
                                           >
                                     <li class="blockList">
-                                        <h4>onCreateView</h4>
-                                        <pre class="methodSignature"> View <a href=OrganizerFragment.html#onCreateView(LayoutInflater,ViewGroup,Bundle)>onCreateView</a>(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)</pre>
-                                        <div class="block"><p>Inflates the layout and intializes all UI elements. Sets up the search bar, QR scan button, and attaches a real-time listener to Firestore</p></div>
+                                        <h4>bind</h4>
+                                        <pre class="methodSignature"> void <a href=OrganizerEventSummaryFragment.html#bind(com.example.syzygy_eventapp.Event,com.example.syzygy_eventapp.OrganizerEventSummaryFragment.AttendeeStatus)>bind</a>(<a href=Event.html>Event</a> event, <a href=OrganizerEventSummaryFragment.AttendeeStatus.html>OrganizerEventSummaryFragment.AttendeeStatus</a> attendeeStatus)</pre>
+                                        <div class="block"><p>Binds an <a href=Event.html>Event</a> object to the summary view, updating text fields and chip color. Also controls admin button visibility.</p></div>
 
                                         <dl>
 
@@ -338,15 +416,11 @@ public class <span class="typeNameLabel"><a href=OrganizerFragment.html>Organize
                                             <dt><span class="paramLabel">Parameters:</span></dt>
                                             
                                             
-                                            <dd><code>inflater</code> - The LayoutInflater object that can be used to inflate any views in the fragment,</dd>
+                                            <dd><code>event</code> - the <a href=Event.html>Event</a> to display.</dd>
                                             
                                             
                                             
-                                            <dd><code>container</code> - If non-null, this is the parent view that the fragment's UI should be attached to.</dd>
-                                            
-                                            
-                                            
-                                            <dd><code>savedInstanceState</code> - If non-null, this fragment is being re-constructed from a previous saved state as given here.</dd>
+                                            <dd><code>attendeeStatus</code> - the status of the current entrant, or <code>null</code> if admin view.</dd>
                                             
                                             
                                         
@@ -359,19 +433,26 @@ public class <span class="typeNameLabel"><a href=OrganizerFragment.html>Organize
                                     </li>
                                 </ul>
                                 
-                                <a id="onDestroyView()">
+                                <a id="setOnOpenDetailsClickListener(OnClickListener)">
                                     <!--   -->
                                 </a>
                                 <ul class=
                                               "blockListLast"
                                           >
                                     <li class="blockList">
-                                        <h4>onDestroyView</h4>
-                                        <pre class="methodSignature"> void <a href=OrganizerFragment.html#onDestroyView()>onDestroyView</a>()</pre>
-                                        <div class="block"><p>Cleans up the Firestore listener to avoid leaks and duplicate listeners</p></div>
+                                        <h4>setOnOpenDetailsClickListener</h4>
+                                        <pre class="methodSignature"> void <a href=OrganizerEventSummaryFragment.html#setOnOpenDetailsClickListener(OnClickListener)>setOnOpenDetailsClickListener</a>(OnClickListener listener)</pre>
+                                        <div class="block"><p>Sets a click listener for when the user taps the event card to open event details.</p></div>
 
                                         <dl>
 
+                                        
+                                            <dt><span class="paramLabel">Parameters:</span></dt>
+                                            
+                                            
+                                            <dd><code>listener</code> - the OnClickListener to invoke when the card is clicked.</dd>
+                                            
+                                            
                                         
 
                                         
