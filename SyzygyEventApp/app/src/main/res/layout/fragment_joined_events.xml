@@ -2,31 +2,83 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:padding="12dp">
+    android:layout_height="match_parent">
 
-    <!-- Use the strong resources to change num for upcoming and history aa-->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:padding="16dp">
 
-        <!-- Upcoming Event List -->
+        <!-- Header Section -->
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            <include
-                layout="@layout/fragment_event_list"
-                android:id="@+id/upcoming_event_list" />
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:elevation="2dp"
+            android:background="@drawable/field_box_background"
+            android:layout_marginBottom="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="My Events"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:textColor="?android:attr/colorForeground"/>
+
+            <TextView
+                android:id="@+id/event_count_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="You're registered for 0 events"
+                android:textSize="14sp"
+                android:textColor="?android:attr/colorForeground"
+                android:layout_marginTop="4dp"/>
         </LinearLayout>
 
-        <!-- History Event List -->
-        <LinearLayout
+        <!-- Upcoming Events Section -->
+        <TextView
+            android:id="@+id/upcoming_empty_message"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            <include
-                layout="@layout/fragment_event_list"
-                android:id="@+id/history_event_list" />
-        </LinearLayout>
+            android:layout_height="wrap_content"
+            android:text="No upcoming events yet.\nBrowse events to get started!"
+            android:textAlignment="center"
+            android:textSize="16sp"
+            android:textColor="#999999"
+            android:padding="32dp"
+            android:visibility="gone"/>
+
+        <com.example.syzygy_eventapp.EventSummaryListView
+            android:id="@+id/upcoming_event_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="24dp"/>
+
+        <!-- Divider -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#E0E0E0"
+            android:layout_marginVertical="8dp"/>
+
+        <!-- Past Events Section -->
+        <TextView
+            android:id="@+id/history_empty_message"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="No past events"
+            android:textAlignment="center"
+            android:textSize="16sp"
+            android:textColor="#999999"
+            android:padding="32dp"
+            android:visibility="gone"/>
+
+        <com.example.syzygy_eventapp.EventSummaryListView
+            android:id="@+id/history_event_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
     </LinearLayout>
 </ScrollView>
