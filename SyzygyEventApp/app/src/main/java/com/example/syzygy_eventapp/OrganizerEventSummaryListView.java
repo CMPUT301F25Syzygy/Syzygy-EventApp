@@ -10,17 +10,17 @@ import android.widget.TextView;
 import java.util.List;
 
 /**
- * Displays a titled, collapsible list of EventSummaryView rows with a count.
- * Used by pages like “Find Events” or “Joined Events”.
+ * Displays a titled, collapsible list of OrganizerEventSummaryFragment rows with a count.
+ * Used primarily by OrganizerFragment.
  */
 public class OrganizerEventSummaryListView extends LinearLayout {
 
     /**
-     * Provides the attendee’s {@link EventSummaryView.AttendeeStatus} for a given {@link Event}.
+     * Provides the attendee’s {@link OrganizerEventSummaryFragment.AttendeeStatus} for a given {@link Event}.
      * Allows the list to display user-specific status coloring when needed.
      */
     public interface StatusProvider {
-        EventSummaryView.AttendeeStatus getStatus(Event event);
+        OrganizerEventSummaryFragment.AttendeeStatus getStatus(Event event);
     }
 
     private LinearLayout listContainer;
@@ -58,7 +58,7 @@ public class OrganizerEventSummaryListView extends LinearLayout {
      * @param context the current context
      */
     private void init(Context context) {
-        LayoutInflater.from(context).inflate(R.layout.view_event_summary_list, this, true);
+        LayoutInflater.from(context).inflate(R.layout.fragment_organizer_event_summary_list, this, true);
         setOrientation(VERTICAL);
 
         listContainer = findViewById(R.id.list_container);
@@ -96,13 +96,12 @@ public class OrganizerEventSummaryListView extends LinearLayout {
     public void toggle() { setExpanded(!expanded); }
 
     /**
-     * Populates the list with a set of {@link EventSummaryView} items and assigns callbacks for user actions.
+     * Populates the list with a set of {@link OrganizerEventSummaryFragment} items and assigns callbacks for user actions.
      * <p>
      * This method is used when the caller needs full control (admin or entrant context), including
      * banner toggling and removal functionality.
      *
      * @param events              the list of {@link Event} objects to display
-     * @param isAdmin             whether this view is shown for an admin
      * @param statusProvider      optional provider for attendee status (nullable)
      * @param onRowClick          click listener for opening event details
      * @param onToggleBannerClick click listener for enabling/disabling banners
@@ -110,7 +109,6 @@ public class OrganizerEventSummaryListView extends LinearLayout {
      */
     public void setItems(
             List<Event> events,
-            boolean isAdmin,
             StatusProvider statusProvider,
             OnClickListener onRowClick,
             OnClickListener onToggleBannerClick,
@@ -123,11 +121,11 @@ public class OrganizerEventSummaryListView extends LinearLayout {
         if (size == 0) return;
 
         for (Event e : events) {
-            EventSummaryView row = new EventSummaryView(getContext());
-            EventSummaryView.AttendeeStatus status =
+            OrganizerEventSummaryFragment row = new OrganizerEventSummaryFragment(getContext());
+            OrganizerEventSummaryFragment.AttendeeStatus status =
                     (statusProvider != null) ? statusProvider.getStatus(e) : null;
 
-            row.bind(e, status, isAdmin);
+            row.bind(e, status);
 
             row.setTag(e);
 
@@ -135,30 +133,21 @@ public class OrganizerEventSummaryListView extends LinearLayout {
                 v.setTag(e);
                 onRowClick.onClick(v);
             });
-            row.setOnToggleBannerClickListener(v -> {
-                v.setTag(e);
-                onToggleBannerClick.onClick(v);
-            });
-            row.setOnRemoveClickListener(v -> {
-                v.setTag(e);
-                onRemoveClick.onClick(v);
-            });
 
             listContainer.addView(row);
         }
     }
 
     /**
-     * Simpler version of {@link #setItems(List, boolean, StatusProvider, OnClickListener, OnClickListener, OnClickListener)}
+     * Simpler version of {@link #setItems(List, StatusProvider, OnClickListener, OnClickListener, OnClickListener)}
      * that omits banner and removal functionality.
      * <p>
      * Useful for entrant-facing lists where events are only opened, not managed.
      *
      * @param events     the list of {@link Event} objects to display
-     * @param isAdmin    whether this view is shown for an admin
      * @param onRowClick click listener for opening event details
      */
     public void setItems(List<Event> events, boolean isAdmin, OnClickListener onRowClick) {
-        setItems(events, isAdmin, null, onRowClick, v -> {}, v -> {});
+        setItems(events, null, onRowClick, v -> {}, v -> {});
     }
 }

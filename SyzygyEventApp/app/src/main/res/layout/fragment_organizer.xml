@@ -45,11 +45,12 @@
             android:layout_marginTop="4dp"
             android:layout_marginBottom="8dp"
             android:backgroundTint="?android:attr/textColorLink"
-            android:drawableLeft="@drawable/qr_code"
+            android:drawableLeft="@drawable/ic_plus"
             android:drawablePadding="8dp"
             android:gravity="center"
             android:text="Create Event"
-            android:textColor="@android:color/white" />
+            android:textColor="@android:color/white"
+            android:drawableTint="@android:color/white"/>
 
         <!-- Upcoming Events Section -->
         <com.example.syzygy_eventapp.OrganizerEventSummaryListView
@@ -73,48 +74,3 @@
 
     </LinearLayout>
 </ScrollView>
-
-
-
-    <!--<?xml version="1.0" encoding="utf-8"?>-->
-    <!--<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
-    <!--    xmlns:app="http://schemas.android.com/apk/res-auto"-->
-    <!--    xmlns:tools="http://schemas.android.com/tools"-->
-    <!--    android:layout_width="match_parent"-->
-    <!--    android:layout_height="match_parent"-->
-    <!--    android:padding="12dp"-->
-    <!--    tools:layout_editor_absoluteX="0dp"-->
-    <!--    tools:layout_editor_absoluteY="12dp">-->
-
-    <!--    <Button-->
-    <!--        android:id="@+id/create_event_button"-->
-    <!--        android:layout_width="fill_parent"-->
-    <!--        android:layout_height="44dp"-->
-    <!--        android:layout_marginTop="8dp"-->
-    <!--        android:backgroundTint="?android:attr/textColorLink"-->
-    <!--        android:drawableLeft="@drawable/qr_code"-->
-    <!--        android:drawablePadding="8dp"-->
-    <!--        android:gravity="center"-->
-    <!--        android:text="Create Event"-->
-    <!--        android:textColor="@android:color/white"-->
-    <!--        app:layout_constraintEnd_toEndOf="parent"-->
-    <!--        app:layout_constraintHorizontal_bias="0.482"-->
-    <!--        app:layout_constraintStart_toStartOf="parent"-->
-    <!--        app:layout_constraintTop_toTopOf="parent" />-->
-
-
-    <!--    <com.example.syzygy_eventapp.OrganizerEventSummaryListView-->
-    <!--        android:id="@+id/event_summary_list_upcoming"-->
-    <!--        android:layout_width="match_parent"-->
-    <!--        android:layout_height="wrap_content"-->
-    <!--        app:layout_constraintTop_toBottomOf="@id/create_event_button"-->
-    <!--        app:layout_constraintBottom_toTopOf="@id/event_summary_list_history"/>-->
-
-    <!--    <com.example.syzygy_eventapp.OrganizerEventSummaryListView-->
-    <!--        android:id="@+id/event_summary_list_history"-->
-    <!--        android:layout_width="match_parent"-->
-    <!--        android:layout_height="wrap_content"-->
-    <!--        app:layout_constraintTop_toBottomOf="@id/event_summary_list_upcoming"-->
-    <!--        app:layout_constraintBottom_toBottomOf="parent"/>-->
-
-    <!--</androidx.constraintlayout.widget.ConstraintLayout>-->

@@ -24,11 +24,9 @@ import java.util.Date;
  */
 public class OrganizerEventSummaryFragment extends LinearLayout {
 
-    private TextView titleText, timeText, locationText, dateText;
+    private TextView titleText, timeText, locationText, dateText, acceptedCountText, interestedCountText;
     private MaterialCardView card;
-    private MaterialButton removeButton, toggleBannerButton;
     private Chip statusChip;
-    private LinearLayout adminButtons;
 
     /**
      * Represents the status of an entrant for a given event.
@@ -70,17 +68,16 @@ public class OrganizerEventSummaryFragment extends LinearLayout {
      * @param context the current {@link Context}.
      */
     private void init(Context context) {
-        LayoutInflater.from(context).inflate(R.layout.view_event_summary, this, true);
+        LayoutInflater.from(context).inflate(R.layout.fragment_organizer_event_summary, this, true);
 
         titleText = findViewById(R.id.event_title);
         timeText = findViewById(R.id.event_time);
         locationText = findViewById(R.id.event_location);
         dateText = findViewById(R.id.event_date);
+        acceptedCountText = findViewById(R.id.event_accepted_count);
+        interestedCountText = findViewById(R.id.event_interested_count);
         card = findViewById(R.id.event_banner_card);
-        removeButton = findViewById(R.id.button_remove_event);
-        toggleBannerButton = findViewById(R.id.button_toggle_banner);
         statusChip = findViewById(R.id.chip_event_status);
-        adminButtons = findViewById(R.id.layout_admin_buttons);
     }
 
     /**
@@ -89,9 +86,8 @@ public class OrganizerEventSummaryFragment extends LinearLayout {
      *
      * @param event the {@link Event} to display.
      * @param attendeeStatus the status of the current entrant, or {@code null} if admin view.
-     * @param isAdmin whether the current user has admin privileges.
      */
-    public void bind(Event event, AttendeeStatus attendeeStatus, boolean isAdmin) {
+    public void bind(Event event, AttendeeStatus attendeeStatus) {
         titleText.setText(event.getName());
         locationText.setText(event.getLocationName());
 
@@ -101,13 +97,13 @@ public class OrganizerEventSummaryFragment extends LinearLayout {
         timeText.setText(timeFormat.format(date));
         dateText.setText(dateFormat.format(date));
 
+        // TODO: Also update the accepted count and interested counts.
+
         if (attendeeStatus != null) {
             setAttendeeChipColor(attendeeStatus);
         } else {
             setAdminChipColor(event.isLotteryComplete(), event.getRegistrationEnd().toDate());
         }
-
-        adminButtons.setVisibility(isAdmin ? VISIBLE : GONE);
     }
 
     /**
@@ -186,21 +182,5 @@ public class OrganizerEventSummaryFragment extends LinearLayout {
      */
     public void setOnOpenDetailsClickListener(OnClickListener listener) {
         card.setOnClickListener(listener);
-    }
-
-    /**
-     * Sets a click listener for when the admin toggles an event’s banner.
-     * @param listener the {@link OnClickListener} to invoke when the banner button is clicked.
-     */
-    public void setOnToggleBannerClickListener(OnClickListener listener) {
-        toggleBannerButton.setOnClickListener(listener);
-    }
-
-    /**
-     * Sets a click listener for when the admin removes an event.
-     * @param listener the {@link OnClickListener} to invoke when the remove button is clicked.
-     */
-    public void setOnRemoveClickListener(OnClickListener listener) {
-        removeButton.setOnClickListener(listener);
     }
 }
