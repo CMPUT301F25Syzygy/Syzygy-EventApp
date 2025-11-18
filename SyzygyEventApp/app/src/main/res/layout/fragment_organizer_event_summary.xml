@@ -1,0 +1,146 @@
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/event_banner_card"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    app:cardBackgroundColor="?attr/colorSurfaceContainerHigh"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="2dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="12dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_event_status"
+                style="@style/Widget.Material3.Chip.Assist"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:text="Status"
+                app:chipCornerRadius="16dp"
+                app:chipMinHeight="28dp"
+                app:ensureMinTouchTargetSize="false"
+                app:chipIconVisible="false" />
+
+            <TextView
+                android:id="@+id/event_title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Event title"
+                android:textStyle="bold"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:textAppearance="@style/TextAppearance.Material3.TitleMedium" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="6dp"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_marginEnd="8dp"
+                app:tint="?attr/colorOnSurfaceVariant"
+                app:srcCompat="@drawable/ic_check" />
+
+            <TextView
+                android:id="@+id/event_accepted_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Accepted: 27/30"
+                android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
+
+            <ImageView
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="8dp"
+                app:tint="?attr/colorOnSurfaceVariant"
+                app:srcCompat="@drawable/ic_question_mark" />
+
+            <TextView
+                android:id="@+id/event_interested_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Interested: 34"
+                android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="6dp"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_marginEnd="8dp"
+                app:tint="?attr/colorOnSurfaceVariant"
+                app:srcCompat="@drawable/clock_outline" />
+
+            <TextView
+                android:id="@+id/event_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Time"
+                android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
+
+            <ImageView
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="8dp"
+                app:tint="?attr/colorOnSurfaceVariant"
+                app:srcCompat="@drawable/baseline_calendar_month_24" />
+
+            <TextView
+                android:id="@+id/event_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Date"
+                android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="6dp"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_marginEnd="8dp"
+                app:tint="?attr/colorOnSurfaceVariant"
+                app:srcCompat="@drawable/location_outline" />
+
+            <TextView
+                android:id="@+id/event_location"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:maxLines="2"
+                android:ellipsize="end"
+                android:text="Address"
+                android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
+        </LinearLayout>
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

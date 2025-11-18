@@ -82,8 +82,14 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
 
         eventController = new EventController();
 
-        setupButtonVisibility();
-        setupListeners();
+        // NOTE: Temporarily disabled these as the buttons
+        // they reference do not seem to be added to the
+        // layout yet, and thus calling these methods crashes
+        // the app at the moment.
+        // TODO: Uncomment these methods when the buttons they
+        // reference are added to the layout.
+        // setupButtonVisibility();
+        // setupListeners();
 
         if (isEditMode && event != null) {
             populateFields(event);
