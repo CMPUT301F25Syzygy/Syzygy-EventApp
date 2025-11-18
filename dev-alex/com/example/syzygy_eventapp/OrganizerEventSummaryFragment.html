@@ -273,7 +273,7 @@ public class <span class="typeNameLabel"><a href=OrganizerEventSummaryFragment.h
                                         <tr id="i0" class="altColor">
                                             <td class="colFirst"><code>void</code>
                                             </td>
-                                            <th class="colSecond" scope="row"><code><a href=OrganizerEventSummaryFragment.html#bind(com.example.syzygy_eventapp.Event,com.example.syzygy_eventapp.OrganizerEventSummaryFragment.AttendeeStatus,boolean)>bind</a>(<a href=Event.html>Event</a> event, <a href=OrganizerEventSummaryFragment.AttendeeStatus.html>OrganizerEventSummaryFragment.AttendeeStatus</a> attendeeStatus, boolean isAdmin) </code>
+                                            <th class="colSecond" scope="row"><code><a href=OrganizerEventSummaryFragment.html#bind(com.example.syzygy_eventapp.Event,com.example.syzygy_eventapp.OrganizerEventSummaryFragment.AttendeeStatus)>bind</a>(<a href=Event.html>Event</a> event, <a href=OrganizerEventSummaryFragment.AttendeeStatus.html>OrganizerEventSummaryFragment.AttendeeStatus</a> attendeeStatus) </code>
                                             </th>
                                             <td class="colLast">Binds an <a href=Event.html>Event</a> object to the summary view, updating text fields and chip color.</td>
                                         </tr>
@@ -284,22 +284,6 @@ public class <span class="typeNameLabel"><a href=OrganizerEventSummaryFragment.h
                                             <th class="colSecond" scope="row"><code><a href=OrganizerEventSummaryFragment.html#setOnOpenDetailsClickListener(OnClickListener)>setOnOpenDetailsClickListener</a>(OnClickListener listener) </code>
                                             </th>
                                             <td class="colLast">Sets a click listener for when the user taps the event card to open event details.</td>
-                                        </tr>
-                                        
-                                        <tr id="i2" class="altColor">
-                                            <td class="colFirst"><code>void</code>
-                                            </td>
-                                            <th class="colSecond" scope="row"><code><a href=OrganizerEventSummaryFragment.html#setOnToggleBannerClickListener(OnClickListener)>setOnToggleBannerClickListener</a>(OnClickListener listener) </code>
-                                            </th>
-                                            <td class="colLast">Sets a click listener for when the admin toggles an event’s banner.</td>
-                                        </tr>
-                                        
-                                        <tr id="i3" class="rowColor">
-                                            <td class="colFirst"><code>void</code>
-                                            </td>
-                                            <th class="colSecond" scope="row"><code><a href=OrganizerEventSummaryFragment.html#setOnRemoveClickListener(OnClickListener)>setOnRemoveClickListener</a>(OnClickListener listener) </code>
-                                            </th>
-                                            <td class="colLast">Sets a click listener for when the admin removes an event.</td>
                                         </tr>
                                         
                                         </tbody>
@@ -415,7 +399,7 @@ public class <span class="typeNameLabel"><a href=OrganizerEventSummaryFragment.h
                             </a>
                                 <h3>Method Detail</h3>
                                 
-                                <a id="bind(com.example.syzygy_eventapp.Event,com.example.syzygy_eventapp.OrganizerEventSummaryFragment.AttendeeStatus,boolean)">
+                                <a id="bind(com.example.syzygy_eventapp.Event,com.example.syzygy_eventapp.OrganizerEventSummaryFragment.AttendeeStatus)">
                                     <!--   -->
                                 </a>
                                 <ul class=
@@ -423,7 +407,7 @@ public class <span class="typeNameLabel"><a href=OrganizerEventSummaryFragment.h
                                           >
                                     <li class="blockList">
                                         <h4>bind</h4>
-                                        <pre class="methodSignature"> void <a href=OrganizerEventSummaryFragment.html#bind(com.example.syzygy_eventapp.Event,com.example.syzygy_eventapp.OrganizerEventSummaryFragment.AttendeeStatus,boolean)>bind</a>(<a href=Event.html>Event</a> event, <a href=OrganizerEventSummaryFragment.AttendeeStatus.html>OrganizerEventSummaryFragment.AttendeeStatus</a> attendeeStatus, boolean isAdmin)</pre>
+                                        <pre class="methodSignature"> void <a href=OrganizerEventSummaryFragment.html#bind(com.example.syzygy_eventapp.Event,com.example.syzygy_eventapp.OrganizerEventSummaryFragment.AttendeeStatus)>bind</a>(<a href=Event.html>Event</a> event, <a href=OrganizerEventSummaryFragment.AttendeeStatus.html>OrganizerEventSummaryFragment.AttendeeStatus</a> attendeeStatus)</pre>
                                         <div class="block"><p>Binds an <a href=Event.html>Event</a> object to the summary view, updating text fields and chip color. Also controls admin button visibility.</p></div>
 
                                         <dl>
@@ -437,10 +421,6 @@ public class <span class="typeNameLabel"><a href=OrganizerEventSummaryFragment.h
                                             
                                             
                                             <dd><code>attendeeStatus</code> - the status of the current entrant, or <code>null</code> if admin view.</dd>
-                                            
-                                            
-                                            
-                                            <dd><code>isAdmin</code> - whether the current user has admin privileges.</dd>
                                             
                                             
                                         
@@ -457,7 +437,7 @@ public class <span class="typeNameLabel"><a href=OrganizerEventSummaryFragment.h
                                     <!--   -->
                                 </a>
                                 <ul class=
-                                              "blockList"
+                                              "blockListLast"
                                           >
                                     <li class="blockList">
                                         <h4>setOnOpenDetailsClickListener</h4>
@@ -471,66 +451,6 @@ public class <span class="typeNameLabel"><a href=OrganizerEventSummaryFragment.h
                                             
                                             
                                             <dd><code>listener</code> - the OnClickListener to invoke when the card is clicked.</dd>
-                                            
-                                            
-                                        
-
-                                        
-
-                                        
-
-                                        </dl>
-                                    </li>
-                                </ul>
-                                
-                                <a id="setOnToggleBannerClickListener(OnClickListener)">
-                                    <!--   -->
-                                </a>
-                                <ul class=
-                                              "blockList"
-                                          >
-                                    <li class="blockList">
-                                        <h4>setOnToggleBannerClickListener</h4>
-                                        <pre class="methodSignature"> void <a href=OrganizerEventSummaryFragment.html#setOnToggleBannerClickListener(OnClickListener)>setOnToggleBannerClickListener</a>(OnClickListener listener)</pre>
-                                        <div class="block"><p>Sets a click listener for when the admin toggles an event’s banner.</p></div>
-
-                                        <dl>
-
-                                        
-                                            <dt><span class="paramLabel">Parameters:</span></dt>
-                                            
-                                            
-                                            <dd><code>listener</code> - the OnClickListener to invoke when the banner button is clicked.</dd>
-                                            
-                                            
-                                        
-
-                                        
-
-                                        
-
-                                        </dl>
-                                    </li>
-                                </ul>
-                                
-                                <a id="setOnRemoveClickListener(OnClickListener)">
-                                    <!--   -->
-                                </a>
-                                <ul class=
-                                              "blockListLast"
-                                          >
-                                    <li class="blockList">
-                                        <h4>setOnRemoveClickListener</h4>
-                                        <pre class="methodSignature"> void <a href=OrganizerEventSummaryFragment.html#setOnRemoveClickListener(OnClickListener)>setOnRemoveClickListener</a>(OnClickListener listener)</pre>
-                                        <div class="block"><p>Sets a click listener for when the admin removes an event.</p></div>
-
-                                        <dl>
-
-                                        
-                                            <dt><span class="paramLabel">Parameters:</span></dt>
-                                            
-                                            
-                                            <dd><code>listener</code> - the OnClickListener to invoke when the remove button is clicked.</dd>
                                             
                                             
                                         

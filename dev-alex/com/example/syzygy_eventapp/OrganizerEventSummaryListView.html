@@ -117,7 +117,7 @@ var pathtoroot = "../../../";
 public class <span class="typeNameLabel"><a href=OrganizerEventSummaryListView.html>OrganizerEventSummaryListView</a></span>
 
                     </pre>
-                    <div class="block"><p>Displays a titled, collapsible list of EventSummaryView rows with a count. Used by pages like “Find Events” or “Joined Events”.</p></div>
+                    <div class="block"><p>Displays a titled, collapsible list of OrganizerEventSummaryFragment rows with a count. Used primarily by OrganizerFragment.</p></div>
 
                     <dl>
 
@@ -153,7 +153,7 @@ public class <span class="typeNameLabel"><a href=OrganizerEventSummaryListView.h
                                             <td class="colFirst"><code>public interface</code></td>
                                             <th class="colSecond" scope="row"><code><a href="OrganizerEventSummaryListView.StatusProvider.html">OrganizerEventSummaryListView.StatusProvider</a></span></code>
                                             </th>
-                                            <td class="colLast"><p>Provides the attendee’s <a href=com/example/syzygy_eventapp/EventSummaryView.AttendeeStatus.html>EventSummaryView.AttendeeStatus</a> for a given <a href=com/example/syzygy_eventapp/Event.html>Event</a>. Allows the list to display user-specific status coloring when needed.</p></td>
+                                            <td class="colLast"><p>Provides the attendee’s <a href=com/example/syzygy_eventapp/OrganizerEventSummaryFragment.AttendeeStatus.html>OrganizerEventSummaryFragment.AttendeeStatus</a> for a given <a href=com/example/syzygy_eventapp/Event.html>Event</a>. Allows the list to display user-specific status coloring when needed.</p></td>
                                         </tr>
                                         
                                     </table>
@@ -289,9 +289,9 @@ public class <span class="typeNameLabel"><a href=OrganizerEventSummaryListView.h
                                         <tr id="i2" class="altColor">
                                             <td class="colFirst"><code>void</code>
                                             </td>
-                                            <th class="colSecond" scope="row"><code><a href=OrganizerEventSummaryListView.html#setItems(java.util.List,boolean,com.example.syzygy_eventapp.OrganizerEventSummaryListView.StatusProvider,OnClickListener,OnClickListener,OnClickListener)>setItems</a>(<a href=https://developer.android.com/reference/kotlin/java/util/List.html>List</a>&lt;<a href=Event.html>Event</a>&gt; events, boolean isAdmin, <a href=OrganizerEventSummaryListView.StatusProvider.html>OrganizerEventSummaryListView.StatusProvider</a> statusProvider, OnClickListener onRowClick, OnClickListener onToggleBannerClick, OnClickListener onRemoveClick) </code>
+                                            <th class="colSecond" scope="row"><code><a href=OrganizerEventSummaryListView.html#setItems(java.util.List,com.example.syzygy_eventapp.OrganizerEventSummaryListView.StatusProvider,OnClickListener,OnClickListener,OnClickListener)>setItems</a>(<a href=https://developer.android.com/reference/kotlin/java/util/List.html>List</a>&lt;<a href=Event.html>Event</a>&gt; events, <a href=OrganizerEventSummaryListView.StatusProvider.html>OrganizerEventSummaryListView.StatusProvider</a> statusProvider, OnClickListener onRowClick, OnClickListener onToggleBannerClick, OnClickListener onRemoveClick) </code>
                                             </th>
-                                            <td class="colLast">Populates the list with a set of <a href=EventSummaryView.html>EventSummaryView</a> items and assigns callbacks for user actions.</td>
+                                            <td class="colLast">Populates the list with a set of <a href=OrganizerEventSummaryFragment.html>OrganizerEventSummaryFragment</a> items and assigns callbacks for user actions.</td>
                                         </tr>
                                         
                                         <tr id="i3" class="rowColor">
@@ -299,7 +299,7 @@ public class <span class="typeNameLabel"><a href=OrganizerEventSummaryListView.h
                                             </td>
                                             <th class="colSecond" scope="row"><code><a href=OrganizerEventSummaryListView.html#setItems(java.util.List,boolean,OnClickListener)>setItems</a>(<a href=https://developer.android.com/reference/kotlin/java/util/List.html>List</a>&lt;<a href=Event.html>Event</a>&gt; events, boolean isAdmin, OnClickListener onRowClick) </code>
                                             </th>
-                                            <td class="colLast">Simpler version of <a href=OrganizerEventSummaryListView.html#setItems(java.util.List,boolean,com.example.syzygy_eventapp.OrganizerEventSummaryListView.StatusProvider,OnClickListener,OnClickListener,OnClickListener)>setItems</a> that omits banner and removal functionality.</td>
+                                            <td class="colLast">Simpler version of <a href=OrganizerEventSummaryListView.html#setItems(java.util.List,com.example.syzygy_eventapp.OrganizerEventSummaryListView.StatusProvider,OnClickListener,OnClickListener,OnClickListener)>setItems</a> that omits banner and removal functionality.</td>
                                         </tr>
                                         
                                         <tr id="i4" class="altColor">
@@ -476,7 +476,7 @@ public class <span class="typeNameLabel"><a href=OrganizerEventSummaryListView.h
                                     </li>
                                 </ul>
                                 
-                                <a id="setItems(java.util.List,boolean,com.example.syzygy_eventapp.OrganizerEventSummaryListView.StatusProvider,OnClickListener,OnClickListener,OnClickListener)">
+                                <a id="setItems(java.util.List,com.example.syzygy_eventapp.OrganizerEventSummaryListView.StatusProvider,OnClickListener,OnClickListener,OnClickListener)">
                                     <!--   -->
                                 </a>
                                 <ul class=
@@ -484,8 +484,8 @@ public class <span class="typeNameLabel"><a href=OrganizerEventSummaryListView.h
                                           >
                                     <li class="blockList">
                                         <h4>setItems</h4>
-                                        <pre class="methodSignature"> void <a href=OrganizerEventSummaryListView.html#setItems(java.util.List,boolean,com.example.syzygy_eventapp.OrganizerEventSummaryListView.StatusProvider,OnClickListener,OnClickListener,OnClickListener)>setItems</a>(<a href=https://developer.android.com/reference/kotlin/java/util/List.html>List</a>&lt;<a href=Event.html>Event</a>&gt; events, boolean isAdmin, <a href=OrganizerEventSummaryListView.StatusProvider.html>OrganizerEventSummaryListView.StatusProvider</a> statusProvider, OnClickListener onRowClick, OnClickListener onToggleBannerClick, OnClickListener onRemoveClick)</pre>
-                                        <div class="block"><p>Populates the list with a set of <a href=EventSummaryView.html>EventSummaryView</a> items and assigns callbacks for user actions. </p><p> This method is used when the caller needs full control (admin or entrant context), including banner toggling and removal functionality.</p></div>
+                                        <pre class="methodSignature"> void <a href=OrganizerEventSummaryListView.html#setItems(java.util.List,com.example.syzygy_eventapp.OrganizerEventSummaryListView.StatusProvider,OnClickListener,OnClickListener,OnClickListener)>setItems</a>(<a href=https://developer.android.com/reference/kotlin/java/util/List.html>List</a>&lt;<a href=Event.html>Event</a>&gt; events, <a href=OrganizerEventSummaryListView.StatusProvider.html>OrganizerEventSummaryListView.StatusProvider</a> statusProvider, OnClickListener onRowClick, OnClickListener onToggleBannerClick, OnClickListener onRemoveClick)</pre>
+                                        <div class="block"><p>Populates the list with a set of <a href=OrganizerEventSummaryFragment.html>OrganizerEventSummaryFragment</a> items and assigns callbacks for user actions. </p><p> This method is used when the caller needs full control (admin or entrant context), including banner toggling and removal functionality.</p></div>
 
                                         <dl>
 
@@ -494,10 +494,6 @@ public class <span class="typeNameLabel"><a href=OrganizerEventSummaryListView.h
                                             
                                             
                                             <dd><code>events</code> - the list of <a href=Event.html>Event</a> objects to display</dd>
-                                            
-                                            
-                                            
-                                            <dd><code>isAdmin</code> - whether this view is shown for an admin</dd>
                                             
                                             
                                             
@@ -535,7 +531,7 @@ public class <span class="typeNameLabel"><a href=OrganizerEventSummaryListView.h
                                     <li class="blockList">
                                         <h4>setItems</h4>
                                         <pre class="methodSignature"> void <a href=OrganizerEventSummaryListView.html#setItems(java.util.List,boolean,OnClickListener)>setItems</a>(<a href=https://developer.android.com/reference/kotlin/java/util/List.html>List</a>&lt;<a href=Event.html>Event</a>&gt; events, boolean isAdmin, OnClickListener onRowClick)</pre>
-                                        <div class="block"><p>Simpler version of <a href=OrganizerEventSummaryListView.html#setItems(java.util.List,boolean,com.example.syzygy_eventapp.OrganizerEventSummaryListView.StatusProvider,OnClickListener,OnClickListener,OnClickListener)>setItems</a> that omits banner and removal functionality. </p><p> Useful for entrant-facing lists where events are only opened, not managed.</p></div>
+                                        <div class="block"><p>Simpler version of <a href=OrganizerEventSummaryListView.html#setItems(java.util.List,com.example.syzygy_eventapp.OrganizerEventSummaryListView.StatusProvider,OnClickListener,OnClickListener,OnClickListener)>setItems</a> that omits banner and removal functionality. </p><p> Useful for entrant-facing lists where events are only opened, not managed.</p></div>
 
                                         <dl>
 
@@ -546,8 +542,6 @@ public class <span class="typeNameLabel"><a href=OrganizerEventSummaryListView.h
                                             <dd><code>events</code> - the list of <a href=Event.html>Event</a> objects to display</dd>
                                             
                                             
-                                            
-                                            <dd><code>isAdmin</code> - whether this view is shown for an admin</dd>
                                             
                                             
                                             
