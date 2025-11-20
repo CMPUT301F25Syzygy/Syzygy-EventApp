@@ -5,13 +5,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FFFFFF">
-<!-- TO DO: drop done for "see more"-->
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="24dp">
 
+        <!-- Title -->
         <TextView
             android:id="@+id/edit_title"
             android:layout_width="wrap_content"
@@ -22,6 +23,7 @@
             android:textSize="24sp"
             android:textStyle="bold" />
 
+        <!-- Event Name -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -40,6 +42,7 @@
             android:padding="8dp"
             android:layout_marginBottom="16dp" />
 
+        <!-- Description -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -59,6 +62,7 @@
             android:padding="8dp"
             android:layout_marginBottom="16dp" />
 
+        <!-- Event Poster -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -105,6 +109,7 @@
                 app:icon="@drawable/delete" />
         </LinearLayout>
 
+        <!-- Location -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -126,14 +131,14 @@
             android:padding="8dp"
             android:layout_marginBottom="16dp" />
 
+        <!-- Date & Time -->
         <TextView
             android:id="@+id/EditDate"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Edit Date"
             android:textStyle="bold"
-            android:textSize="16sp"
-             />
+            android:textSize="16sp" />
 
         <TextView
             android:layout_width="match_parent"
@@ -201,7 +206,7 @@
                 android:textColor="#000" />
         </LinearLayout>
 
-
+        <!-- Waiting Lists -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -210,6 +215,7 @@
             android:textSize="16sp"
             android:layout_marginBottom="8dp" />
 
+        <!-- Accepted -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -256,7 +262,7 @@
             android:layout_marginBottom="16dp"
             android:scrollbars="none" />
 
-
+        <!-- Pending -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -303,7 +309,7 @@
             android:layout_marginBottom="16dp"
             android:scrollbars="none" />
 
-
+        <!-- Waiting -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -350,16 +356,13 @@
             android:layout_marginBottom="24dp"
             android:scrollbars="none" />
 
-
+        <!-- Max Entrants row -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:weightSum="2"
-            android:layout_marginBottom="36dp">
+            android:layout_marginBottom="12dp">
 
-            <!-- Label box -->
             <TextView
                 android:id="@+id/MaxEntrantsLabel"
                 android:layout_width="0dp"
@@ -373,7 +376,6 @@
                 android:layout_marginEnd="8dp"
                 android:gravity="center_vertical" />
 
-            <!-- Number box -->
             <EditText
                 android:id="@+id/max_entrants"
                 android:layout_width="0dp"
@@ -386,6 +388,48 @@
                 android:textStyle="bold"
                 android:textSize="16sp"
                 android:padding="12dp" />
+        </LinearLayout>
+
+        <!-- Action buttons row -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginBottom="36dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp">
+
+            <Button
+                android:id="@+id/create_button"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp"
+                android:text="Create" />
+
+            <Button
+                android:id="@+id/cancel_button"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Cancel" />
+
+            <Button
+                android:id="@+id/update_button"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp"
+                android:text="Update" />
+
+            <Button
+                android:id="@+id/delete_button"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Delete" />
+
         </LinearLayout>
 
     </LinearLayout>

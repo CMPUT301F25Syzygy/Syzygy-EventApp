@@ -11,6 +11,7 @@ import androidx.core.content.ContextCompat;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.chip.Chip;
+import com.google.firebase.Timestamp;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -91,18 +92,38 @@ public class OrganizerEventSummaryFragment extends LinearLayout {
         titleText.setText(event.getName());
         locationText.setText(event.getLocationName());
 
-        Date date = event.getRegistrationEnd().toDate();
+        // Had to comment this out and create a version where a null date is allowed, otherwise, the app crashes
+        //Date date = event.getRegistrationEnd().toDate();
+        //DateFormat timeFormat = DateFormat.getTimeInstance(DateFormat.SHORT);
+        //DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.MEDIUM);
+        //timeText.setText(timeFormat.format(date));
+        //dateText.setText(dateFormat.format(date));
+
+        Timestamp endTs = event.getRegistrationEnd();
+
         DateFormat timeFormat = DateFormat.getTimeInstance(DateFormat.SHORT);
         DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.MEDIUM);
-        timeText.setText(timeFormat.format(date));
-        dateText.setText(dateFormat.format(date));
+
+        if (endTs != null) {
+            Date date = endTs.toDate();
+            timeText.setText(timeFormat.format(date));
+            dateText.setText(dateFormat.format(date));
+        } else {
+            timeText.setText("—");
+            dateText.setText("No date");
+        }
 
         // TODO: Also update the accepted count and interested counts.
 
         if (attendeeStatus != null) {
             setAttendeeChipColor(attendeeStatus);
         } else {
-            setAdminChipColor(event.isLotteryComplete(), event.getRegistrationEnd().toDate());
+            // Also had to make a null-safe verison here
+            // setAdminChipColor(event.isLotteryComplete(), event.getRegistrationEnd().toDate());
+            endTs = event.getRegistrationEnd();
+            Date endDate = (endTs != null) ? endTs.toDate() : new Date(0);  // epoch fallback
+
+            setAdminChipColor(event.isLotteryComplete(), endDate);
         }
     }
 
