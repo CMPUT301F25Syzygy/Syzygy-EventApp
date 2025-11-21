@@ -35,7 +35,7 @@
             android:id="@+id/edit_event_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="John Doe’s Super Cool Event"
+            android:hint="John Doe's Super Cool Event"
             android:inputType="text"
             android:backgroundTint="#CCCCCC"
             android:drawableEnd="@drawable/ic_edit"
@@ -215,14 +215,17 @@
             android:textSize="16sp"
             android:layout_marginBottom="8dp" />
 
-        <!-- Accepted -->
+        <!-- Accepted (Clickable) -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical"
             android:weightSum="2"
-            android:layout_marginBottom="8dp">
+            android:layout_marginBottom="8dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground">
 
             <TextView
                 android:id="@+id/tvAcceptedLabel"
@@ -244,7 +247,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:background="#E8F5E9"
-                android:text="@string/edit_accepted_count"
+                android:text="0"
                 android:textColor="#2E7D32"
                 android:textStyle="bold"
                 android:textSize="16sp"
@@ -253,23 +256,24 @@
                 android:textAlignment="center" />
         </LinearLayout>
 
+        <!-- Hidden ListView for compatibility -->
         <ListView
             android:id="@+id/listAccepted"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:divider="@android:color/darker_gray"
-            android:dividerHeight="4dp"
-            android:layout_marginBottom="16dp"
-            android:scrollbars="none" />
+            android:layout_height="0dp"
+            android:visibility="gone" />
 
-        <!-- Pending -->
+        <!-- Pending (Clickable) -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical"
             android:weightSum="2"
-            android:layout_marginBottom="8dp">
+            android:layout_marginBottom="8dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground">
 
             <TextView
                 android:id="@+id/tvPendingLabel"
@@ -291,7 +295,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:background="#FFF8E1"
-                android:text="@string/edit_pending_count"
+                android:text="0"
                 android:textColor="#F9A825"
                 android:textStyle="bold"
                 android:textSize="16sp"
@@ -300,23 +304,24 @@
                 android:textAlignment="center" />
         </LinearLayout>
 
+        <!-- Hidden ListView for compatibility -->
         <ListView
             android:id="@+id/listPending"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:divider="@android:color/darker_gray"
-            android:dividerHeight="4dp"
-            android:layout_marginBottom="16dp"
-            android:scrollbars="none" />
+            android:layout_height="0dp"
+            android:visibility="gone" />
 
-        <!-- Waiting -->
+        <!-- Waiting (Clickable) -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical"
             android:weightSum="2"
-            android:layout_marginBottom="8dp">
+            android:layout_marginBottom="8dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground">
 
             <TextView
                 android:id="@+id/WaitingLabel"
@@ -338,7 +343,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:background="#E3F2FD"
-                android:text="@string/edit_waiting_count"
+                android:text="0"
                 android:textColor="#1565C0"
                 android:textStyle="bold"
                 android:textSize="16sp"
@@ -347,21 +352,21 @@
                 android:textAlignment="center" />
         </LinearLayout>
 
+        <!-- Hidden ListView for compatibility -->
         <ListView
             android:id="@+id/listWaiting"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:divider="@android:color/darker_gray"
-            android:dividerHeight="4dp"
-            android:layout_marginBottom="24dp"
-            android:scrollbars="none" />
+            android:layout_height="0dp"
+            android:visibility="gone"
+            android:layout_marginBottom="24dp" />
 
         <!-- Max Entrants row -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginBottom="12dp">
+            android:layout_marginBottom="12dp"
+            android:layout_marginTop="16dp">
 
             <TextView
                 android:id="@+id/MaxEntrantsLabel"
@@ -381,7 +386,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:hint="@string/edit_max_entrant_num"
+                android:hint="100"
                 android:inputType="number"
                 android:background="#F5F5F5"
                 android:textAlignment="center"
@@ -406,6 +411,8 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:layout_marginEnd="8dp"
+                android:backgroundTint="#2E7D32"
+                android:textColor="#FFFFFF"
                 android:text="Create" />
 
             <Button
@@ -413,6 +420,8 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:backgroundTint="#DC3545"
+                android:textColor="#FFFFFF"
                 android:text="Cancel" />
 
             <Button
@@ -421,6 +430,8 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:layout_marginEnd="8dp"
+                android:backgroundTint="#2E7D32"
+                android:textColor="#FFFFFF"
                 android:text="Update" />
 
             <Button
@@ -428,6 +439,8 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:backgroundTint="#DC3545"
+                android:textColor="#FFFFFF"
                 android:text="Delete" />
 
         </LinearLayout>

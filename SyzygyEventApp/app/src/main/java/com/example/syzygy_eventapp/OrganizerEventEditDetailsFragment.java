@@ -29,6 +29,7 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.google.firebase.Timestamp;
+import com.google.firebase.firestore.ListenerRegistration;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -36,6 +37,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
@@ -46,15 +48,16 @@ import java.util.Objects;
 public class OrganizerEventEditDetailsFragment extends Fragment {
 
     private EditText titleInput, locationInput, entrantLimitInput, descriptionInput;
-    private Button lotteryTimeButton, startTimeButton, endTimeButton, startDateButton, endDateButton;
+    private Button startTimeButton, endTimeButton, startDateButton, endDateButton;
     private Button importPosterButton, deletePosterButton;
     private ImageView posterPreview;
     private Button createButton, cancelButton, updateButton, deleteButton;
     private EventController eventController;
+    private InvitationController invitationController;
     private Organizer organizer;
     private Event event;
     private boolean isEditMode = false;
-    private Timestamp lotteryTime, startTime, endTime;
+    private Timestamp startTime, endTime;
     private NavigationStackFragment navStack;
 
     private static final String TAG = "OrganizerEventEdit";
@@ -62,13 +65,25 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
     private Uri selectedImageUri;
     private String posterBase64;
     private boolean posterDeleted = false;
-    private static final int MAX_IMAGE_SIZE = 800; // Max width/height in pixels
+    private static final int MAX_IMAGE_SIZE = 800;
 
-    // Activity result launcher for image picker
+    // Waiting list UI elements
+    private TextView acceptedCountText, pendingCountText, waitingCountText;
+    private LinearLayout acceptedLabelLayout, pendingLabelLayout, waitingLabelLayout;
+    private ListView listAccepted, listPending, listWaiting;
+
+    // Real-time data
+    private List<String> waitingListUsers = new ArrayList<>();
+    private List<String> acceptedUsers = new ArrayList<>();
+    private List<String> pendingUsers = new ArrayList<>();
+
+    // Firestore listeners
+    private ListenerRegistration eventListener;
+    private ListenerRegistration invitationsListener;
+
     private ActivityResultLauncher<Intent> imagePickerLauncher;
 
     public OrganizerEventEditDetailsFragment() {
-        // Required empty public constructor
     }
 
     public static OrganizerEventEditDetailsFragment newInstance(@Nullable Event existingEvent, @NonNull Organizer organizer, @Nullable NavigationStackFragment navStack) {
@@ -80,13 +95,6 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
         return fragment;
     }
 
-    /**
-     * Factory method for creating a new instance of this fragment
-     *
-     * @param existingEvent The event to edit (if any). If null, a new event will be created
-     * @param organizer     The organizer creating or editing the event
-     * @return A new instance of {@link OrganizerEventEditDetailsFragment}.
-     */
     public static OrganizerEventEditDetailsFragment newInstance(@Nullable Event existingEvent, @NonNull Organizer organizer) {
         OrganizerEventEditDetailsFragment fragment = new OrganizerEventEditDetailsFragment();
         Bundle args = new Bundle();
@@ -105,7 +113,6 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Initialize image picker launcher
         imagePickerLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
@@ -119,11 +126,6 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
         );
     }
 
-
-    /**
-     * Inflates the layout for this fragment and initializes UI components
-     * @return The root view of the fragment
-     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -148,9 +150,22 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
         endDateButton = view.findViewById(R.id.btnEndDate);
         endTimeButton = view.findViewById(R.id.btnEndTime);
 
-        eventController = new EventController();
+        // Initialize waiting list UI elements
+        acceptedCountText = view.findViewById(R.id.accepted_count);
+        pendingCountText = view.findViewById(R.id.pending_count);
+        waitingCountText = view.findViewById(R.id.Waiting_count);
 
-        // Set the title based on mode (edit/create)
+        acceptedLabelLayout = view.findViewById(R.id.tvAcceptedLabel).getParent() instanceof LinearLayout ? (LinearLayout) view.findViewById(R.id.tvAcceptedLabel).getParent() : null;
+        pendingLabelLayout = view.findViewById(R.id.tvPendingLabel).getParent() instanceof LinearLayout ? (LinearLayout) view.findViewById(R.id.tvPendingLabel).getParent() : null;
+        waitingLabelLayout = view.findViewById(R.id.WaitingLabel).getParent() instanceof LinearLayout ? (LinearLayout) view.findViewById(R.id.WaitingLabel).getParent() : null;
+
+        listAccepted = view.findViewById(R.id.listAccepted);
+        listPending = view.findViewById(R.id.listPending);
+        listWaiting = view.findViewById(R.id.listWaiting);
+
+        eventController = new EventController();
+        invitationController = new InvitationController();
+
         if (isEditMode) {
             fragmentTitle.setText("Edit Event");
         }
@@ -160,31 +175,42 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
 
         setupButtonVisibility();
         setupListeners();
+        setupWaitingListListeners();
 
         if (isEditMode && event != null) {
             populateFields(event);
+            startRealtimeListeners();
         }
         else {
-            // Set the default button text for create mode
             updateDateButtonText(startDateButton, null);
             updateDateButtonText(endDateButton, null);
             updateTimeButtonText(startTimeButton, null);
             updateTimeButtonText(endTimeButton, null);
+
+            // Hide waiting list sections in create mode
+            hideWaitingListSections();
         }
 
         return view;
     }
 
-    /**
-     * Sets button visibility depending on whether the fragment is in create or edit mode
-     */
+    private void hideWaitingListSections() {
+        if (acceptedLabelLayout != null) acceptedLabelLayout.setVisibility(View.GONE);
+        if (pendingLabelLayout != null) pendingLabelLayout.setVisibility(View.GONE);
+        if (waitingLabelLayout != null) waitingLabelLayout.setVisibility(View.GONE);
+        if (listAccepted != null) listAccepted.setVisibility(View.GONE);
+        if (listPending != null) listPending.setVisibility(View.GONE);
+        if (listWaiting != null) listWaiting.setVisibility(View.GONE);
+    }
+
     private void setupButtonVisibility() {
         if (isEditMode) {
             createButton.setVisibility(View.GONE);
             cancelButton.setVisibility(View.GONE);
             updateButton.setVisibility(View.VISIBLE);
             deleteButton.setVisibility(View.VISIBLE);
-        } else {
+        }
+        else {
             createButton.setVisibility(View.VISIBLE);
             cancelButton.setVisibility(View.VISIBLE);
             updateButton.setVisibility(View.GONE);
@@ -192,14 +218,9 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
         }
     }
 
-    /**
-     * Listeners for buttons and UI
-     */
     private void setupListeners() {
-        // Image upload functionality
         importPosterButton.setOnClickListener(v -> openImagePicker());
 
-        // Delete poster functionality
         deletePosterButton.setOnClickListener(v -> {
             selectedImageUri = null;
             posterBase64 = null;
@@ -209,9 +230,6 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
             Toast.makeText(getContext(), "Poster removed", Toast.LENGTH_SHORT).show();
         });
 
-        // Registration period date/time pickers
-
-        // Start date/time
         startDateButton.setOnClickListener(v -> showDatePicker(startDateButton, startTime, date -> {
             startTime = mergeDateWithTime(date, startTime);
             updateDateButtonText(startDateButton, startTime);
@@ -222,7 +240,6 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
             updateTimeButtonText(startTimeButton, startTime);
         }));
 
-        // End date/time
         endDateButton.setOnClickListener(v -> showDatePicker(endDateButton, endTime, date -> {
             endTime = mergeDateWithTime(date, endTime);
             updateDateButtonText(endDateButton, endTime);
@@ -235,23 +252,114 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
 
         createButton.setOnClickListener(v -> createEvent());
         updateButton.setOnClickListener(v -> updateEvent());
-        cancelButton.setOnClickListener(v -> navStack.popScreen());
+        cancelButton.setOnClickListener(v -> {
+            if (navStack != null) navStack.popScreen();
+        });
         deleteButton.setOnClickListener(v -> deleteEvent());
     }
 
-    /**
-     * Opens the system's image picker to let the organizer select a poster image.
-     */
+    private void setupWaitingListListeners() {
+        // Click listeners for accepted
+        if (acceptedLabelLayout != null) {
+            acceptedLabelLayout.setOnClickListener(v -> showUserListDialog("Accepted Users", acceptedUsers));
+        }
+        if (acceptedCountText != null) {
+            acceptedCountText.setOnClickListener(v -> showUserListDialog("Accepted Users", acceptedUsers));
+        }
+
+        // Click listeners for pending
+        if (pendingLabelLayout != null) {
+            pendingLabelLayout.setOnClickListener(v -> showUserListDialog("Pending Users", pendingUsers));
+        }
+        if (pendingCountText != null) {
+            pendingCountText.setOnClickListener(v -> showUserListDialog("Pending Users", pendingUsers));
+        }
+
+        // Click listeners for waiting
+        if (waitingLabelLayout != null) {
+            waitingLabelLayout.setOnClickListener(v -> showUserListDialog("Waiting List Users", waitingListUsers));
+        }
+        if (waitingCountText != null) {
+            waitingCountText.setOnClickListener(v -> showUserListDialog("Waiting List Users", waitingListUsers));
+        }
+    }
+
+    private void showUserListDialog(String title, List<String> userIds) {
+        if (userIds == null) {
+            userIds = new ArrayList<>();
+        }
+        UserListDialogFragment dialog = UserListDialogFragment.newInstance(title, userIds);
+        dialog.show(getChildFragmentManager(), "user_list_dialog");
+    }
+
+    private void startRealtimeListeners() {
+        if (event == null || event.getEventID() == null) return;
+
+        // Listen to event changes (for waiting list)
+        eventListener = eventController.observeEvent(event.getEventID(), updatedEvent -> {
+            event = updatedEvent;
+            waitingListUsers = event.getWaitingList() != null ? event.getWaitingList() : new ArrayList<>();
+            updateWaitingCount();
+        }, error -> {
+            Log.e(TAG, "Error observing event", error);
+        });
+
+        // Listen to invitations changes (for accepted and pending)
+        invitationsListener = invitationController.observeEventInvitations(event.getEventID(), invitations -> {
+            acceptedUsers = new ArrayList<>();
+            pendingUsers = new ArrayList<>();
+
+            for (Invitation invitation : invitations) {
+                if (Boolean.TRUE.equals(invitation.getCancelled())) {
+                    continue; // Skip cancelled invitations
+                }
+
+                Boolean accepted = invitation.getAccepted();
+                if (accepted == null) {
+                    // Pending
+                    pendingUsers.add(invitation.getRecipientID());
+                }
+                else if (accepted) {
+                    // Accepted
+                    acceptedUsers.add(invitation.getRecipientID());
+                }
+                // We don't track rejected invitations in these lists
+            }
+
+            updateAcceptedCount();
+            updatePendingCount();
+        }, error -> {
+            Log.e(TAG, "Error observing invitations", error);
+        });
+    }
+
+    private void updateAcceptedCount() {
+        if (acceptedCountText != null) {
+            acceptedCountText.setText(String.valueOf(acceptedUsers.size()));
+        }
+    }
+
+    private void updatePendingCount() {
+        if (pendingCountText != null) {
+            pendingCountText.setText(String.valueOf(pendingUsers.size()));
+        }
+    }
+
+    private void updateWaitingCount() {
+        if (waitingCountText != null) {
+            waitingCountText.setText(String.valueOf(waitingListUsers.size()));
+        }
+    }
+
     private void openImagePicker() {
-        // For Android 13+ (API 33+), use READ_MEDIA_IMAGES
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(requireContext(),
                     Manifest.permission.READ_MEDIA_IMAGES) != PackageManager.PERMISSION_GRANTED) {
                 requestPermissions(new String[]{Manifest.permission.READ_MEDIA_IMAGES}, 100);
                 return;
             }
-        } else {
-            // For older versions, use READ_EXTERNAL_STORAGE
+        }
+        else {
             if (ContextCompat.checkSelfPermission(requireContext(),
                     Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                 requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 100);
@@ -264,18 +372,15 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
         imagePickerLauncher.launch(intent);
     }
 
-    /**
-     * Load and convert the selected image to Base64
-     */
     private void loadAndConvertImage(Uri imageUri) {
         try {
-            // Load the bitmap
             Bitmap bitmap;
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
                 ImageDecoder.Source source = ImageDecoder.createSource(
                         requireContext().getContentResolver(), imageUri);
                 bitmap = ImageDecoder.decodeBitmap(source);
-            } else {
+            }
+            else {
                 InputStream inputStream = requireContext().getContentResolver()
                         .openInputStream(imageUri);
                 bitmap = BitmapFactory.decodeStream(inputStream);
@@ -289,10 +394,8 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
                 return;
             }
 
-            // Resize bitmap to reduce size
             Bitmap resizedBitmap = resizeBitmap(bitmap, MAX_IMAGE_SIZE);
 
-            // Convert to Base64
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 70, baos);
             byte[] imageBytes = baos.toByteArray();
@@ -300,22 +403,19 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
 
             Log.d(TAG, "Image converted to Base64, size: " + posterBase64.length() + " characters");
 
-            // Display in preview
             posterPreview.setImageBitmap(resizedBitmap);
             deletePosterButton.setVisibility(View.VISIBLE);
             posterDeleted = false;
 
             Toast.makeText(getContext(), "Image loaded successfully", Toast.LENGTH_SHORT).show();
 
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             Log.e(TAG, "Error loading image", e);
             Toast.makeText(getContext(), "Failed to load image: " + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 
-    /**
-     * Resize bitmap to fit within max dimensions while maintaining aspect ratio
-     */
     private Bitmap resizeBitmap(Bitmap bitmap, int maxSize) {
         int width = bitmap.getWidth();
         int height = bitmap.getHeight();
@@ -331,9 +431,6 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
         return Bitmap.createScaledBitmap(bitmap, newWidth, newHeight, true);
     }
 
-    /**
-     * Load an image from Base64 string and display it in the preview
-     */
     private void loadImageFromBase64(String base64String) {
         if (TextUtils.isEmpty(base64String)) {
             posterPreview.setImageResource(R.drawable.image_placeholder);
@@ -346,25 +443,20 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
             Bitmap bitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
             posterPreview.setImageBitmap(bitmap);
             deletePosterButton.setVisibility(View.VISIBLE);
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             Log.e(TAG, "Failed to load image from Base64", e);
             posterPreview.setImageResource(R.drawable.image_placeholder);
             deletePosterButton.setVisibility(View.GONE);
         }
     }
 
-    /**
-     * Updates the text on the date button to show the selected date instead.
-     * @param button
-     * @param timestamp
-     */
     private void updateDateButtonText(Button button, Timestamp timestamp) {
         if (timestamp != null) {
             SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault());
             button.setText(dateFormat.format(timestamp.toDate()));
         }
         else {
-            // Show the placeholder text instead
             if (button.getId() == R.id.btnStartDate) {
                 button.setText("Select Start Date");
             }
@@ -374,18 +466,12 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
         }
     }
 
-    /**
-     * Updates the text on the time button to show the selected time instead.
-     * @param button
-     * @param timestamp
-     */
     private void updateTimeButtonText(Button button, Timestamp timestamp) {
         if (timestamp != null) {
             SimpleDateFormat dateFormat = new SimpleDateFormat("h:mm a", Locale.getDefault());
             button.setText(dateFormat.format(timestamp.toDate()));
         }
         else {
-            // Show the placeholder text instead
             if (button.getId() == R.id.btnStartTime) {
                 button.setText("Select Start Time");
             }
@@ -395,17 +481,12 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
         }
     }
 
-    /**
-     * Populates UI fields with an existing event's data when editing
-     * @param e The {@link Event} object containing existing data.
-     */
     private void populateFields(Event e) {
         titleInput.setText(e.getName());
         locationInput.setText(e.getLocationName());
         descriptionInput.setText(e.getDescription());
         entrantLimitInput.setText(e.getMaxAttendees() != null ? String.valueOf(e.getMaxAttendees()) : "");
 
-        // Populate registration period
         startTime = e.getRegistrationStart();
         endTime = e.getRegistrationEnd();
         updateDateButtonText(startDateButton, startTime);
@@ -413,16 +494,12 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
         updateTimeButtonText(startTimeButton, startTime);
         updateTimeButtonText(endTimeButton, endTime);
 
-        // Load existing poster if available
-        posterBase64 = e.getPosterUrl(); // Now storing Base64 string in posterUrl field
+        posterBase64 = e.getPosterUrl();
         if (!TextUtils.isEmpty(posterBase64)) {
             loadImageFromBase64(posterBase64);
         }
     }
 
-    /**
-     * Validates user inputs, creates a new {@link Event}, and stores it in Firestore via {@link EventController}
-     */
     private void createEvent() {
         if (!validateInputs()) {
             return;
@@ -432,10 +509,6 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
         createEventWithPoster(posterBase64);
     }
 
-    /**
-     * Create the event object and save it to Firestore
-     * @param posterData Base64 string of the poster image
-     */
     private void createEventWithPoster(String posterData) {
         Event newEvent = new Event();
         newEvent.setName(titleInput.getText().toString());
@@ -446,9 +519,8 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
         newEvent.setRegistrationStart(startTime);
         newEvent.setRegistrationEnd(endTime);
         newEvent.setLotteryComplete(false);
-        newEvent.setPosterUrl(posterData); // Storing Base64 string in posterUrl field
+        newEvent.setPosterUrl(posterData);
 
-        // explicit defaults
         newEvent.setGeolocationRequired(false);
         newEvent.setLocationCoordinates(null);
         newEvent.setMaxWaitingList(null);
@@ -471,9 +543,6 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
                 });
     }
 
-    /**
-     * Updates an existing {@link Event} in Firestore with the modified input data
-     */
     private void updateEvent() {
         if (event == null || TextUtils.isEmpty(event.getEventID())) return;
 
@@ -483,15 +552,14 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
 
         Toast.makeText(getContext(), "Updating event...", Toast.LENGTH_SHORT).show();
 
-        // Determine the poster data to save
         String posterDataToSave;
         if (posterDeleted) {
             posterDataToSave = null;
-        } else if (posterBase64 != null && !posterBase64.equals(event.getPosterUrl())) {
-            // New image selected
+        }
+        else if (posterBase64 != null && !posterBase64.equals(event.getPosterUrl())) {
             posterDataToSave = posterBase64;
-        } else {
-            // No change to poster
+        }
+        else {
             posterDataToSave = event.getPosterUrl();
         }
 
@@ -514,11 +582,11 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
                 event.setPosterUrl(posterData);
                 posterBase64 = posterData;
 
-                // Return to Organizer screen
                 if (navStack != null) {
                     navStack.popScreen();
                 }
-            } else {
+            }
+            else {
                 Toast.makeText(getContext(), "Failed to update: " + Objects.requireNonNull(task.getException()).getMessage(), Toast.LENGTH_LONG).show();
             }
         });
@@ -557,11 +625,6 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
         return new Timestamp(calendarDate.getTime());
     }
 
-    /**
-     * Validates all required text fields before performing create or update operations
-     *
-     * @return {@code true} if all required fields are filled; otherwise {@code false}
-     */
     private boolean validateInputs() {
         boolean isValid = true;
 
@@ -600,7 +663,6 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
             isValid = false;
         }
 
-        // Validate that the end time is after the start time
         if (startTime != null && endTime != null) {
             if (endTime.toDate().before(startTime.toDate())) {
                 Toast.makeText(getContext(), "End date must be after start date", Toast.LENGTH_SHORT).show();
@@ -623,12 +685,10 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
                 .setPositiveButton("Delete", (dialog, which) -> {
                     String eventID = event.getEventID();
 
-                    // Delete from Firestore
                     eventController.deleteEvent(eventID)
                             .addOnSuccessListener(aVoid -> {
                                 Log.d(TAG, "Event deleted from Firestore");
 
-                                // Then remove from organizer's list
                                 if (organizer != null) {
                                     organizer.removeOwnedEventID(eventID)
                                             .addOnSuccessListener(unused -> {
@@ -649,8 +709,8 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
                                                     }
                                                 }
                                             });
-                                } else {
-                                    // No organizer reference, just navigate away
+                                }
+                                else {
                                     if (isAdded() && getContext() != null) {
                                         Toast.makeText(getContext(), "Event deleted", Toast.LENGTH_SHORT).show();
                                         if (navStack != null) {
@@ -676,15 +736,27 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
         if (requestCode == 100) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 openImagePicker();
-            } else {
+            }
+            else {
                 Toast.makeText(getContext(), "Permission denied to read images", Toast.LENGTH_SHORT).show();
             }
         }
     }
 
-    /**
-     * Interface for time selection callbacks
-     */
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        // Clean up listeners to prevent memory leaks
+        if (eventListener != null) {
+            eventListener.remove();
+            eventListener = null;
+        }
+        if (invitationsListener != null) {
+            invitationsListener.remove();
+            invitationsListener = null;
+        }
+    }
+
     private interface TimeSelectedCallback {
         void onTimeSelected(Timestamp time);
     }
