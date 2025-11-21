@@ -263,6 +263,104 @@
             android:layout_height="0dp"
             android:visibility="gone" />
 
+        <!-- Rejected/Cancelled (Clickable) -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:weightSum="2"
+            android:layout_marginBottom="8dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground">
+
+            <TextView
+                android:id="@+id/RejectedLabel"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="REJECTED"
+                android:background="#FFEBEE"
+                android:textColor="#C62828"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:padding="12dp"
+                android:layout_marginEnd="8dp"
+                android:gravity="center_vertical" />
+
+            <TextView
+                android:id="@+id/rejected_count"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="#FFEBEE"
+                android:text="0"
+                android:textColor="#C62828"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:padding="12dp"
+                android:gravity="center"
+                android:textAlignment="center" />
+        </LinearLayout>
+
+        <!-- Hidden ListView for compatibility -->
+        <ListView
+            android:id="@+id/listRejected"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:visibility="gone"
+            android:layout_marginBottom="24dp" />
+
+        <!-- Cancelled (Clickable) -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:weightSum="2"
+            android:layout_marginBottom="8dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground">
+
+            <TextView
+                android:id="@+id/CancelledLabel"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="CANCELLED"
+                android:background="#F5F5F5"
+                android:textColor="#757575"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:padding="12dp"
+                android:layout_marginEnd="8dp"
+                android:gravity="center_vertical" />
+
+            <TextView
+                android:id="@+id/cancelled_count"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="#F5F5F5"
+                android:text="0"
+                android:textColor="#757575"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:padding="12dp"
+                android:gravity="center"
+                android:textAlignment="center" />
+        </LinearLayout>
+
+        <!-- Hidden ListView for compatibility -->
+        <ListView
+            android:id="@+id/listCancelled"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:visibility="gone"
+            android:layout_marginBottom="24dp" />
+
         <!-- Pending (Clickable) -->
         <LinearLayout
             android:layout_width="match_parent"
@@ -373,7 +471,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Maximum Entrants"
+                android:text="Max. Attendees"
                 android:background="#F5F5F5"
                 android:textStyle="bold"
                 android:textSize="16sp"

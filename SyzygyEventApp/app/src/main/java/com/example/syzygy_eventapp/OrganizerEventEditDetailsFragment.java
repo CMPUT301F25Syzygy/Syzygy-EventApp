@@ -29,6 +29,8 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.google.firebase.Timestamp;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
 
 import java.io.ByteArrayOutputStream;
@@ -68,14 +70,16 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
     private static final int MAX_IMAGE_SIZE = 800;
 
     // Waiting list UI elements
-    private TextView acceptedCountText, pendingCountText, waitingCountText;
-    private LinearLayout acceptedLabelLayout, pendingLabelLayout, waitingLabelLayout;
-    private ListView listAccepted, listPending, listWaiting;
+    private TextView acceptedCountText, pendingCountText, waitingCountText, rejectedCountText, cancelledCountText;
+    private LinearLayout acceptedLabelLayout, pendingLabelLayout, waitingLabelLayout, rejectedLabelLayout, cancelledLabelLayout;
+    private ListView listAccepted, listPending, listWaiting, listRejected, listCancelled;
 
     // Real-time data
     private List<String> waitingListUsers = new ArrayList<>();
     private List<String> acceptedUsers = new ArrayList<>();
     private List<String> pendingUsers = new ArrayList<>();
+    private List<String> rejectedUsers = new ArrayList<>();
+    private List<String> cancelledUsers = new ArrayList<>();
 
     // Firestore listeners
     private ListenerRegistration eventListener;
@@ -154,14 +158,20 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
         acceptedCountText = view.findViewById(R.id.accepted_count);
         pendingCountText = view.findViewById(R.id.pending_count);
         waitingCountText = view.findViewById(R.id.Waiting_count);
+        rejectedCountText = view.findViewById(R.id.rejected_count);
+        cancelledCountText = view.findViewById(R.id.cancelled_count);
 
         acceptedLabelLayout = view.findViewById(R.id.tvAcceptedLabel).getParent() instanceof LinearLayout ? (LinearLayout) view.findViewById(R.id.tvAcceptedLabel).getParent() : null;
         pendingLabelLayout = view.findViewById(R.id.tvPendingLabel).getParent() instanceof LinearLayout ? (LinearLayout) view.findViewById(R.id.tvPendingLabel).getParent() : null;
         waitingLabelLayout = view.findViewById(R.id.WaitingLabel).getParent() instanceof LinearLayout ? (LinearLayout) view.findViewById(R.id.WaitingLabel).getParent() : null;
+        rejectedLabelLayout = view.findViewById(R.id.RejectedLabel).getParent() instanceof LinearLayout ? (LinearLayout) view.findViewById(R.id.RejectedLabel).getParent() : null;
+        cancelledLabelLayout = view.findViewById(R.id.CancelledLabel).getParent() instanceof LinearLayout ? (LinearLayout) view.findViewById(R.id.CancelledLabel).getParent() : null;
 
         listAccepted = view.findViewById(R.id.listAccepted);
         listPending = view.findViewById(R.id.listPending);
         listWaiting = view.findViewById(R.id.listWaiting);
+        listRejected = view.findViewById(R.id.listRejected);
+        listCancelled = view.findViewById(R.id.listCancelled);
 
         eventController = new EventController();
         invitationController = new InvitationController();
@@ -180,6 +190,14 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
         if (isEditMode && event != null) {
             populateFields(event);
             startRealtimeListeners();
+
+            // Seed test data
+            //createFakeUsers();
+
+            // Wait 2 seconds for users to be created, then seed invitations
+            //new android.os.Handler().postDelayed(() -> {
+            //    seedTestInvitations();
+            //}, 2000);
         }
         else {
             updateDateButtonText(startDateButton, null);
@@ -198,9 +216,14 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
         if (acceptedLabelLayout != null) acceptedLabelLayout.setVisibility(View.GONE);
         if (pendingLabelLayout != null) pendingLabelLayout.setVisibility(View.GONE);
         if (waitingLabelLayout != null) waitingLabelLayout.setVisibility(View.GONE);
+        if (rejectedLabelLayout != null) rejectedLabelLayout.setVisibility(View.GONE);
+        if (cancelledLabelLayout != null) cancelledLabelLayout.setVisibility(View.GONE);
+
         if (listAccepted != null) listAccepted.setVisibility(View.GONE);
         if (listPending != null) listPending.setVisibility(View.GONE);
         if (listWaiting != null) listWaiting.setVisibility(View.GONE);
+        if (listRejected != null) listRejected.setVisibility(View.GONE);
+        if (listCancelled != null) listCancelled.setVisibility(View.GONE);
     }
 
     private void setupButtonVisibility() {
@@ -282,6 +305,22 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
         if (waitingCountText != null) {
             waitingCountText.setOnClickListener(v -> showUserListDialog("Waiting List Users", waitingListUsers));
         }
+
+        // Click listeners for rejected
+        if (rejectedLabelLayout != null) {
+            rejectedLabelLayout.setOnClickListener(v -> showUserListDialog("Rejected Users", rejectedUsers));
+        }
+        if (rejectedCountText != null) {
+            rejectedCountText.setOnClickListener(v -> showUserListDialog("Rejected Users", rejectedUsers));
+        }
+
+        // Click listeners for cancelled
+        if (cancelledLabelLayout != null) {
+            cancelledLabelLayout.setOnClickListener(v -> showUserListDialog("Cancelled Invitations", cancelledUsers));
+        }
+        if (cancelledCountText != null) {
+            cancelledCountText.setOnClickListener(v -> showUserListDialog("Cancelled Invitations", cancelledUsers));
+        }
     }
 
     private void showUserListDialog(String title, List<String> userIds) {
@@ -308,10 +347,13 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
         invitationsListener = invitationController.observeEventInvitations(event.getEventID(), invitations -> {
             acceptedUsers = new ArrayList<>();
             pendingUsers = new ArrayList<>();
+            rejectedUsers = new ArrayList<>();
+            cancelledUsers = new ArrayList<>();
 
             for (Invitation invitation : invitations) {
                 if (Boolean.TRUE.equals(invitation.getCancelled())) {
-                    continue; // Skip cancelled invitations
+                    cancelledUsers.add(invitation.getRecipientID());
+                    continue;
                 }
 
                 Boolean accepted = invitation.getAccepted();
@@ -323,11 +365,17 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
                     // Accepted
                     acceptedUsers.add(invitation.getRecipientID());
                 }
-                // We don't track rejected invitations in these lists
+                else {
+                    // Rejected (accepted == false)
+                    rejectedUsers.add(invitation.getRecipientID());
+                }
             }
 
+            // Call methods to update counts
             updateAcceptedCount();
             updatePendingCount();
+            updateRejectedCount();
+            updateCancelledCount();
         }, error -> {
             Log.e(TAG, "Error observing invitations", error);
         });
@@ -336,6 +384,12 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
     private void updateAcceptedCount() {
         if (acceptedCountText != null) {
             acceptedCountText.setText(String.valueOf(acceptedUsers.size()));
+        }
+    }
+
+    private void updateRejectedCount() {
+        if (rejectedCountText != null) {
+            rejectedCountText.setText(String.valueOf(rejectedUsers.size()));
         }
     }
 
@@ -348,6 +402,12 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
     private void updateWaitingCount() {
         if (waitingCountText != null) {
             waitingCountText.setText(String.valueOf(waitingListUsers.size()));
+        }
+    }
+
+    private void updateCancelledCount() {
+        if (cancelledCountText != null) {
+            cancelledCountText.setText(String.valueOf(cancelledUsers.size()));
         }
     }
 
@@ -629,15 +689,15 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
         boolean isValid = true;
 
         if (TextUtils.isEmpty(titleInput.getText())) {
-            titleInput.setError("Required");
+            titleInput.setError("Title is required");
             isValid = false;
         }
         if (TextUtils.isEmpty(locationInput.getText())) {
-            locationInput.setError("Required");
+            locationInput.setError("Location is required");
             isValid = false;
         }
         if (TextUtils.isEmpty(entrantLimitInput.getText())) {
-            entrantLimitInput.setError("Required");
+            entrantLimitInput.setError("Entrant limit is required");
             isValid = false;
         }
         else {

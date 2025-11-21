@@ -2,6 +2,7 @@ package com.example.syzygy_eventapp;
 
 import android.app.Dialog;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,7 +14,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Dialog fragment that displays a scrollable list of users
@@ -22,9 +26,13 @@ public class UserListDialogFragment extends DialogFragment {
 
     private static final String ARG_TITLE = "title";
     private static final String ARG_USER_IDS = "user_ids";
+    private static final String TAG = "UserListDialog";
 
     private String title;
     private List<String> userIds;
+    private ArrayAdapter<String> adapter;
+    private List<String> userDisplayNames;
+    private UserControllerInterface userController;
 
     public static UserListDialogFragment newInstance(String title, List<String> userIds) {
         UserListDialogFragment fragment = new UserListDialogFragment();
@@ -42,6 +50,8 @@ public class UserListDialogFragment extends DialogFragment {
             title = getArguments().getString(ARG_TITLE);
             userIds = getArguments().getStringArrayList(ARG_USER_IDS);
         }
+        userController = UserController.getInstance();
+        userDisplayNames = new ArrayList<>();
     }
 
     @Nullable
@@ -58,21 +68,55 @@ public class UserListDialogFragment extends DialogFragment {
         if (userIds == null || userIds.isEmpty()) {
             listView.setVisibility(View.GONE);
             emptyView.setVisibility(View.VISIBLE);
-        } else {
+        }
+        else {
             listView.setVisibility(View.VISIBLE);
             emptyView.setVisibility(View.GONE);
 
-            ArrayAdapter<String> adapter = new ArrayAdapter<>(
+            // Initialize adapter with loading placeholders
+            for (int i = 0; i < userIds.size(); i++) {
+                userDisplayNames.add("Loading...");
+            }
+
+            adapter = new ArrayAdapter<>(
                     requireContext(),
                     android.R.layout.simple_list_item_1,
-                    userIds
+                    userDisplayNames
             );
             listView.setAdapter(adapter);
+
+            // Load user names asynchronously
+            loadUserNames();
         }
 
         view.findViewById(R.id.close_button).setOnClickListener(v -> dismiss());
 
         return view;
+    }
+
+    private void loadUserNames() {
+        for (int i = 0; i < userIds.size(); i++) {
+            final int index = i;
+            String userId = userIds.get(i);
+
+            userController.getUser(userId)
+                    .addOnSuccessListener(user -> {
+                        if (user != null && user.getName() != null && !user.getName().isEmpty()) {
+                            userDisplayNames.set(index, user.getName());
+                        }
+                        else {
+                            // Fallback to ID
+                            userDisplayNames.set(index, userId);
+                        }
+                        adapter.notifyDataSetChanged();
+                    })
+                    .addOnFailureListener(e -> {
+                        Log.e(TAG, "Failed to load user: " + userId, e);
+                        // Fallback to ID
+                        userDisplayNames.set(index, userId);
+                        adapter.notifyDataSetChanged();
+                    });
+        }
     }
 
     @Override
