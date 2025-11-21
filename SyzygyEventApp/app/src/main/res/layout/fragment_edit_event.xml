@@ -379,6 +379,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:autofillHints="30"
                 android:hint="@string/edit_max_entrant_num"
                 android:inputType="number"
                 android:background="#F5F5F5"
