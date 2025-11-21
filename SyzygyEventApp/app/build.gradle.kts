@@ -106,7 +106,4 @@ dependencies {
     // Import the Firebase BoM
     implementation(platform("com.google.firebase:firebase-bom:34.4.0"))
     implementation("com.google.firebase:firebase-firestore")
-
-    // Firebase storage
-    implementation("com.google.firebase:firebase-storage:20.3.0")
 }
