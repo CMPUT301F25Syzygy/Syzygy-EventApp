@@ -20,23 +20,7 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * Displays the Find Events screen.
- * <p>
- *     Provides:
- *     <ul>
- *         <li>Search bar that filters open events by soonest (registration date closest to farthest) or popularity. </li>
- *         <li>A button to open the QR code scanner</li>
- *         <li>An {@link EventSummaryListView} that displays all currently open events</li>
- * </ul>
- * </p>
- *
- * Only events that meet the following criteria are shown:
- * <ul>
- *     <li>Are not past their registration deadline</li>
- *     <li>Have not completed their lottery</li>
- * </ul>
- *
- * Clicking an event opens the Event Details page using the {@link NavigationStackFragment}
+ * Displays the Organize Events Fragment
  */
 public class OrganizerFragment extends Fragment {
     private NavigationStackFragment navStack;
@@ -84,12 +68,17 @@ public class OrganizerFragment extends Fragment {
         userID = AppInstallationId.get(requireContext());
         eventController = new EventController();
 
-        // TODO: Remove this and add EditEventFragment when
-        // that layout and code is implemented.
-        // Open the create event fragment when pressed
-        // createEventButton.setOnClickListener((v) -> {
-        //    navStack.pushScreen(editEventFragment);
-        // });
+        createEventButton.setOnClickListener(v -> {
+            UserController.getInstance().getUser(userID)
+                    .addOnSuccessListener(user -> {
+                        navStack.pushScreen(
+                                OrganizerEventEditDetailsFragment.newInstance(null, user.promote(), navStack)
+                        );
+                    })
+                    .addOnFailureListener(e -> {
+                        Log.e("OrganizerFragment", "Failed to get user", e);
+                    });
+        });
 
         startObserver();
 
@@ -108,11 +97,10 @@ public class OrganizerFragment extends Fragment {
 
                 // NOTE: For the demo, I have it to just allow the organizer to edit
                 // any event.
-                // TODO: After the demo, uncomment out the code below.
                 // Skip events that the user is NOT the organizer of
-                // if (!event.getOrganizerID().equals(userID)) {
-                //    continue;
-                // }
+                if (!event.getOrganizerID().equals(userID)) {
+                    continue;
+                 }
 
                 // An event will be considered as "past" if the lottery is complete OR if the registration end time is before now
                 boolean isPast = event.isLotteryComplete() || (event.getRegistrationEnd() != null && event.getRegistrationEnd().toDate().before(now));
@@ -139,7 +127,7 @@ public class OrganizerFragment extends Fragment {
                                     // TODO: Maybe add a stricter check here to make sure the user is actually
                                     // an organizer, even though this shouldn't really ever be an issue unless
                                     // someone is hacking our app...
-                                    OrganizerEventEditDetailsFragment.newInstance(clicked, user.promote())
+                                    OrganizerEventEditDetailsFragment.newInstance(clicked, user.promote(), navStack)
                             );
                         })
                         .addOnFailureListener(e -> {

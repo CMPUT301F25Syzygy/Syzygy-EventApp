@@ -3,8 +3,12 @@ package com.example.syzygy_eventapp;
 import static androidx.core.content.ContentProviderCompat.requireContext;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Base64;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,7 +22,6 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.google.firebase.firestore.ListenerRegistration;
-import com.squareup.picasso.Picasso;
 
 /**
  * EventView - Displays event details for entrants.
@@ -34,6 +37,7 @@ import com.squareup.picasso.Picasso;
  * Collaborators: Event, EventController
  */
 public class EventFragment extends Fragment {
+    private static final String TAG = "EventFragment";
     private final EventController eventController;
     private final NavigationStackFragment navStack;
     private final String eventID;
@@ -43,6 +47,7 @@ public class EventFragment extends Fragment {
     private TextView eventDescriptionText;
     private TextView locationText;
     private TextView waitingListCountText;
+    private TextView waitingListLimitText;
     private TextView registrationPeriodText;
     private TextView maxAttendeesText;
     private ImageView posterImage;
@@ -112,6 +117,7 @@ public class EventFragment extends Fragment {
         eventDescriptionText = view.findViewById(R.id.event_description_text);
         locationText = view.findViewById(R.id.location_text);
         waitingListCountText = view.findViewById(R.id.waiting_list_count_text);
+        waitingListLimitText = view.findViewById(R.id.waiting_list_limit_text);
         registrationPeriodText = view.findViewById(R.id.registration_period_text);
         maxAttendeesText = view.findViewById(R.id.max_attendees_text);
         posterImage = view.findViewById(R.id.poster_image);
@@ -161,7 +167,19 @@ public class EventFragment extends Fragment {
         int waitingListSize = currentEvent.getWaitingList() != null
                 ? currentEvent.getWaitingList().size()
                 : 0;
-        waitingListCountText.setText("Waiting List: " + waitingListSize + " entrants");
+
+        // Update to show limit if it exists
+        if (currentEvent.getMaxWaitingList() != null) {
+            // If there is a limit, show it as x/max entrants
+            waitingListCountText.setText("Waiting List: " + waitingListSize + "/" + currentEvent.getMaxWaitingList() + " entrants");
+            waitingListLimitText.setText("Maximum Waiting List: " + currentEvent.getMaxWaitingList());
+            waitingListLimitText.setVisibility(View.VISIBLE);
+        }
+        else {
+            // No limit will just show the number of interested entrants
+            waitingListCountText.setText("Waiting List: " + waitingListSize + " entrants");
+            waitingListLimitText.setVisibility(View.GONE);
+        }
 
         // Display max attendees (lottery selection criteria)
         if (currentEvent.getMaxAttendees() != null) {
@@ -180,20 +198,45 @@ public class EventFragment extends Fragment {
             registrationPeriodText.setVisibility(View.GONE);
         }
 
-        // Display poster image
-        if (currentEvent.getPosterUrl() != null && !currentEvent.getPosterUrl().isEmpty()) {
-            Picasso.get()
-                    .load(currentEvent.getPosterUrl())
-                    .placeholder(android.R.drawable.ic_menu_gallery)
-                    .error(android.R.drawable.ic_menu_report_image)
-                    .into(posterImage);
-            posterImage.setVisibility(View.VISIBLE);
-        } else {
-            posterImage.setVisibility(View.GONE);
-        }
+        // Display poster image (now using Base64)
+        loadPosterImage();
 
         // Update button states based on whether user is on waiting list
         checkUserWaitingListStatus();
+    }
+
+    /**
+     * Load poster image from Base64 string, which needs to be decoded
+     */
+    private void loadPosterImage() {
+        // Get the base64 string
+        String posterData = currentEvent.getPosterUrl();
+
+        if (posterData != null && !posterData.isEmpty()) {
+            try {
+                // Decode Base64 string to bitmap
+                byte[] decodedBytes = Base64.decode(posterData, Base64.DEFAULT);
+                Bitmap bitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
+
+                if (bitmap != null) {
+                    posterImage.setImageBitmap(bitmap);
+                    posterImage.setVisibility(View.VISIBLE);
+                    Log.d(TAG, "Poster loaded successfully");
+                } else {
+                    Log.e(TAG, "Failed to decode bitmap from Base64");
+                    posterImage.setImageResource(R.drawable.image_placeholder);
+                    posterImage.setVisibility(View.VISIBLE);
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "Error loading poster image", e);
+                posterImage.setImageResource(R.drawable.image_placeholder);
+                posterImage.setVisibility(View.VISIBLE);
+            }
+        } else {
+            // No poster image, show placeholder
+            posterImage.setImageResource(R.drawable.image_placeholder);
+            posterImage.setVisibility(View.VISIBLE);
+        }
     }
 
     /**
@@ -344,11 +387,4 @@ public class EventFragment extends Fragment {
                     Toast.LENGTH_LONG).show();
         }
     }
-
-
-
-
-
-
-
 }
