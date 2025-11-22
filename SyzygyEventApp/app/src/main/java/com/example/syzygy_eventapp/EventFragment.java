@@ -47,6 +47,7 @@ public class EventFragment extends Fragment {
     private TextView eventDescriptionText;
     private TextView locationText;
     private TextView waitingListCountText;
+    private TextView waitingListLimitText;
     private TextView registrationPeriodText;
     private TextView maxAttendeesText;
     private ImageView posterImage;
@@ -116,6 +117,7 @@ public class EventFragment extends Fragment {
         eventDescriptionText = view.findViewById(R.id.event_description_text);
         locationText = view.findViewById(R.id.location_text);
         waitingListCountText = view.findViewById(R.id.waiting_list_count_text);
+        waitingListLimitText = view.findViewById(R.id.waiting_list_limit_text);
         registrationPeriodText = view.findViewById(R.id.registration_period_text);
         maxAttendeesText = view.findViewById(R.id.max_attendees_text);
         posterImage = view.findViewById(R.id.poster_image);
@@ -165,7 +167,19 @@ public class EventFragment extends Fragment {
         int waitingListSize = currentEvent.getWaitingList() != null
                 ? currentEvent.getWaitingList().size()
                 : 0;
-        waitingListCountText.setText("Waiting List: " + waitingListSize + " entrants");
+
+        // Update to show limit if it exists
+        if (currentEvent.getMaxWaitingList() != null) {
+            // If there is a limit, show it as x/max entrants
+            waitingListCountText.setText("Waiting List: " + waitingListSize + "/" + currentEvent.getMaxWaitingList() + " entrants");
+            waitingListLimitText.setText("Maximum Waiting List: " + currentEvent.getMaxWaitingList());
+            waitingListLimitText.setVisibility(View.VISIBLE);
+        }
+        else {
+            // No limit will just show the number of interested entrants
+            waitingListCountText.setText("Waiting List: " + waitingListSize + " entrants");
+            waitingListLimitText.setVisibility(View.GONE);
+        }
 
         // Display max attendees (lottery selection criteria)
         if (currentEvent.getMaxAttendees() != null) {

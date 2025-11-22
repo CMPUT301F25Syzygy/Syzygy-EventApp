@@ -51,7 +51,7 @@ import java.util.Objects;
 public class OrganizerEventEditDetailsFragment extends Fragment {
 
     // Event detail input fields
-    private EditText titleInput, locationInput, entrantLimitInput, descriptionInput;
+    private EditText titleInput, locationInput, entrantLimitInput, descriptionInput, maxWaitingListInput;
     private Button startTimeButton, endTimeButton, startDateButton, endDateButton;
     private Button importPosterButton, deletePosterButton;
     private ImageView posterPreview;
@@ -175,6 +175,7 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
         updateButton = view.findViewById(R.id.update_button);
         deleteButton = view.findViewById(R.id.delete_button);
         entrantLimitInput = view.findViewById(R.id.max_entrants);
+        maxWaitingListInput = view.findViewById(R.id.max_waiting_list);
 
         startDateButton = view.findViewById(R.id.btnStartDate);
         startTimeButton = view.findViewById(R.id.btnStartTime);
@@ -669,6 +670,7 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
         locationInput.setText(e.getLocationName());
         descriptionInput.setText(e.getDescription());
         entrantLimitInput.setText(e.getMaxAttendees() != null ? String.valueOf(e.getMaxAttendees()) : "");
+        maxWaitingListInput.setText(e.getMaxWaitingList() != null ? String.valueOf(e.getMaxWaitingList()) : "");
 
         // Set date/time values
         startTime = e.getRegistrationStart();
@@ -716,11 +718,20 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
         newEvent.setLotteryComplete(false);
         newEvent.setPosterUrl(posterData);
 
+        // Max waiting list
+        String maxWaitingListStr = maxWaitingListInput.getText().toString().trim();
+        if (!maxWaitingListStr.isEmpty()) {
+            newEvent.setMaxWaitingList(Integer.parseInt(maxWaitingListStr));
+        }
+        else {
+            // Keep as null, which means unlimited people can enter the waiting list
+            newEvent.setMaxWaitingList(null);
+        }
+
         // Set default values for optional fields
         // TODO: Change these if/when they are implemented based on the organizer's choices.
         newEvent.setGeolocationRequired(false);
         newEvent.setLocationCoordinates(null);
-        newEvent.setMaxWaitingList(null);
         newEvent.setQrCodeData(null);
         newEvent.setWaitingList(new ArrayList<>());
         newEvent.setCreatedAt(Timestamp.now());
@@ -787,6 +798,16 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
         updates.put("registrationStart", startTime);
         updates.put("registrationEnd", endTime);
         updates.put("posterUrl", posterData);
+
+        // Max waiting list change
+        String maxWaitingListStr = maxWaitingListInput.getText().toString().trim();
+        if (!maxWaitingListStr.isEmpty()) {
+            updates.put("maxWaitingList", Integer.parseInt(maxWaitingListStr));
+        }
+        else {
+            // Null means unlimited
+            updates.put("maxWaitingList", null);
+        }
 
         // Perform the update in Firestore
         eventController.updateEvent(event.getEventID(), updates).addOnCompleteListener(task -> {
