@@ -97,7 +97,6 @@ public class OrganizerFragment extends Fragment {
 
                 // NOTE: For the demo, I have it to just allow the organizer to edit
                 // any event.
-                // TODO: After the demo, uncomment out the code below.
                 // Skip events that the user is NOT the organizer of
                 if (!event.getOrganizerID().equals(userID)) {
                     continue;

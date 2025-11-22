@@ -12,6 +12,7 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.chip.Chip;
 import com.google.firebase.Timestamp;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -28,6 +29,7 @@ public class OrganizerEventSummaryFragment extends LinearLayout {
     private TextView titleText, timeText, locationText, dateText, acceptedCountText, interestedCountText;
     private MaterialCardView card;
     private Chip statusChip;
+    private FirebaseFirestore db;
 
     /**
      * Represents the status of an entrant for a given event.
@@ -79,6 +81,8 @@ public class OrganizerEventSummaryFragment extends LinearLayout {
         interestedCountText = findViewById(R.id.event_interested_count);
         card = findViewById(R.id.event_banner_card);
         statusChip = findViewById(R.id.chip_event_status);
+
+        db = FirebaseFirestore.getInstance();
     }
 
     /**
@@ -113,7 +117,8 @@ public class OrganizerEventSummaryFragment extends LinearLayout {
             dateText.setText("No date");
         }
 
-        // TODO: Also update the accepted count and interested counts.
+        // Get and update counts from Firestore
+        getAndUpdateCounts(event.getEventID(), event.getMaxAttendees());
 
         if (attendeeStatus != null) {
             setAttendeeChipColor(attendeeStatus);
@@ -125,6 +130,58 @@ public class OrganizerEventSummaryFragment extends LinearLayout {
 
             setAdminChipColor(event.isLotteryComplete(), endDate);
         }
+    }
+
+    /**
+     * Gets accepted and interested counts from Firestore and updates the UI.
+     *
+     * @param eventID The ID of the event to get counts for
+     * @param maxAttendees The maximum number of attendees for this event
+     */
+    private void getAndUpdateCounts(String eventID, Integer maxAttendees) {
+        if (eventID == null || eventID.isEmpty()) {
+            acceptedCountText.setText("0");
+            interestedCountText.setText("0");
+            return;
+        }
+
+        // Show a loading state
+        acceptedCountText.setText("—");
+        interestedCountText.setText("—");
+
+        // Get accepted count (accepted = true, cancelled = false)
+        db.collection("invitations")
+                .whereEqualTo("event", eventID)
+                .whereEqualTo("accepted", true)
+                .whereEqualTo("cancelled", false)
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+                    int acceptedCount = querySnapshot.size();
+                    acceptedCountText.setText(acceptedCount + "/" + maxAttendees);
+                })
+                .addOnFailureListener(e -> {
+                    acceptedCountText.setText("0");
+                });
+
+        // Get interested count (basically just get the waiting list size from the event)
+        db.collection("events")
+                .document(eventID)
+                .get()
+                .addOnSuccessListener(eventDoc -> {
+                    int waitingListSize = 0;
+                    if (eventDoc.exists() && eventDoc.contains("waitingList")) {
+                        Object waitingListObj = eventDoc.get("waitingList");
+                        if (waitingListObj instanceof java.util.List) {
+                            waitingListSize = ((java.util.List<?>) waitingListObj).size();
+                        }
+                    }
+
+                    interestedCountText.setText(String.valueOf(waitingListSize));
+
+                })
+                .addOnFailureListener(e -> {
+                    interestedCountText.setText("0");
+                });
     }
 
     /**
