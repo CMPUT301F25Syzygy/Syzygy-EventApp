@@ -1,10 +1,13 @@
 package com.example.syzygy_eventapp;
 
+import android.content.Context;
 import android.os.Bundle;
+import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -13,6 +16,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -20,18 +24,19 @@ import java.util.List;
  * Use the {@link UserListView#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class UserListView extends Fragment {
+public class UserListView extends LinearLayout {
 
     /// The argument key for the title.
     private static final String ARG_TITLE = "title";
 
     /// The list of users to display.
-    private List<User> users;
+    private List<User> users = new ArrayList<>();
     /// The title of the user list.
-    private String title;
+    private String title = "Users";
 
     /// The RecyclerView for displaying the user list.
     private RecyclerView recyclerView;
+    private TextView titleText;
     /// The TextView for displaying the user count.
     private TextView countText;
     /// The ImageView for the expand/collapse icon.
@@ -45,7 +50,22 @@ public class UserListView extends Fragment {
     /**
      * Required empty public constructor.
      */
-    public UserListView() {
+//    public UserListView() {
+//    }
+
+    public UserListView(Context context) {
+        super(context);
+        init(context);
+    }
+
+    public UserListView(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        init(context);
+    }
+
+    public UserListView(Context context, AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+        init(context);
     }
 
     /**
@@ -55,9 +75,9 @@ public class UserListView extends Fragment {
      * @param users The list of {@link User} objects to display.
      * @return A new instance of fragment UserListView.
      */
-    public static UserListView newInstance(List<User> users) {
-        return newInstance(users, "Users");
-    }
+//    public static UserListView newInstance(List<User> users) {
+//        return newInstance(users, "Users");
+//    }
 
     /**
      * Use this factory method to create a new instance of
@@ -67,44 +87,66 @@ public class UserListView extends Fragment {
      * @param title The title of the user list.
      * @return A new instance of fragment UserListView.
      */
-    public static UserListView newInstance(List<User> users, String title) {
-        UserListView fragment = new UserListView();
-        fragment.users = users;
-        fragment.title = title;
-        return fragment;
-    }
+//    public static UserListView newInstance(List<User> users, String title) {
+//        UserListView fragment = new UserListView();
+//        fragment.users = users;
+//        fragment.title = title;
+//        return fragment;
+//    }
 
     /**
      * Initializes the fragment and retrieves arguments.
      */
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState) {
+//    @Nullable
+//    @Override
+//    public View onCreateView(@NonNull LayoutInflater inflater,
+//                             @Nullable ViewGroup container,
+//                             @Nullable Bundle savedInstanceState) {
+//
+//        // Inflate the layout
+//        View view = inflater.inflate(R.layout.fragment_user_list_view, container, false);
+//
+//        // Bind UI components
+//        TextView titleText = view.findViewById(R.id.list_title);
+//        countText = view.findViewById(R.id.user_count);
+//        expandIcon = view.findViewById(R.id.expand_icon);
+//        recyclerView = view.findViewById(R.id.user_recycler_view);
+//        View headerLayout = view.findViewById(R.id.header_layout);
+//
+//        // Setup UI
+//        titleText.setText(title != null ? title : "Users");
+//        updateCountText();
+//
+//        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+//        adapter = new UserListViewAdapter(users);
+//        recyclerView.setAdapter(adapter);
+//
+//        // Expand/collapse behavior
+//        headerLayout.setOnClickListener(v -> toggleListVisibility());
+//
+//        return view;
+//    }
 
-        // Inflate the layout
-        View view = inflater.inflate(R.layout.fragment_user_list_view, container, false);
+    private void init(Context context) {
+        setOrientation(VERTICAL);
+        LayoutInflater.from(context).inflate(R.layout.fragment_user_list_view, this, true);
 
-        // Bind UI components
-        TextView titleText = view.findViewById(R.id.list_title);
-        countText = view.findViewById(R.id.user_count);
-        expandIcon = view.findViewById(R.id.expand_icon);
-        recyclerView = view.findViewById(R.id.user_recycler_view);
-        View headerLayout = view.findViewById(R.id.header_layout);
+        titleText = findViewById(R.id.list_title);
+        countText = findViewById(R.id.user_count);
+        expandIcon = findViewById(R.id.expand_icon);
+        recyclerView = findViewById(R.id.user_recycler_view);
 
-        // Setup UI
-        titleText.setText(title != null ? title : "Users");
-        updateCountText();
+        View header = findViewById(R.id.header_layout);
+        header.setOnClickListener(v -> toggleListVisibility());
 
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerView.setLayoutManager(new LinearLayoutManager(context));
         adapter = new UserListViewAdapter(users);
         recyclerView.setAdapter(adapter);
 
-        // Expand/collapse behavior
-        headerLayout.setOnClickListener(v -> toggleListVisibility());
+        updateTitle();
+        updateCount();
 
-        return view;
+        this.addUser(new User());
     }
 
     /** 
@@ -173,5 +215,13 @@ public class UserListView extends Fragment {
                 .rotation(isExpanded ? 0 : 90)
                 .setDuration(150)
                 .start();
+    }
+
+    private void updateTitle() {
+        titleText.setText(title);
+    }
+
+    private void updateCount() {
+        countText.setText(String.valueOf(users.size()));
     }
 }

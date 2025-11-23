@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/user_list_root"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -44,5 +45,6 @@
         android:id="@+id/user_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:visibility="visible"/>
+        android:visibility="visible"
+        tools:listitem="@layout/fragment_user_view"/>
 </LinearLayout>
