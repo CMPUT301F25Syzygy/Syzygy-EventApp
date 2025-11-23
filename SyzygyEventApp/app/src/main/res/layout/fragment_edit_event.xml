@@ -5,13 +5,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FFFFFF">
-<!-- TO DO: drop done for "see more"-->
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="24dp">
 
+        <!-- Title -->
         <TextView
             android:id="@+id/edit_title"
             android:layout_width="wrap_content"
@@ -22,6 +23,7 @@
             android:textSize="24sp"
             android:textStyle="bold" />
 
+        <!-- Event Name -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -33,13 +35,14 @@
             android:id="@+id/edit_event_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="John Doe’s Super Cool Event"
+            android:hint="John Doe's Super Cool Event"
             android:inputType="text"
             android:backgroundTint="#CCCCCC"
             android:drawableEnd="@drawable/ic_edit"
             android:padding="8dp"
             android:layout_marginBottom="16dp" />
 
+        <!-- Description -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -59,6 +62,7 @@
             android:padding="8dp"
             android:layout_marginBottom="16dp" />
 
+        <!-- Event Poster -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -105,6 +109,7 @@
                 app:icon="@drawable/delete" />
         </LinearLayout>
 
+        <!-- Location -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -126,14 +131,14 @@
             android:padding="8dp"
             android:layout_marginBottom="16dp" />
 
+        <!-- Date & Time -->
         <TextView
             android:id="@+id/EditDate"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Edit Date"
             android:textStyle="bold"
-            android:textSize="16sp"
-             />
+            android:textSize="16sp" />
 
         <TextView
             android:layout_width="match_parent"
@@ -201,7 +206,7 @@
                 android:textColor="#000" />
         </LinearLayout>
 
-
+        <!-- Waiting Lists -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -210,13 +215,17 @@
             android:textSize="16sp"
             android:layout_marginBottom="8dp" />
 
+        <!-- Accepted (Clickable) -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical"
             android:weightSum="2"
-            android:layout_marginBottom="8dp">
+            android:layout_marginBottom="8dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground">
 
             <TextView
                 android:id="@+id/tvAcceptedLabel"
@@ -238,7 +247,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:background="#E8F5E9"
-                android:text="@string/edit_accepted_count"
+                android:text="0"
                 android:textColor="#2E7D32"
                 android:textStyle="bold"
                 android:textSize="16sp"
@@ -247,23 +256,122 @@
                 android:textAlignment="center" />
         </LinearLayout>
 
+        <!-- Hidden ListView for compatibility -->
         <ListView
             android:id="@+id/listAccepted"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:divider="@android:color/darker_gray"
-            android:dividerHeight="4dp"
-            android:layout_marginBottom="16dp"
-            android:scrollbars="none" />
+            android:layout_height="0dp"
+            android:visibility="gone" />
 
-
+        <!-- Rejected/Cancelled (Clickable) -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical"
             android:weightSum="2"
-            android:layout_marginBottom="8dp">
+            android:layout_marginBottom="8dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground">
+
+            <TextView
+                android:id="@+id/RejectedLabel"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="REJECTED"
+                android:background="#FFEBEE"
+                android:textColor="#C62828"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:padding="12dp"
+                android:layout_marginEnd="8dp"
+                android:gravity="center_vertical" />
+
+            <TextView
+                android:id="@+id/rejected_count"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="#FFEBEE"
+                android:text="0"
+                android:textColor="#C62828"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:padding="12dp"
+                android:gravity="center"
+                android:textAlignment="center" />
+        </LinearLayout>
+
+        <!-- Hidden ListView for compatibility -->
+        <ListView
+            android:id="@+id/listRejected"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:visibility="gone"
+            android:layout_marginBottom="24dp" />
+
+        <!-- Cancelled (Clickable) -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:weightSum="2"
+            android:layout_marginBottom="8dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground">
+
+            <TextView
+                android:id="@+id/CancelledLabel"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="CANCELLED"
+                android:background="#F5F5F5"
+                android:textColor="#757575"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:padding="12dp"
+                android:layout_marginEnd="8dp"
+                android:gravity="center_vertical" />
+
+            <TextView
+                android:id="@+id/cancelled_count"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="#F5F5F5"
+                android:text="0"
+                android:textColor="#757575"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:padding="12dp"
+                android:gravity="center"
+                android:textAlignment="center" />
+        </LinearLayout>
+
+        <!-- Hidden ListView for compatibility -->
+        <ListView
+            android:id="@+id/listCancelled"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:visibility="gone"
+            android:layout_marginBottom="24dp" />
+
+        <!-- Pending (Clickable) -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:weightSum="2"
+            android:layout_marginBottom="8dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground">
 
             <TextView
                 android:id="@+id/tvPendingLabel"
@@ -285,7 +393,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:background="#FFF8E1"
-                android:text="@string/edit_pending_count"
+                android:text="0"
                 android:textColor="#F9A825"
                 android:textStyle="bold"
                 android:textSize="16sp"
@@ -294,23 +402,24 @@
                 android:textAlignment="center" />
         </LinearLayout>
 
+        <!-- Hidden ListView for compatibility -->
         <ListView
             android:id="@+id/listPending"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:divider="@android:color/darker_gray"
-            android:dividerHeight="4dp"
-            android:layout_marginBottom="16dp"
-            android:scrollbars="none" />
+            android:layout_height="0dp"
+            android:visibility="gone" />
 
-
+        <!-- Waiting (Clickable) -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical"
             android:weightSum="2"
-            android:layout_marginBottom="8dp">
+            android:layout_marginBottom="8dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground">
 
             <TextView
                 android:id="@+id/WaitingLabel"
@@ -332,7 +441,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:background="#E3F2FD"
-                android:text="@string/edit_waiting_count"
+                android:text="0"
                 android:textColor="#1565C0"
                 android:textStyle="bold"
                 android:textSize="16sp"
@@ -341,31 +450,28 @@
                 android:textAlignment="center" />
         </LinearLayout>
 
+        <!-- Hidden ListView for compatibility -->
         <ListView
             android:id="@+id/listWaiting"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:divider="@android:color/darker_gray"
-            android:dividerHeight="4dp"
-            android:layout_marginBottom="24dp"
-            android:scrollbars="none" />
+            android:layout_height="0dp"
+            android:visibility="gone"
+            android:layout_marginBottom="24dp" />
 
-
+        <!-- Max Entrants row -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:weightSum="2"
-            android:layout_marginBottom="36dp">
+            android:layout_marginBottom="12dp"
+            android:layout_marginTop="16dp">
 
-            <!-- Label box -->
             <TextView
                 android:id="@+id/MaxEntrantsLabel"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Maximum Entrants"
+                android:text="Max. Attendees"
                 android:background="#F5F5F5"
                 android:textStyle="bold"
                 android:textSize="16sp"
@@ -373,20 +479,102 @@
                 android:layout_marginEnd="8dp"
                 android:gravity="center_vertical" />
 
-            <!-- Number box -->
             <EditText
                 android:id="@+id/max_entrants"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:autofillHints="30"
-                android:hint="@string/edit_max_entrant_num"
+                android:hint="100"
                 android:inputType="number"
                 android:background="#F5F5F5"
                 android:textAlignment="center"
                 android:textStyle="bold"
                 android:textSize="16sp"
                 android:padding="12dp" />
+        </LinearLayout>
+
+        <!-- Max Waiting List row -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="24dp">
+
+            <TextView
+                android:id="@+id/MaxWaitingListLabel"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Max. Waiting List"
+                android:background="#F5F5F5"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:padding="12dp"
+                android:layout_marginEnd="8dp"
+                android:gravity="center_vertical" />
+
+            <EditText
+                android:id="@+id/max_waiting_list"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="Unlimited"
+                android:inputType="number"
+                android:background="#F5F5F5"
+                android:textAlignment="center"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:padding="12dp" />
+        </LinearLayout>
+
+        <!-- Action buttons row -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginBottom="36dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp">
+
+            <Button
+                android:id="@+id/create_button"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp"
+                android:backgroundTint="#2E7D32"
+                android:textColor="#FFFFFF"
+                android:text="Create" />
+
+            <Button
+                android:id="@+id/cancel_button"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:backgroundTint="#DC3545"
+                android:textColor="#FFFFFF"
+                android:text="Cancel" />
+
+            <Button
+                android:id="@+id/update_button"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp"
+                android:backgroundTint="#2E7D32"
+                android:textColor="#FFFFFF"
+                android:text="Update" />
+
+            <Button
+                android:id="@+id/delete_button"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:backgroundTint="#DC3545"
+                android:textColor="#FFFFFF"
+                android:text="Delete" />
+
         </LinearLayout>
 
     </LinearLayout>

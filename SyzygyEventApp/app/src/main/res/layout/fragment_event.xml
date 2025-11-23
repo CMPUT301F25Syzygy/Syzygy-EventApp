@@ -22,6 +22,14 @@
             android:textSize="28sp"
             android:textStyle="bold" />
 
+        <!-- Divider -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginBottom="12dp"
+            android:background="?android:attr/listDivider" />
+
+
         <!-- Event Description -->
         <TextView
             android:id="@+id/event_description_text"
@@ -70,6 +78,17 @@
             android:textColor="?android:attr/colorForeground"
             android:textSize="16sp"
             android:textStyle="bold" />
+
+        <!-- Waiting List Limit Info -->
+        <TextView
+            android:id="@+id/waiting_list_limit_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="Waiting List Limit: 100"
+            android:textColor="?attr/colorSecondary"
+            android:textSize="14sp"
+            android:visibility="gone" />
 
         <ImageView
             android:id="@+id/poster_image"
