@@ -114,6 +114,8 @@ public class FindEventsFragment extends Fragment {
 
         // Load events from Firestore
         FirebaseFirestore db = FirebaseFirestore.getInstance();
+        String currentUserID = AppInstallationId.get(requireContext());
+
         eventsListener = db.collection("events").addSnapshotListener((snapshots, e) -> {
             if (e != null) return;
 
@@ -126,7 +128,11 @@ public class FindEventsFragment extends Fragment {
 
                         // only include events that are still open
                         boolean isOpen = !event.isLotteryComplete() && event.getRegistrationEnd() != null && event.getRegistrationEnd().toDate().after(new Date());
-                        if (isOpen) {
+
+                        // don't show events organized by the current user
+                        boolean isNotOwnEvent = !currentUserID.equals(event.getOrganizerID());
+
+                        if (isOpen && isNotOwnEvent) {
                             events.add(event);
                         }
                     }
