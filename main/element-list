@@ -5,5 +5,6 @@ $dokka.location:com.example.syzygy_eventapp/EventSummaryView.AttendeeStatus///Po
 $dokka.location:com.example.syzygy_eventapp/OrganizerEventSummaryFragment.AttendeeStatus///PointingToDeclaration/com/example/syzygy_eventapp/OrganizerEventSummaryFragment.AttendeeStatus.html
 $dokka.location:com.example.syzygy_eventapp/OrganizerEventSummaryListView.StatusProvider///PointingToDeclaration/com/example/syzygy_eventapp/OrganizerEventSummaryListView.StatusProvider.html
 $dokka.location:com.example.syzygy_eventapp/UserListViewAdapter.UserViewHolder///PointingToDeclaration/com/example/syzygy_eventapp/UserListViewAdapter.UserViewHolder.html
+$dokka.location:com.example.syzygy_eventapp/WaitlistEntryAdapter.EntryViewHolder///PointingToDeclaration/com/example/syzygy_eventapp/WaitlistEntryAdapter.EntryViewHolder.html
 com.example.syzygy_eventapp
 
