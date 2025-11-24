@@ -27,6 +27,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.CollectionReference;
@@ -55,7 +57,7 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
     private Button startTimeButton, endTimeButton, startDateButton, endDateButton;
     private Button importPosterButton, deletePosterButton;
     private ImageView posterPreview;
-    private Button createButton, cancelButton, updateButton, deleteButton;
+    private Button createButton, cancelButton, updateButton, deleteButton, generateQRButton;
 
     // Controllers for Firebase operations
     private EventController eventController;
@@ -181,6 +183,7 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
         startTimeButton = view.findViewById(R.id.btnStartTime);
         endDateButton = view.findViewById(R.id.btnEndDate);
         endTimeButton = view.findViewById(R.id.btnEndTime);
+        generateQRButton = view.findViewById(R.id.generate_qr_button);
 
         // Initialize waiting list UI elements
         acceptedCountText = view.findViewById(R.id.accepted_count);
@@ -272,12 +275,14 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
             cancelButton.setVisibility(View.GONE);
             updateButton.setVisibility(View.VISIBLE);
             deleteButton.setVisibility(View.VISIBLE);
+            generateQRButton.setVisibility(View.VISIBLE);
         }
         else {
             createButton.setVisibility(View.VISIBLE);
             cancelButton.setVisibility(View.VISIBLE);
             updateButton.setVisibility(View.GONE);
             deleteButton.setVisibility(View.GONE);
+            generateQRButton.setVisibility(View.GONE);
         }
     }
 
@@ -319,6 +324,17 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
             updateTimeButtonText(endTimeButton, endTime);
         }));
 
+        // QR Code generate button
+        generateQRButton.setOnClickListener(v -> {
+            if (event != null && navStack != null) {
+                QRGenerateFragment qrFragment = new QRGenerateFragment(event, navStack);
+                navStack.pushScreen(qrFragment);
+            }
+            else {
+                Toast.makeText(getContext(), "Please save the event first", Toast.LENGTH_SHORT).show();
+            }
+        });
+
         // Action buttons
         createButton.setOnClickListener(v -> createEvent());
         updateButton.setOnClickListener(v -> updateEvent());
@@ -334,57 +350,248 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
     private void setupWaitingListListeners() {
         // Click listeners for accepted users
         if (acceptedLabelLayout != null) {
-            acceptedLabelLayout.setOnClickListener(v -> showUserListDialog("Accepted Users", acceptedUsers));
+            acceptedLabelLayout.setOnClickListener(v -> showUserListDialog("Accepted Users", acceptedUsers, "accepted"));
         }
         if (acceptedCountText != null) {
-            acceptedCountText.setOnClickListener(v -> showUserListDialog("Accepted Users", acceptedUsers));
+            acceptedCountText.setOnClickListener(v -> showUserListDialog("Accepted Users", acceptedUsers, "accepted"));
         }
 
         // Click listeners for pending users
         if (pendingLabelLayout != null) {
-            pendingLabelLayout.setOnClickListener(v -> showUserListDialog("Pending Users", pendingUsers));
+            pendingLabelLayout.setOnClickListener(v -> showUserListDialog("Pending Users", pendingUsers, "pending"));
         }
         if (pendingCountText != null) {
-            pendingCountText.setOnClickListener(v -> showUserListDialog("Pending Users", pendingUsers));
+            pendingCountText.setOnClickListener(v -> showUserListDialog("Pending Users", pendingUsers, "pending"));
         }
 
         // Click listeners for waiting users
         if (waitingLabelLayout != null) {
-            waitingLabelLayout.setOnClickListener(v -> showUserListDialog("Waiting List Users", waitingListUsers));
+            waitingLabelLayout.setOnClickListener(v -> showUserListDialog("Waiting List Users", waitingListUsers, "waiting"));
         }
         if (waitingCountText != null) {
-            waitingCountText.setOnClickListener(v -> showUserListDialog("Waiting List Users", waitingListUsers));
+            waitingCountText.setOnClickListener(v -> showUserListDialog("Waiting List Users", waitingListUsers, "waiting"));
         }
 
         // Click listeners for rejected users
         if (rejectedLabelLayout != null) {
-            rejectedLabelLayout.setOnClickListener(v -> showUserListDialog("Rejected Users", rejectedUsers));
+            rejectedLabelLayout.setOnClickListener(v -> showUserListDialog("Rejected Users", rejectedUsers, "rejected"));
         }
         if (rejectedCountText != null) {
-            rejectedCountText.setOnClickListener(v -> showUserListDialog("Rejected Users", rejectedUsers));
+            rejectedCountText.setOnClickListener(v -> showUserListDialog("Rejected Users", rejectedUsers, "rejected"));
         }
 
         // Click listeners for cancelled invitations
         if (cancelledLabelLayout != null) {
-            cancelledLabelLayout.setOnClickListener(v -> showUserListDialog("Cancelled Invitations", cancelledUsers));
+            cancelledLabelLayout.setOnClickListener(v -> showUserListDialog("Cancelled Invitations", cancelledUsers, "cancelled"));
         }
         if (cancelledCountText != null) {
-            cancelledCountText.setOnClickListener(v -> showUserListDialog("Cancelled Invitations", cancelledUsers));
+            cancelledCountText.setOnClickListener(v -> showUserListDialog("Cancelled Invitations", cancelledUsers, "cancelled"));
         }
     }
 
     /**
-     * Displays a dialog showing a list of users with a given status
+     * Displays a dialog showing a detailed list of entries with timestamps
      *
      * @param title The title for the dialog
      * @param userIds The list fo userIDs to display
+     * @param status The status type for proper timestamp display
      */
-    private void showUserListDialog(String title, List<String> userIds) {
-        if (userIds == null) {
-            userIds = new ArrayList<>();
+    private void showUserListDialog(String title, List<String> userIds, String status) {
+        if (userIds == null || userIds.isEmpty()) {
+            Toast.makeText(getContext(), "No users in this list", Toast.LENGTH_SHORT).show();
+            return;
         }
-        UserListDialogFragment dialog = UserListDialogFragment.newInstance(title, userIds);
-        dialog.show(getChildFragmentManager(), "user_list_dialog");
+
+        // Create dialog
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_waitlist_entries, null);
+        builder.setView(dialogView);
+
+        TextView titleView = dialogView.findViewById(R.id.dialog_title);
+        RecyclerView recyclerView = dialogView.findViewById(R.id.entries_recycler_view);
+        TextView emptyView = dialogView.findViewById(R.id.empty_text);
+
+        titleView.setText(title);
+
+        // Setup RecyclerView
+        recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+        List<WaitlistEntry> entries = new ArrayList<>();
+        WaitlistEntryAdapter adapter = new WaitlistEntryAdapter(entries);
+        recyclerView.setAdapter(adapter);
+
+        // Load entries with timestamps
+        loadWaitlistEntries(userIds, status, entries, adapter, recyclerView, emptyView);
+
+        AlertDialog dialog = builder.create();
+        dialogView.findViewById(R.id.close_button).setOnClickListener(v -> dialog.dismiss());
+        dialog.show();
+    }
+
+    private void loadWaitlistEntries(List<String> userIds, String status, List<WaitlistEntry> entries, WaitlistEntryAdapter adapter, RecyclerView recyclerView, TextView emptyView) {
+        UserControllerInterface userController = UserController.getInstance();
+
+        // no users for the status, so show empty state message
+        if (userIds == null || userIds.isEmpty()) {
+            recyclerView.setVisibility(View.GONE);
+            emptyView.setVisibility(View.VISIBLE);
+            emptyView.setText(getEmptyMessage(status));
+            return;
+        }
+
+        // If we have users, show the recycler view and hide empty message
+        recyclerView.setVisibility(View.VISIBLE);
+        emptyView.setVisibility(View.GONE);
+
+        // Waiting list users don't have timestamps
+        if ("waiting".equals(status)) {
+            for (String userId : userIds) {
+                // Loaiding state
+                WaitlistEntry entry = new WaitlistEntry(userId, "Loading...", null, status);
+                entries.add(entry);
+
+                // Load user details
+                userController.getUser(userId).addOnSuccessListener(user -> {
+                    if (user != null) {
+                        int index = entries.indexOf(entry);
+                        if (index != -1) {
+                            entry.setUserName(user.getName());
+                            adapter.notifyItemChanged(index);
+                        }
+                    }
+                }).addOnFailureListener(e -> {
+                    // Fallback: show the userID is user details cannot be retrieved
+                    int index = entries.indexOf(entry);
+                    if (index != -1) {
+                        entry.setUserName(userId);
+                        adapter.notifyItemChanged(index);
+                    }
+                });
+            }
+            return;
+        }
+
+        // For invitation-based statuses, get the timestamps from invitation data via Firestore
+        invitationController.observeEventInvitations(event.getEventID(), invitations -> {
+            // Create a map of userID and invitation for quick lookup
+            Map<String, Invitation> invitationMap = new HashMap<>();
+            for (Invitation invitation : invitations) {
+                invitationMap.put(invitation.getRecipientID(), invitation);
+            }
+
+            // Create an entry for each user and attach the relevant timestamps
+            for (String userId : userIds) {
+                Invitation invitation = invitationMap.get(userId);
+                WaitlistEntry entry = new WaitlistEntry(userId, "Loading...", null, status);
+
+                // Set appropriate timestamp based on status
+                if (invitation != null) {
+                    switch (status) {
+                        case "accepted":
+                            entry.setRegistrationDate(invitation.getResponseTime());
+                            break;
+
+                        case "pending":
+                            entry.setJoinedAt(invitation.getSendTime());
+                            break;
+
+                        case "cancelled":
+                            entry.setCancellationDate(invitation.getCancelTime());
+                            break;
+
+                        case "rejected":
+                            entry.setRegistrationDate(invitation.getResponseTime());
+                            break;
+                    }
+                }
+
+                entries.add(entry);
+
+                // Load user details
+                userController.getUser(userId).addOnSuccessListener(user -> {
+                    if (user != null) {
+                        int index = entries.indexOf(entry);
+                        if (index != -1) {
+                            entry.setUserName(user.getName());
+
+                            // Sort and refresh (ensure a sorted order ehenever new info is given)
+                            sortEntries(entries, status);
+                            adapter.notifyDataSetChanged();
+                        }
+                    }
+                }).addOnFailureListener(e -> {
+                    // Fallback: uuse the username if details cannot be loaded
+                    int index = entries.indexOf(entry);
+                    if (index != -1) {
+                        entry.setUserName(userId);
+                        adapter.notifyItemChanged(index);
+                    }
+                });
+            }
+        }, error -> {
+            Log.e(TAG, "Error loading invitations for timestamps", error);
+        });
+    }
+
+    /**
+     * Sorts entries by timestamp, based on status, with earliest times first.
+     * Each status category uses its own timestamp field (sendTime, responseTime, etc.)
+     */
+    private void sortEntries(List<WaitlistEntry> entries, String status) {
+        entries.sort((e1, e2) -> {
+            Timestamp t1 = null;
+            Timestamp t2 = null;
+
+            switch (status) {
+                case "accepted":
+
+                case "rejected":
+                    t1 = e1.getRegistrationDate();
+                    t2 = e2.getRegistrationDate();
+                    break;
+
+                case "pending":
+                    t1 = e1.getJoinedAt();
+                    t2 = e2.getJoinedAt();
+                    break;
+
+                case "cancelled":
+                    t1 = e1.getCancellationDate();
+                    t2 = e2.getCancellationDate();
+                    break;
+            }
+
+            // Entries with missing timestamps get put in the bottom
+            if (t1 == null) return 1;
+            if (t2 == null) return -1;
+
+            // Earliest first (which translates to ascending order)
+            return t1.compareTo(t2);
+        });
+    }
+
+    /**
+     * Returns appropriate empty message based on list type
+     */
+    private String getEmptyMessage(String status) {
+        switch (status) {
+            case "waiting":
+                return "No entrants on the waitlist";
+
+            case "cancelled":
+                return "No entrants have cancelled this event";
+
+            case "accepted":
+                return "No entrants have been accepted yet";
+
+            case "pending":
+                return "No pending invitations";
+
+            case "rejected":
+                return "No entrants have rejected yet";
+
+            default:
+                return "No users in this list";
+        }
     }
 
     /**
