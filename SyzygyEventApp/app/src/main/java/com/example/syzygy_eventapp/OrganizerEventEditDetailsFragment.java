@@ -438,6 +438,10 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
             return;
         }
 
+        // If we have users, show the recycler view and hide empty message
+        recyclerView.setVisibility(View.VISIBLE);
+        emptyView.setVisibility(View.GONE);
+
         // Waiting list users don't have timestamps
         if ("waiting".equals(status)) {
             for (String userId : userIds) {
@@ -570,11 +574,23 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
      */
     private String getEmptyMessage(String status) {
         switch (status) {
-            case "waiting": return "No entrants on the waitlist";
-            case "cancelled": return "No entrants have cancelled this event";
-            case "accepted": return "No entrants have been accepted yet";
+            case "waiting":
+                return "No entrants on the waitlist";
 
-            default: return "No users in this list";
+            case "cancelled":
+                return "No entrants have cancelled this event";
+
+            case "accepted":
+                return "No entrants have been accepted yet";
+
+            case "pending":
+                return "No pending invitations";
+
+            case "rejected":
+                return "No entrants have rejected yet";
+
+            default:
+                return "No users in this list";
         }
     }
 
