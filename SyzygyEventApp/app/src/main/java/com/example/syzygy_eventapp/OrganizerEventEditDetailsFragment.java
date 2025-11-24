@@ -55,7 +55,7 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
     private Button startTimeButton, endTimeButton, startDateButton, endDateButton;
     private Button importPosterButton, deletePosterButton;
     private ImageView posterPreview;
-    private Button createButton, cancelButton, updateButton, deleteButton;
+    private Button createButton, cancelButton, updateButton, deleteButton, generateQRButton;
 
     // Controllers for Firebase operations
     private EventController eventController;
@@ -181,6 +181,7 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
         startTimeButton = view.findViewById(R.id.btnStartTime);
         endDateButton = view.findViewById(R.id.btnEndDate);
         endTimeButton = view.findViewById(R.id.btnEndTime);
+        generateQRButton = view.findViewById(R.id.generate_qr_button);
 
         // Initialize waiting list UI elements
         acceptedCountText = view.findViewById(R.id.accepted_count);
@@ -272,12 +273,14 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
             cancelButton.setVisibility(View.GONE);
             updateButton.setVisibility(View.VISIBLE);
             deleteButton.setVisibility(View.VISIBLE);
+            generateQRButton.setVisibility(View.VISIBLE);
         }
         else {
             createButton.setVisibility(View.VISIBLE);
             cancelButton.setVisibility(View.VISIBLE);
             updateButton.setVisibility(View.GONE);
             deleteButton.setVisibility(View.GONE);
+            generateQRButton.setVisibility(View.GONE);
         }
     }
 
@@ -318,6 +321,17 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
             endTime = mergeDateWithTime(endTime, time);
             updateTimeButtonText(endTimeButton, endTime);
         }));
+
+        // QR Code generate button
+        generateQRButton.setOnClickListener(v -> {
+            if (event != null && navStack != null) {
+                QRGenerateFragment qrFragment = new QRGenerateFragment(event, navStack);
+                navStack.pushScreen(qrFragment);
+            }
+            else {
+                Toast.makeText(getContext(), "Please save the event first", Toast.LENGTH_SHORT).show();
+            }
+        });
 
         // Action buttons
         createButton.setOnClickListener(v -> createEvent());
