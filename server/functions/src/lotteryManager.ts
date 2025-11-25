@@ -81,8 +81,9 @@ export const lotteryDrawCallback =
     });
 
 /**
- * A function to draw a lottery early
- * HttpsCallableReference drawLotteryEarly = mFunctions.getHttpsCallable("drawLotteryEarly");
+ * A function to draw a lottery early.
+ *
+ * @type CloudFunction
  */
 export const drawLotteryEarly =
     onCall(async (req, res) => {
@@ -148,6 +149,11 @@ class LotteryManager {
         } else {
             const timeBefore = data.before.get("registrationEnd") as Timestamp;
             const timeAfter = data.after.get("registrationEnd") as Timestamp;
+
+            if (timeBefore == null || timeAfter == null) {
+                logger.warn(`Ignoring ${data.after.id} since "registrationEnd" is null`)
+                return
+            }
 
             if (!timeBefore.isEqual(timeAfter)) {
                 if (debug) logger.debug("event updated");
@@ -284,6 +290,15 @@ class LotteryManager {
         const waitingList = eventSnap.get("waitingList") as string[];
         const organizerId = eventSnap.get("organizerID") as string;
         if (debug) logger.debug("drawLottery B", maxAttendees, waitingList, organizerId);
+
+
+        if (waitingList == null) {
+            logger.warn(`Ignoring ${eventRef.id} since "waitingList" is null`)
+            return
+        } else if (organizerId == null) {
+            logger.warn(`Ignoring ${eventRef.id} since "organizerId" is null`)
+            return
+        }
 
         const invitesIds = [];
         const inviteCount = Math.min(maxAttendees, waitingList.length);
