@@ -146,14 +146,25 @@ public class ProfileFragment extends Fragment {
             }
 
             Role currentRole = currentUser.getRole();
-            Role newRole = (currentRole == Role.ENTRANT)
-                    ? Role.ORGANIZER
-                    : Role.ENTRANT;
 
+            Role newRole = currentRole;
+            switch(currentRole) {
+                case ENTRANT:
+                    newRole = Role.ORGANIZER;
+                    break;
+                case ORGANIZER:
+                    newRole = Role.ADMIN;
+                    break;
+                case ADMIN:
+                    newRole = Role.ENTRANT;
+                    break;
+            }
+
+            Role finalNewRole = newRole;
             userController.setUserRole(userID, newRole)
                     .addOnSuccessListener(updatedUser ->
                             Toast.makeText(getContext(),
-                                    "Role changed to " + newRole.name(),
+                                    "Role changed to " + finalNewRole.name(),
                                     Toast.LENGTH_SHORT).show())
                     .addOnFailureListener(err ->
                             showError("Failed to change role: " + err.getMessage()));

@@ -21,6 +21,16 @@ public class UserListViewAdapter extends RecyclerView.Adapter<UserListViewAdapte
     /// The list of users to display.
     private final List<User> users;
 
+    /// The listener for user item clicks.
+    private OnUserClickListener listener;
+
+    /**
+     * Interface for handling user item clicks.
+     */
+    public interface OnUserClickListener {
+        void onUserClick(User user);
+    }
+
     /**
      * Constructor for UserListViewAdapter.
      *
@@ -57,6 +67,10 @@ public class UserListViewAdapter extends RecyclerView.Adapter<UserListViewAdapte
         holder.phoneText.setText(user.getPhone());
         holder.roleChip.setText(user.getRole().toString());
         // TODO: set profile image if available
+
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) listener.onUserClick(user);
+        });
     }
 
     /**
@@ -66,6 +80,14 @@ public class UserListViewAdapter extends RecyclerView.Adapter<UserListViewAdapte
     @Override
     public int getItemCount() {
         return users.size();
+    }
+
+    /**
+     * Sets the listener for user item clicks.
+     * @param listener The OnUserClickListener to set.
+     */
+    public void setOnUserClickListener(OnUserClickListener listener) {
+        this.listener = listener;
     }
 
     /**
