@@ -117,7 +117,7 @@ var pathtoroot = "../../../";
 public class <span class="typeNameLabel"><a href=UserListView.html>UserListView</a></span>
 
                     </pre>
-                    <div class="block"><p>A view representing a list of <a href=User.html>User</a> objects. Use the newInstance factory method to create an instance of this fragment.</p></div>
+                    <div class="block"><p>A view representing a list of <a href=User.html>User</a> objects.</p></div>
 
                     <dl>
 
@@ -199,19 +199,19 @@ public class <span class="typeNameLabel"><a href=UserListView.html>UserListView<
                                             <tr class="altColor">
                                                 <th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a
                                                         href="#UserListView(Context)">UserListView</a></span>(Context context)</code></th>
-                                                <td class="colLast">Required empty public constructor.</td>
+                                                <td class="colLast">Constructor with context.</td>
                                             </tr>
                                         
                                             <tr class="rowColor">
                                                 <th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a
                                                         href="#UserListView(Context,AttributeSet)">UserListView</a></span>(Context context, AttributeSet attrs)</code></th>
-                                                <td class="colLast"></td>
+                                                <td class="colLast">Constructor with attribute set.</td>
                                             </tr>
                                         
                                             <tr class="altColor">
                                                 <th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a
                                                         href="#UserListView(Context,AttributeSet,int)">UserListView</a></span>(Context context, AttributeSet attrs, int defStyleAttr)</code></th>
-                                                <td class="colLast"></td>
+                                                <td class="colLast">Constructor with style attributes.</td>
                                             </tr>
                                         
 
@@ -287,6 +287,22 @@ public class <span class="typeNameLabel"><a href=UserListView.html>UserListView<
                                             <td class="colLast">Removes a user by index and updates RecyclerView.</td>
                                         </tr>
                                         
+                                        <tr id="i3" class="rowColor">
+                                            <td class="colFirst"><code>void</code>
+                                            </td>
+                                            <th class="colSecond" scope="row"><code><a href=UserListView.html#setOnUserClickListener(com.example.syzygy_eventapp.UserListViewAdapter.OnUserClickListener)>setOnUserClickListener</a>(<a href=UserListViewAdapter.OnUserClickListener.html>UserListViewAdapter.OnUserClickListener</a> listener) </code>
+                                            </th>
+                                            <td class="colLast">Sets the listener for user item clicks.</td>
+                                        </tr>
+                                        
+                                        <tr id="i4" class="altColor">
+                                            <td class="colFirst"><code>void</code>
+                                            </td>
+                                            <th class="colSecond" scope="row"><code><a href=UserListView.html#setUsers(java.util.List)>setUsers</a>(<a href=https://developer.android.com/reference/kotlin/java/util/List.html>List</a>&lt;<a href=User.html>User</a>&gt; newUsers) </code>
+                                            </th>
+                                            <td class="colLast">Sets the entire user list and updates RecyclerView.</td>
+                                        </tr>
+                                        
                                         </tbody>
                                     </table>
                                 </div>
@@ -323,7 +339,16 @@ public class <span class="typeNameLabel"><a href=UserListView.html>UserListView<
                                     <li class="blockList">
                                         <h4>UserListView</h4>
                                         <pre>UserListView(Context context)</pre>
-                                        <div class="block">Required empty public constructor.</div>
+                                        <div class="block">Constructor with context.</div>
+                                        
+                                        <dl>
+                                            <dt><span class="paramLabel">Parameters:</span></dt>
+                                            
+                                            
+                                            <dd><code>context</code> - The context to use.</dd>
+                                            
+                                            
+                                        </dl>
                                         
                                     </li>
                                 </ul>
@@ -333,7 +358,20 @@ public class <span class="typeNameLabel"><a href=UserListView.html>UserListView<
                                     <li class="blockList">
                                         <h4>UserListView</h4>
                                         <pre>UserListView(Context context, AttributeSet attrs)</pre>
-                                        <div class="block"></div>
+                                        <div class="block">Constructor with attribute set.</div>
+                                        
+                                        <dl>
+                                            <dt><span class="paramLabel">Parameters:</span></dt>
+                                            
+                                            
+                                            <dd><code>context</code> - The context to use.</dd>
+                                            
+                                            
+                                            
+                                            <dd><code>attrs</code> - The attribute set.</dd>
+                                            
+                                            
+                                        </dl>
                                         
                                     </li>
                                 </ul>
@@ -343,7 +381,24 @@ public class <span class="typeNameLabel"><a href=UserListView.html>UserListView<
                                     <li class="blockList">
                                         <h4>UserListView</h4>
                                         <pre>UserListView(Context context, AttributeSet attrs, int defStyleAttr)</pre>
-                                        <div class="block"></div>
+                                        <div class="block">Constructor with style attributes.</div>
+                                        
+                                        <dl>
+                                            <dt><span class="paramLabel">Parameters:</span></dt>
+                                            
+                                            
+                                            <dd><code>context</code> - The context to use.</dd>
+                                            
+                                            
+                                            
+                                            <dd><code>attrs</code> - The attribute set.</dd>
+                                            
+                                            
+                                            
+                                            <dd><code>defStyleAttr</code> - The default style attribute.</dd>
+                                            
+                                            
+                                        </dl>
                                         
                                     </li>
                                 </ul>
@@ -425,7 +480,7 @@ public class <span class="typeNameLabel"><a href=UserListView.html>UserListView<
                                     <!--   -->
                                 </a>
                                 <ul class=
-                                              "blockListLast"
+                                              "blockList"
                                           >
                                     <li class="blockList">
                                         <h4>removeUserAt</h4>
@@ -439,6 +494,66 @@ public class <span class="typeNameLabel"><a href=UserListView.html>UserListView<
                                             
                                             
                                             <dd><code>index</code> - The index of the user to remove.</dd>
+                                            
+                                            
+                                        
+
+                                        
+
+                                        
+
+                                        </dl>
+                                    </li>
+                                </ul>
+                                
+                                <a id="setOnUserClickListener(com.example.syzygy_eventapp.UserListViewAdapter.OnUserClickListener)">
+                                    <!--   -->
+                                </a>
+                                <ul class=
+                                              "blockList"
+                                          >
+                                    <li class="blockList">
+                                        <h4>setOnUserClickListener</h4>
+                                        <pre class="methodSignature"> void <a href=UserListView.html#setOnUserClickListener(com.example.syzygy_eventapp.UserListViewAdapter.OnUserClickListener)>setOnUserClickListener</a>(<a href=UserListViewAdapter.OnUserClickListener.html>UserListViewAdapter.OnUserClickListener</a> listener)</pre>
+                                        <div class="block"><p>Sets the listener for user item clicks.</p></div>
+
+                                        <dl>
+
+                                        
+                                            <dt><span class="paramLabel">Parameters:</span></dt>
+                                            
+                                            
+                                            <dd><code>listener</code> - The listener to set.</dd>
+                                            
+                                            
+                                        
+
+                                        
+
+                                        
+
+                                        </dl>
+                                    </li>
+                                </ul>
+                                
+                                <a id="setUsers(java.util.List)">
+                                    <!--   -->
+                                </a>
+                                <ul class=
+                                              "blockListLast"
+                                          >
+                                    <li class="blockList">
+                                        <h4>setUsers</h4>
+                                        <pre class="methodSignature"> void <a href=UserListView.html#setUsers(java.util.List)>setUsers</a>(<a href=https://developer.android.com/reference/kotlin/java/util/List.html>List</a>&lt;<a href=User.html>User</a>&gt; newUsers)</pre>
+                                        <div class="block"><p>Sets the entire user list and updates RecyclerView.</p></div>
+
+                                        <dl>
+
+                                        
+                                            <dt><span class="paramLabel">Parameters:</span></dt>
+                                            
+                                            
+                                            <dd><code>newUsers</code> - The new list of users.</dd>
                                             
                                             
                                         
