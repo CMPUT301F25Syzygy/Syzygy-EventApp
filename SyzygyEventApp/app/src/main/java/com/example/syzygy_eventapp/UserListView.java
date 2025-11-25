@@ -1,5 +1,6 @@
 package com.example.syzygy_eventapp;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.AttributeSet;
@@ -21,8 +22,6 @@ import java.util.List;
 
 /**
  * A view representing a list of {@link User} objects.
- * Use the {@link UserListView#newInstance} factory method to
- * create an instance of this fragment.
  */
 public class UserListView extends LinearLayout {
 
@@ -36,6 +35,7 @@ public class UserListView extends LinearLayout {
 
     /// The RecyclerView for displaying the user list.
     private RecyclerView recyclerView;
+    /// The TextView for displaying the title.
     private TextView titleText;
     /// The TextView for displaying the user count.
     private TextView countText;
@@ -47,86 +47,40 @@ public class UserListView extends LinearLayout {
     /// Whether the list is currently expanded.
     private boolean isExpanded = true;
 
-    /**
-     * Required empty public constructor.
+    /** 
+     * Constructor with context.
+     * @param context The context to use.
      */
-//    public UserListView() {
-//    }
-
     public UserListView(Context context) {
         super(context);
         init(context);
     }
 
+    /** 
+     * Constructor with attribute set.
+     * @param context The context to use.
+     * @param attrs The attribute set.
+     */
     public UserListView(Context context, AttributeSet attrs) {
         super(context, attrs);
         init(context);
     }
 
+    /** 
+     * Constructor with style attributes.
+     * @param context The context to use.
+     * @param attrs The attribute set.
+     * @param defStyleAttr The default style attribute.
+     */
     public UserListView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init(context);
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param users The list of {@link User} objects to display.
-     * @return A new instance of fragment UserListView.
+    /** 
+     * Initializes the UserListView.
+     * @param context The context to use.
      */
-//    public static UserListView newInstance(List<User> users) {
-//        return newInstance(users, "Users");
-//    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param users The list of {@link User} objects to display.
-     * @param title The title of the user list.
-     * @return A new instance of fragment UserListView.
-     */
-//    public static UserListView newInstance(List<User> users, String title) {
-//        UserListView fragment = new UserListView();
-//        fragment.users = users;
-//        fragment.title = title;
-//        return fragment;
-//    }
-
-    /**
-     * Initializes the fragment and retrieves arguments.
-     */
-//    @Nullable
-//    @Override
-//    public View onCreateView(@NonNull LayoutInflater inflater,
-//                             @Nullable ViewGroup container,
-//                             @Nullable Bundle savedInstanceState) {
-//
-//        // Inflate the layout
-//        View view = inflater.inflate(R.layout.fragment_user_list_view, container, false);
-//
-//        // Bind UI components
-//        TextView titleText = view.findViewById(R.id.list_title);
-//        countText = view.findViewById(R.id.user_count);
-//        expandIcon = view.findViewById(R.id.expand_icon);
-//        recyclerView = view.findViewById(R.id.user_recycler_view);
-//        View headerLayout = view.findViewById(R.id.header_layout);
-//
-//        // Setup UI
-//        titleText.setText(title != null ? title : "Users");
-//        updateCountText();
-//
-//        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-//        adapter = new UserListViewAdapter(users);
-//        recyclerView.setAdapter(adapter);
-//
-//        // Expand/collapse behavior
-//        headerLayout.setOnClickListener(v -> toggleListVisibility());
-//
-//        return view;
-//    }
-
     private void init(Context context) {
         setOrientation(VERTICAL);
         LayoutInflater.from(context).inflate(R.layout.fragment_user_list_view, this, true);
@@ -181,6 +135,18 @@ public class UserListView extends LinearLayout {
     }
 
     /** 
+     * Sets the entire user list and updates RecyclerView.
+     * @param newUsers The new list of users.
+     */
+    @SuppressLint("NotifyDataSetChanged")
+    public void setUsers(List<User> newUsers) {
+        users.clear();
+        users.addAll(newUsers);
+        adapter.notifyDataSetChanged();
+        updateCountText();
+    }
+
+    /** 
      * Removes a user by index and updates RecyclerView.
      * @param index The index of the user to remove.
      */
@@ -192,6 +158,14 @@ public class UserListView extends LinearLayout {
             }
             updateCountText();
         }
+    }
+
+    /**
+     * Sets the listener for user item clicks.
+     * @param listener The listener to set.
+     */
+    public void setOnUserClickListener(UserListViewAdapter.OnUserClickListener listener) {
+        adapter.setOnUserClickListener(listener);
     }
 
     /** 
@@ -217,10 +191,16 @@ public class UserListView extends LinearLayout {
                 .start();
     }
 
+    /**
+     * Updates the title TextView.
+     */
     private void updateTitle() {
         titleText.setText(title);
     }
 
+    /** 
+     * Updates the count TextView.
+     */
     private void updateCount() {
         countText.setText(String.valueOf(users.size()));
     }

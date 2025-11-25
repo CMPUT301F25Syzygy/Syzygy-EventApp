@@ -10,6 +10,7 @@ import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 import java.util.function.Consumer;
@@ -163,6 +164,41 @@ public class UserController implements UserControllerInterface {
            if (error != null) {
                System.err.println("Error on user snapshot listener: " + error.toString());
            }
+        });
+    }
+
+    /**
+     * Observe all users in real time.
+     * @param onChange Callback invoked with the latest list of User objects
+     * @param onError Callback invoked on listener errors
+     * @return ListenerRegistration that must be removed when no longer needed
+     */
+    public ListenerRegistration observeAllUsers(Consumer<List<User>> onChange, Consumer<Exception> onError) {
+        return usersRef.addSnapshotListener((snap, error) -> {
+            if (error != null) {
+                onError.accept(error);
+                return;
+            }
+
+            List<User> users = new ArrayList<>();
+
+            if (snap != null) {
+                for (DocumentSnapshot doc : snap.getDocuments()) {
+                    try {
+                        User user = buildUser(doc);
+                        if (user != null) {
+                            // Ensure the user has its ID set
+                            user.setUserID(doc.getId());
+                            users.add(user);
+                        }
+                    } catch (Exception e) {
+                        // buildUser may fail if fields are malformed
+                        onError.accept(e);
+                    }
+                }
+            }
+
+            onChange.accept(users);
         });
     }
 

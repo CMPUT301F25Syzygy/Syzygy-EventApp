@@ -5,6 +5,7 @@ import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.ListenerRegistration;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.function.Consumer;
 
 public class UserControllerMock implements UserControllerInterface {
@@ -25,6 +26,11 @@ public class UserControllerMock implements UserControllerInterface {
     }
 
     public ListenerRegistration observeUser(String userID, Consumer<User> onUpdate, Runnable onDelete) {
+        return () -> {
+        };
+    }
+
+    public ListenerRegistration observeAllUsers(Consumer<List<User>> onChange, Consumer<Exception> onError) {
         return () -> {
         };
     }
