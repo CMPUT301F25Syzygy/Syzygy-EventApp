@@ -3,7 +3,7 @@ import { DocumentData, Firestore, getFirestore, Timestamp } from "firebase-admin
 import { Change, DocumentSnapshot, onDocumentWritten } from "firebase-functions/v2/firestore";
 import { logger } from "firebase-functions/v2";
 import { onSchedule } from "firebase-functions/v2/scheduler";
-import { onRequest } from "firebase-functions/v2/https";
+import { HttpsError, onCall, onRequest } from "firebase-functions/v2/https";
 
 /** location for Google Cloud tasks */
 const taskLocation = "us-central1";
@@ -76,10 +76,23 @@ export const lotteryDrawCallback =
             await LotteryManager.getInstance().drawLottery(req.body);
             res.status(200);
         } catch (err) {
-            res.status(500).json(String(err));
+            throw new HttpsError("internal", String(err));
         }
     });
 
+/**
+ * A function to draw a lottery early
+ * HttpsCallableReference drawLotteryEarly = mFunctions.getHttpsCallable("drawLotteryEarly");
+ */
+export const drawLotteryEarly =
+    onCall(async (req, res) => {
+        if (debug) logger.debug("earlyLotteryDraw");
+        try {
+            await LotteryManager.getInstance().drawLottery(req.data.lotteryID);
+        } catch (err) {
+            throw new HttpsError("internal", String(err));
+        }
+    });
 
 /**
  * A singleton that handles drawing event lotteries.
