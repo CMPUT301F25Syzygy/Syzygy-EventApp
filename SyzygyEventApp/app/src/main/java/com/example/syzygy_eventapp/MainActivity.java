@@ -46,8 +46,8 @@ public class MainActivity extends AppCompatActivity implements OnItemSelectedLis
 
         profileFragment = new ProfileFragment();
         findFragment = new FindEventsFragment(navStack);
-        joinedFragment = new JoinedEventsFragment();
-        organizerFragment = new OrganizerFragment(navStack, "eventID");
+        joinedFragment = new JoinedEventsFragment(navStack);
+        organizerFragment = new OrganizerFragment(navStack);
         adminFragment = new AdministratorFragment();
 
         String userID = AppInstallationId.get(this);

@@ -4,28 +4,169 @@ import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.TextView;
+
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.ListenerRegistration;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 /**
- * A empty placeholder for OrganizerFragment
+ * Displays the Find Events screen.
+ * <p>
+ *     Provides:
+ *     <ul>
+ *         <li>Search bar that filters open events by soonest (registration date closest to farthest) or popularity. </li>
+ *         <li>A button to open the QR code scanner</li>
+ *         <li>An {@link EventSummaryListView} that displays all currently open events</li>
+ * </ul>
+ * </p>
+ *
+ * Only events that meet the following criteria are shown:
+ * <ul>
+ *     <li>Are not past their registration deadline</li>
+ *     <li>Have not completed their lottery</li>
+ * </ul>
+ *
+ * Clicking an event opens the Event Details page using the {@link NavigationStackFragment}
  */
 public class OrganizerFragment extends Fragment {
+    private NavigationStackFragment navStack;
+    private OrganizerEventSummaryListView organizerSummaryListViewUpcoming;
+    private OrganizerEventSummaryListView organizerSummaryListViewHistory;
+    private String userID;
+    private EventController eventController;
+    private ListenerRegistration eventsListener;
 
-    // Creating a custom constructor so that EventListFragment can pass params
-    private final NavigationStackFragment navStack;
-    private final String eventID;
+    // TODO: Add this when EditEventFragment exists
+    // private EditEventFragment editEventFragment;
 
-    // Custom constructor to match how it's called
-    public OrganizerFragment(NavigationStackFragment navStack, String eventID) {
-        this.navStack = navStack;
-        this.eventID = eventID;
+    // required empty constructor
+    public OrganizerFragment() {
+        this.navStack = null;
     }
 
+    OrganizerFragment(NavigationStackFragment navStack) {
+        this.navStack = navStack;
+    }
+
+    /**
+     * Inflates the layout and intializes all UI elements.
+     * Sets up the search bar, QR scan button, and attaches a real-time listener to Firestore
+     * @param inflater The LayoutInflater object that can be used to inflate
+     * any views in the fragment,
+     * @param container If non-null, this is the parent view that the fragment's
+     * UI should be attached to.  The fragment should not add the view itself,
+     * but this can be used to generate the LayoutParams of the view.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed
+     * from a previous saved state as given here.
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_organizer, container, false);
+        View view = inflater.inflate(R.layout.fragment_organizer, container, false);
+
+        // Initialize the summary lists
+        organizerSummaryListViewUpcoming = view.findViewById(R.id.upcoming_event_list);
+        organizerSummaryListViewHistory = view.findViewById(R.id.history_event_list);
+
+        Button createEventButton = view.findViewById(R.id.create_event_button);
+
+        // Load current user ID and event controller
+        userID = AppInstallationId.get(requireContext());
+        eventController = new EventController();
+
+        // TODO: Remove this and add EditEventFragment when
+        // that layout and code is implemented.
+        // Open the create event fragment when pressed
+        // createEventButton.setOnClickListener((v) -> {
+        //    navStack.pushScreen(editEventFragment);
+        // });
+
+        startObserver();
+
+        return view;
     }
+
+    private void startObserver() {
+        eventsListener = eventController.observeAllEvents(events -> {
+
+            List<Event> upcoming = new ArrayList<>();
+            List<Event> past = new ArrayList<>();
+            Date now = new Date();
+
+            // Filter events for the current organizer
+            for (Event event : events) {
+
+                // NOTE: For the demo, I have it to just allow the organizer to edit
+                // any event.
+                // TODO: After the demo, uncomment out the code below.
+                // Skip events that the user is NOT the organizer of
+                // if (!event.getOrganizerID().equals(userID)) {
+                //    continue;
+                // }
+
+                // An event will be considered as "past" if the lottery is complete OR if the registration end time is before now
+                boolean isPast = event.isLotteryComplete() || (event.getRegistrationEnd() != null && event.getRegistrationEnd().toDate().before(now));
+
+                if (isPast) {
+                    past.add(event);
+                }
+                else {
+                    upcoming.add(event);
+                }
+            }
+
+            // Populate the upcoming events list. Upcoming events should be clickable and take
+            // the organizer to the event edit page
+            organizerSummaryListViewUpcoming.setTitle("Upcoming Events");
+            organizerSummaryListViewUpcoming.setItems(upcoming, false, v -> {
+                Event clicked = (Event) v.getTag();
+
+                UserController.getInstance().getUser(userID)
+                        .addOnSuccessListener(user -> {
+                            navStack.pushScreen(
+                                    // Here we assume that the user is an organizer if they managed to get
+                                    // to this screen.
+                                    // TODO: Maybe add a stricter check here to make sure the user is actually
+                                    // an organizer, even though this shouldn't really ever be an issue unless
+                                    // someone is hacking our app...
+                                    OrganizerEventEditDetailsFragment.newInstance(clicked, user.promote())
+                            );
+                        })
+                        .addOnFailureListener(e -> {
+                            // Handle error (optional)
+                            Log.e("syzygy_eventapp", "Failed to get user", e);
+                        });
+            });
+
+            // Populate the past event list. We probably don't need to allow the organizer to edit
+            // these, but if we do, then just reuse the code for clicking the upcoming events above.
+            organizerSummaryListViewHistory.setTitle("Past Events");
+            organizerSummaryListViewHistory.setItems(past, false, v -> {});
+        }, error -> {
+
+        });
+    }
+
+    /**
+     * Cleans up the Firestore listener to avoid leaks and duplicate listeners
+     */
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (eventsListener != null) {
+            eventsListener.remove();
+            eventsListener = null;
+        }
+    }
+
 }

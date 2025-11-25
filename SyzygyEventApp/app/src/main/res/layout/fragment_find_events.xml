@@ -55,14 +55,11 @@
         app:layout_constraintTop_toBottomOf="@id/searchLayout" />
 
 
-    <LinearLayout
+    <com.example.syzygy_eventapp.EventSummaryListView
+        android:id="@+id/event_summary_list"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/open_qr_scan_button">
-        <include
-            layout="@layout/fragment_event_list"
-            android:id="@+id/result_event_list"/>
-    </LinearLayout>
+        app:layout_constraintTop_toBottomOf="@id/open_qr_scan_button"
+        app:layout_constraintBottom_toBottomOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

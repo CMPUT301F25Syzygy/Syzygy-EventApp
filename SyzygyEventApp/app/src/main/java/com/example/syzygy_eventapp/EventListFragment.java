@@ -226,15 +226,24 @@ public class EventListFragment extends Fragment {
     private void onEventClicked(Event event) {
         String userID = AppInstallationId.get(requireContext());
 
-        if (isOrganizerView && event.getOrganizerID().equals(userID)) {
-            // Open EventOrganizerView if user is the organizer
-            OrganizerFragment organizerFragment = new OrganizerFragment(navStack, event.getEventID());
-            navStack.pushScreen(organizerFragment);
-        } else {
-            // Open EventView for entrants
-            EventFragment eventFragment = new EventFragment(navStack, event.getEventID());
-            navStack.pushScreen(eventFragment);
-        }
+        /**
+         * TODO: This should probably open the edit event view instead of
+         * going to the organizer fragment
+         */
+
+//        if (isOrganizerView && event.getOrganizerID().equals(userID)) {
+//            // Open EventOrganizerView if user is the organizer
+//            OrganizerFragment organizerFragment = new OrganizerFragment(navStack, event.getEventID());
+//            navStack.pushScreen(organizerFragment);
+//        } else {
+//            // Open EventView for entrants
+//            EventFragment eventFragment = new EventFragment(navStack, event.getEventID());
+//            navStack.pushScreen(eventFragment);
+//        }
+
+        // Open EventView for everyone, implement the TODO above in the future
+        EventFragment eventFragment = new EventFragment(navStack, event.getEventID());
+        navStack.pushScreen(eventFragment);
     }
 
     /**
