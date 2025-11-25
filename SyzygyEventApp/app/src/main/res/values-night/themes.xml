@@ -4,4 +4,8 @@
         <!-- Customize your dark theme here. -->
         <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
     </style>
+
+    <color name="pale_blue">#0D47A1</color>
+    <color name="pale_green">#1B5E20</color>
+    <color name="pale_orange">#AD4800</color>
 </resources>

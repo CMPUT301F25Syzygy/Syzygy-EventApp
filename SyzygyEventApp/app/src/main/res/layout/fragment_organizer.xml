@@ -63,8 +63,8 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="#E0E0E0"
-            android:layout_marginVertical="8dp"/>
+            android:layout_marginVertical="8dp"
+            android:background="@color/grey" />
 
         <!-- Past Events Section -->
         <com.example.syzygy_eventapp.OrganizerEventSummaryListView
