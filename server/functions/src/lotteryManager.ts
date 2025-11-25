@@ -11,6 +11,8 @@ const taskLocation = "us-central1";
 /** Name of the Google Cloud task queue used to call {drawLottery} when it is time */
 const taskQueue = "firestore-lottery";
 
+const debug = false;
+
 
 /**
  * Google Cloud tasks can't be scheduled more than 30 days out.
@@ -44,7 +46,7 @@ export const updateLottery =
     onDocumentWritten("/events/{eventId}", async (event) => {
         if (event === undefined || event.data === undefined) return;
 
-        logger.debug("updateLottery", event.params.eventId);
+        if (debug) logger.debug("updateLottery", event.params.eventId);
         await LotteryManager.getInstance().handleEventChange(event.data);
     });
 
@@ -57,7 +59,7 @@ export const updateLottery =
  */
 export const refreshLotteries =
     onSchedule(refreshLotteriesSchedule, async () => {
-        logger.debug("refreshLotteries");
+        if (debug) logger.debug("refreshLotteries");
         await LotteryManager.getInstance().refreshLotteries();
     });
 
@@ -68,9 +70,14 @@ export const refreshLotteries =
 * @type CloudFunction
 */
 export const lotteryDrawCallback =
-    onRequest(async (req) => {
-        logger.debug("lotteryDrawCallback");
-        await LotteryManager.getInstance().drawLottery(req.body);
+    onRequest(async (req, res) => {
+        if (debug) logger.debug("lotteryDrawCallback");
+        try {
+            await LotteryManager.getInstance().drawLottery(req.body);
+            res.status(200);
+        } catch (err) {
+            res.status(500).json(String(err));
+        }
     });
 
 
@@ -116,12 +123,12 @@ class LotteryManager {
      */
     async handleEventChange(data: Change<DocumentSnapshot>) {
         if (!data.after.exists) {
-            logger.debug("event deleted");
+            if (debug) logger.debug("event deleted");
             // event deleted
 
             await this.deleteLotteryTask(data.before);
         } else if (!data.before.exists) {
-            logger.debug("event created");
+            if (debug) logger.debug("event created");
             // event created
 
             await this.queueLotteryTask(data.after);
@@ -130,13 +137,13 @@ class LotteryManager {
             const timeAfter = data.after.get("registrationEnd") as Timestamp;
 
             if (!timeBefore.isEqual(timeAfter)) {
-                logger.debug("event updated");
+                if (debug) logger.debug("event updated");
                 // event lottery time updated
 
                 await this.deleteLotteryTask(data.after);
                 await this.queueLotteryTask(data.after);
             } else {
-                logger.debug("event not updated");
+                if (debug) logger.debug("event not updated");
             }
         }
     }
@@ -149,7 +156,7 @@ class LotteryManager {
      * @return {*}
      */
     async refreshLotteries() {
-        logger.debug("refreshLotteries");
+        if (debug) logger.debug("refreshLotteries");
 
         const snap = await this.db.collection("events").get();
 
@@ -171,15 +178,16 @@ class LotteryManager {
     * @return {*}
     */
     async queueLotteryTask(snap: DocumentSnapshot) {
-        logger.debug("queueLotteryTask", snap.id);
+        if (debug) logger.debug("queueLotteryTask A", snap.id);
         const event = snap.data() as EventData;
 
         // don't reschedule a lottery
-        logger.debug("queueLotteryTask2", event.lotteryComplete, event.lotteryTaskName);
-        if (event.lotteryComplete || event.lotteryTaskName != null) return;
+        const oldTaskName = event.lotteryTaskName;
+        if (debug) logger.debug("queueLotteryTask B", event.lotteryComplete, oldTaskName);
+        if (event.lotteryComplete || oldTaskName != null) return;
 
         const millisUntilLottery = event.registrationEnd.toMillis() - Date.now();
-        logger.debug("queueLotteryTask3", millisUntilLottery);
+        if (debug) logger.debug("queueLotteryTask C", millisUntilLottery);
         if (millisUntilLottery >= taskMillisLimit) return;
 
         const payload: LotteryTaskPayload = {
@@ -215,10 +223,10 @@ class LotteryManager {
         };
 
         const queuePath = this.tasksClient.queuePath(projectId, taskLocation, taskQueue);
-        const [{ name }] = await this.tasksClient.createTask({ parent: queuePath, task });
-        logger.debug("queueLotteryTask4", name);
+        const [{ name: taskName }] = await this.tasksClient.createTask({ parent: queuePath, task });
+        if (debug) logger.debug("queueLotteryTask D", taskName);
 
-        await snap.ref.update({ lotteryTaskName: name });
+        await snap.ref.update({ lotteryTaskName: taskName });
     }
 
     /**
@@ -230,12 +238,12 @@ class LotteryManager {
      * @return {*}
      */
     async deleteLotteryTask(snap: DocumentSnapshot) {
-        logger.debug("deleteLotteryTask", snap.id);
+        if (debug) logger.debug("deleteLotteryTask", snap.id);
         const event = snap.data() as EventData;
 
         const task = event.lotteryTaskName;
 
-        if (task !== undefined) {
+        if (task != null) {
             await this.tasksClient.deleteTask({ name: task });
             await snap.ref.update({ lotteryTaskName: null });
         }
@@ -251,9 +259,58 @@ class LotteryManager {
      * @return {*}
      */
     async drawLottery(payload: LotteryTaskPayload) {
-        logger.debug("drawLottery", payload.eventId);
+        if (debug) logger.debug("drawLottery A", payload.eventId);
         const eventsCollection = this.db.collection("events");
-        // const snap =
-        await eventsCollection.doc(payload.eventId);
+        const invitationsCollection = this.db.collection("invitations");
+
+        const eventRef = eventsCollection.doc(payload.eventId);
+        const eventSnap = await eventRef.get();
+
+        // get event info
+        const maxAttendees = eventSnap.get("maxAttendees") ?? Infinity as number;
+        const waitingList = eventSnap.get("waitingList") as string[];
+        const organizerId = eventSnap.get("organizerID") as string;
+        if (debug) logger.debug("drawLottery B", maxAttendees, waitingList, organizerId);
+
+        const invitesIds = [];
+        const inviteCount = Math.min(maxAttendees, waitingList.length);
+
+        const tasks: Promise<unknown>[] = [];
+
+        for (let i = 0; i < inviteCount; i++) {
+            const inviteRef = invitationsCollection.doc();
+            invitesIds.push(inviteRef.id);
+
+            // pick random index and remove from waitingList
+            const index = Math.floor(Math.random() * waitingList.length);
+            if (debug) logger.debug("drawLottery C", index);
+            const [recipientID] = waitingList.splice(index, 1);
+
+            // create invite
+            tasks.push(inviteRef.create({
+                accepted: false,
+                cancelTime: null,
+                cancelled: false,
+                event: eventSnap.id,
+                invitation: inviteRef.id,
+                organizerID: organizerId,
+                recipientID: recipientID,
+                responseTime: null,
+                sendTime: Timestamp.now(),
+            }));
+        }
+
+        // update event
+        tasks.push(eventRef.set({
+            "lotteryComplete": true,
+            "invites": invitesIds,
+            "waitingList": waitingList,
+        }, {
+            merge: true,
+        }));
+        if (debug) logger.debug("drawLottery D", invitesIds, waitingList);
+
+        // wait for everything to finish
+        await Promise.all(tasks);
     }
 }
