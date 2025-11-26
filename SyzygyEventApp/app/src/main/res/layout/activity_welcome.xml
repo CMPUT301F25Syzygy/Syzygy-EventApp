@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/welcome_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/syzygy_background">
+
+    <!-- Earth circle behind title -->
+    <View
+        android:id="@+id/earthCircle"
+        android:layout_width="350dp"
+        android:layout_height="350dp"
+        android:background="@drawable/earth_circle"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:translationY="-120dp" />
+
+    <!-- Sun circle at bottom -->
+    <View
+        android:id="@+id/sunCircle"
+        android:layout_width="600dp"
+        android:layout_height="260dp"
+        android:background="@drawable/sun_circle"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:translationY="140dp" />
+
+    <!-- Title in front of Earth -->
+    <TextView
+        android:id="@+id/appTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Syzygy Event Lottery"
+        android:textSize="28sp"
+        android:textStyle="bold"
+        android:textColor="?android:attr/textColorPrimary"
+        android:gravity="center"
+        android:paddingTop="48dp"
+        android:paddingBottom="16dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Moon -->
+    <View
+        android:id="@+id/moonBase"
+        android:layout_width="140dp"
+        android:layout_height="140dp"
+        android:background="@drawable/moon_button_background"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintVertical_bias="0.5" />
+
+    <!-- Create Profile text button -->
+    <Button
+        android:id="@+id/createProfileButton"
+        android:layout_width="140dp"
+        android:layout_height="140dp"
+        android:background="@android:color/transparent"
+        android:backgroundTint="@null"
+        android:gravity="center"
+        android:text="Create Profile"
+        android:textColor="?android:attr/textColorPrimary"
+
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:visibility="gone"
+
+        app:backgroundTint="@null"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.5" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

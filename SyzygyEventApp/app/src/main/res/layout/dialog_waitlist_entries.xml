@@ -3,8 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="16dp"
-    android:background="#FFFFFF">
+    android:padding="16dp">
 
     <TextView
         android:id="@+id/dialog_title"
@@ -13,25 +12,22 @@
         android:text="User List"
         android:textSize="20sp"
         android:textStyle="bold"
-        android:textColor="#5A5CE1"
         android:layout_marginBottom="16dp"
         android:gravity="center" />
 
-    <ListView
-        android:id="@+id/user_list"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/entries_recycler_view"
         android:layout_width="match_parent"
-        android:layout_height="300dp"
-        android:divider="@android:color/darker_gray"
-        android:dividerHeight="1dp" />
+        android:layout_height="300dp" />
 
     <TextView
         android:id="@+id/empty_text"
         android:layout_width="match_parent"
         android:layout_height="300dp"
-        android:text="No users in this list"
         android:gravity="center"
+        android:text="No users in this list"
+        android:textColor="?android:attr/textColorTertiary"
         android:textSize="16sp"
-        android:textColor="#999999"
         android:visibility="gone" />
 
     <Button
@@ -41,7 +37,6 @@
         android:layout_gravity="center"
         android:layout_marginTop="16dp"
         android:text="Close"
-        android:backgroundTint="#5A5CE1"
-        android:textColor="#FFFFFF" />
+        android:backgroundTint="@color/blue"/>
 
 </LinearLayout>

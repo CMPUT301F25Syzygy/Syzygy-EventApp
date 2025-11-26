@@ -204,58 +204,83 @@ public class QRScanFragment extends Fragment {
         }
 
         for (Barcode barcode : barcodes) {
-            String eventID = barcode.getRawValue();
-            if (eventID != null && eventID.length() == 20) {
-                // set isProcessingQR to true
-                isProcessingQR = true;
+            String rawValue = barcode.getRawValue();
+            if (rawValue != null) {
+                String eventID = extractEventID(rawValue);
 
-                // Toast indicating successful scan
-                Toast.makeText(requireContext(), "QR Code: " + eventID, Toast.LENGTH_SHORT).show();
+                if (eventID != null) {
+                    // Set isProcessingQR to true
+                    isProcessingQR = true;
 
-                // Get event from firestore
-                FirebaseFirestore db = FirebaseFirestore.getInstance();
-                db.collection("events").document(eventID)
-                        .get()
-                        .addOnSuccessListener(snapshot -> {
-                            if (snapshot != null && snapshot.exists()) {
-                                // Check if event is within the registration period
-                                Timestamp registrationStart = snapshot.getTimestamp("registrationStart");
-                                Timestamp registrationEnd = snapshot.getTimestamp("registrationEnd");
-                                Date now = new Date();
+                    // Toast indicating a successful scan
+                    Toast.makeText(requireContext(), "QR Code scanned", Toast.LENGTH_SHORT).show();
 
-                                // No registration date provided
-                                if (registrationStart == null || registrationEnd == null) {
-                                    Toast.makeText(requireContext(), "This event has incomplete registration info.", Toast.LENGTH_SHORT).show();
-                                }
-                                // Too early
-                                else if (now.before(registrationStart.toDate())) {
-                                    Toast.makeText(requireContext(), "Registration for this event has not started yet.", Toast.LENGTH_SHORT).show();
-                                }
-                                // Too late/expired
-                                else if (now.after(registrationEnd.toDate())) {
-                                    Toast.makeText(requireContext(), "Registration for this event has ended.", Toast.LENGTH_SHORT).show();
+                    // Get event from firestore
+                    FirebaseFirestore db = FirebaseFirestore.getInstance();
+                    db.collection("events").document(eventID)
+                            .get()
+                            .addOnSuccessListener(snapshot -> {
+                                if (snapshot != null && snapshot.exists()) {
+                                    // Check if event is within the registration period
+                                    Timestamp registrationStart = snapshot.getTimestamp("registrationStart");
+                                    Timestamp registrationEnd = snapshot.getTimestamp("registrationEnd");
+                                    Date now = new Date();
+
+                                    // No registration date provided
+                                    if (registrationStart == null || registrationEnd == null) {
+                                        Toast.makeText(requireContext(), "This event has incomplete registration info.", Toast.LENGTH_SHORT).show();
+                                    }
+                                    // Too early
+                                    else if (now.before(registrationStart.toDate())) {
+                                        Toast.makeText(requireContext(), "Registration for this event has not started yet.", Toast.LENGTH_SHORT).show();
+                                    }
+                                    // Too late/expired
+                                    else if (now.after(registrationEnd.toDate())) {
+                                        Toast.makeText(requireContext(), "Registration for this event has ended.", Toast.LENGTH_SHORT).show();
+                                    }
+                                    else {
+                                        // Event was found and is within registration period, use the navStack to navigate to the scanned event's details
+                                        navStack.replaceScreen(new EventFragment(navStack, eventID));
+                                    }
                                 }
                                 else {
-                                    // Event was found and is within registration period, use the navStack to navigate to the scanned event's details
-                                    navStack.replaceScreen(new EventFragment(navStack, eventID));
+                                    Toast.makeText(requireContext(), "Event not found", Toast.LENGTH_SHORT).show();
                                 }
-                            }
-                            else {
-                                Toast.makeText(requireContext(), "Event not found for QR: " + eventID, Toast.LENGTH_SHORT).show();
-                            }
-                            // resume scanning
-                            isProcessingQR = false;
-                        })
-                        .addOnFailureListener(e -> {
-                            Toast.makeText(requireContext(), "Error loading event: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                            // resume scanning
-                            isProcessingQR = false;
-                        });
+                                // resume scanning
+                                isProcessingQR = false;
+                            })
+                            .addOnFailureListener(e -> {
+                                Toast.makeText(requireContext(), "Error loading event: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                // resume scanning
+                                isProcessingQR = false;
+                            });
 
-                // Stop after first valid QR is scanned
-                break;
+                    // Stop after first valid QR is scanned
+                    break;
+                }
             }
         }
+    }
+
+    private String extractEventID(String rawValue) {
+        if (rawValue == null || rawValue.isEmpty()) {
+            return null;
+        }
+
+        // Check if it's in deep link format
+        if (rawValue.startsWith("syzygy://event/")) {
+            String eventID = rawValue.substring("syzygy://event/".length());
+            // Validate it's not empty and looks like a Firestore ID
+            if (!eventID.isEmpty() && eventID.length() == 20) {
+                return eventID;
+            }
+        }
+        // Fallback: check if it's a raw 20-character event ID
+        else if (rawValue.length() == 20) {
+            return rawValue;
+        }
+
+        return null;
     }
 
     @Override

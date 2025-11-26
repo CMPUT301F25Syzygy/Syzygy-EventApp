@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:gravity="center"
+    android:background="?android:attr/colorBackground">
+
+    <!-- Title -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Event QR Code"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:textColor="?android:attr/colorForeground"
+        android:layout_marginBottom="8dp" />
+
+    <!-- Event Name -->
+    <TextView
+        android:id="@+id/event_title_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Event Name"
+        android:textSize="18sp"
+        android:textColor="?android:attr/colorForeground"
+        android:layout_marginBottom="24dp" />
+
+    <!-- QR Code Image -->
+    <androidx.cardview.widget.CardView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"
+        android:elevation="4dp">
+
+        <ImageView
+            android:id="@+id/qr_code_image"
+            android:layout_width="300dp"
+            android:layout_height="300dp"
+            android:contentDescription="QR Code"
+            android:scaleType="fitCenter"
+            android:padding="16dp"
+            android:background="@android:color/white" />
+    </androidx.cardview.widget.CardView>
+
+    <!-- Instructions -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Share this QR code with entrants to let them join your event"
+        android:textSize="14sp"
+        android:textColor="?attr/colorSecondary"
+        android:gravity="center"
+        android:layout_marginBottom="24dp" />
+
+    <!-- Buttons -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center">
+
+        <Button
+            android:id="@+id/export_button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1"
+            android:backgroundTint="@color/green"
+            android:text="Export QR Code"
+            android:textColor="?android:attr/colorBackground" />
+
+        <Button
+            android:id="@+id/close_button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="8dp"
+            android:text="Close"
+            android:backgroundTint="@color/blue"
+            android:textColor="?android:attr/colorBackground" />
+    </LinearLayout>
+
+</LinearLayout>
