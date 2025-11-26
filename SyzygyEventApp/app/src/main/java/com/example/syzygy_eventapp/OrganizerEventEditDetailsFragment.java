@@ -67,6 +67,7 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
     private Organizer organizer;
     private Event event;
     private boolean isEditMode = false;
+    private boolean isViewMode = false;
     private Timestamp startTime, endTime;
     private NavigationStackFragment navStack;
 
@@ -117,6 +118,27 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
         fragment.navStack = navStack;
         fragment.event = existingEvent;
         fragment.isEditMode = existingEvent != null;
+        fragment.organizer = organizer;
+        return fragment;
+    }
+
+    /**
+     * A new instance of this fragment in VIEW-ONLY mode.
+     * To be used so the organizer can retain the ability to view old events and their entrant info, without being able to edit it.
+     *
+     * @param existingEvent The event to view organizer details for
+     * @param organizer The organizer creating or editing the event
+     * @param navStack The nav stack for screen management
+     * @return A new instance of OrganizerEventEditDetailsFragment
+     */
+    public static OrganizerEventEditDetailsFragment newInstanceViewOnly(@Nullable Event existingEvent, @NonNull Organizer organizer, @Nullable NavigationStackFragment navStack) {
+        OrganizerEventEditDetailsFragment fragment = new OrganizerEventEditDetailsFragment();
+        fragment.navStack = navStack;
+        fragment.event = existingEvent;
+        // Set to true so it shows waiting lists
+        fragment.isEditMode = true;
+        // Set view-only mode
+        fragment.isViewMode = true;
         fragment.organizer = organizer;
         return fragment;
     }
@@ -210,6 +232,9 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
         invitationController = new InvitationController();
 
         // Set the appropriate title based on mode
+        if (isViewMode) {
+            fragmentTitle.setText("View Event");
+        }
         if (isEditMode) {
             fragmentTitle.setText("Edit Event");
         }
@@ -225,6 +250,11 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
             // In edit mode, populate the fields with EXISTING event data
             populateFields(event);
             startRealtimeListeners();
+
+            // Disable all inputs if we're in view mode
+            if (isViewMode) {
+                disableAllInputs();
+            }
 
             // Seed test data
             //createFakeUsers();
@@ -270,6 +300,21 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
      * Edit mode shows the update + delete button combo, while create mode shows the create + cancel one.
      */
     private void setupButtonVisibility() {
+        // View only mode has to be added, where all action buttons are hidden, and I'll use the back button from the navStack since that's the only one we need
+        if (isViewMode) {
+            createButton.setVisibility(View.GONE);
+            updateButton.setVisibility(View.GONE);
+            deleteButton.setVisibility(View.GONE);
+            generateQRButton.setVisibility(View.GONE);
+            cancelButton.setVisibility(View.VISIBLE);
+            cancelButton.setText("Back");
+            // Override the cancel button to use navStack
+            cancelButton.setOnClickListener(v -> {
+                if (navStack != null) {
+                    navStack.popScreen();
+                }
+            });
+        }
         if (isEditMode) {
             createButton.setVisibility(View.GONE);
             cancelButton.setVisibility(View.GONE);
@@ -1210,6 +1255,41 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
                 })
                 .setNegativeButton("Cancel", null)
                 .show();
+    }
+
+    /**
+     * DIsables all the input fields and buttons, for view-only mode. This will prevent organizers from editing past events.
+     */
+    private void disableAllInputs() {
+        // Disable text inputs
+        titleInput.setEnabled(false);
+        locationInput.setEnabled(false);
+        descriptionInput.setEnabled(false);
+        entrantLimitInput.setEnabled(false);
+        maxWaitingListInput.setEnabled(false);
+
+        // Disable date/time buttons
+        startDateButton.setEnabled(false);
+        startTimeButton.setEnabled(false);
+        endDateButton.setEnabled(false);
+        endTimeButton.setEnabled(false);
+
+        // Disable poster buttons
+        importPosterButton.setEnabled(false);
+        deletePosterButton.setEnabled(false);
+
+        // I'm just gonna change the opacity so clear fields are disabled
+        titleInput.setAlpha(0.6f);
+        locationInput.setAlpha(0.6f);
+        descriptionInput.setAlpha(0.6f);
+        entrantLimitInput.setAlpha(0.6f);
+        maxWaitingListInput.setAlpha(0.6f);
+        startDateButton.setAlpha(0.6f);
+        startTimeButton.setAlpha(0.6f);
+        endDateButton.setAlpha(0.6f);
+        endTimeButton.setAlpha(0.6f);
+        importPosterButton.setAlpha(0.6f);
+        deletePosterButton.setAlpha(0.6f);
     }
 
     @Override
