@@ -117,7 +117,7 @@ var pathtoroot = "../../../";
 public class <span class="typeNameLabel"><a href=QRGenerateFragment.html>QRGenerateFragment</a></span>
 
                     </pre>
-                    <div class="block"><p>This fragment will generatr and display QR Codes for events.</p></div>
+                    <div class="block"><p>This fragment will generatr and display QR Codes for events. The scannable QR code made by this fragment will contain the event's ID in DEEP LINK FORMAT. When scanned, the code will navigate users directly to the event details page. Organizers can export the QR code image to their device (and then print/share it however they like).</p></div>
 
                     <dl>
 
@@ -198,8 +198,8 @@ public class <span class="typeNameLabel"><a href=QRGenerateFragment.html>QRGener
                                         
                                             <tr class="altColor">
                                                 <th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a
-                                                        href="#QRGenerateFragment()">QRGenerateFragment</a></span>()</code></th>
-                                                <td class="colLast"></td>
+                                                        href="#QRGenerateFragment(com.example.syzygy_eventapp.Event,com.example.syzygy_eventapp.NavigationStackFragment)">QRGenerateFragment</a></span>(<a href=Event.html>Event</a> event, <a href=NavigationStackFragment.html>NavigationStackFragment</a> navStack)</code></th>
+                                                <td class="colLast">Constructor for QRGenerateFragment</td>
                                             </tr>
                                         
 
@@ -251,6 +251,14 @@ public class <span class="typeNameLabel"><a href=QRGenerateFragment.html>QRGener
                                             <th class="colLast" scope="col">Description</th>
                                         </tr>
                                         
+                                        <tr id="i0" class="altColor">
+                                            <td class="colFirst"><code>View</code>
+                                            </td>
+                                            <th class="colSecond" scope="row"><code><a href=QRGenerateFragment.html#onCreateView(LayoutInflater,ViewGroup,Bundle)>onCreateView</a>(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) </code>
+                                            </th>
+                                            <td class="colLast">Inflates the layout and initializes all the UI components</td>
+                                        </tr>
+                                        
                                         </tbody>
                                     </table>
                                 </div>
@@ -282,12 +290,25 @@ public class <span class="typeNameLabel"><a href=QRGenerateFragment.html>QRGener
                             </a>
                                 <h3>Constructor Detail</h3>
                                 
-                                <a name="QRGenerateFragment()"></a>
+                                <a name="QRGenerateFragment(com.example.syzygy_eventapp.Event,com.example.syzygy_eventapp.NavigationStackFragment)"></a>
                                 <ul class="blockList">
                                     <li class="blockList">
                                         <h4>QRGenerateFragment</h4>
-                                        <pre>QRGenerateFragment()</pre>
-                                        <div class="block"></div>
+                                        <pre>QRGenerateFragment(<a href=Event.html>Event</a> event, <a href=NavigationStackFragment.html>NavigationStackFragment</a> navStack)</pre>
+                                        <div class="block">Constructor for QRGenerateFragment</div>
+                                        
+                                        <dl>
+                                            <dt><span class="paramLabel">Parameters:</span></dt>
+                                            
+                                            
+                                            <dd><code>event</code> - The event that needs to have a QR generated</dd>
+                                            
+                                            
+                                            
+                                            <dd><code>navStack</code> - Navigation stack to manage screens</dd>
+                                            
+                                            
+                                        </dl>
                                         
                                     </li>
                                 </ul>
@@ -304,6 +325,47 @@ public class <span class="typeNameLabel"><a href=QRGenerateFragment.html>QRGener
                                 <!--   -->
                             </a>
                                 <h3>Method Detail</h3>
+                                
+                                <a id="onCreateView(LayoutInflater,ViewGroup,Bundle)">
+                                    <!--   -->
+                                </a>
+                                <ul class=
+                                              "blockListLast"
+                                          >
+                                    <li class="blockList">
+                                        <h4>onCreateView</h4>
+                                        <pre class="methodSignature"> View <a href=QRGenerateFragment.html#onCreateView(LayoutInflater,ViewGroup,Bundle)>onCreateView</a>(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)</pre>
+                                        <div class="block"><p>Inflates the layout and initializes all the UI components</p></div>
+
+                                        <dl>
+
+                                        
+                                            <dt><span class="paramLabel">Parameters:</span></dt>
+                                            
+                                            
+                                            <dd><code>inflater</code> - The LayoutInflater object that can be used to inflate any views in the fragment,</dd>
+                                            
+                                            
+                                            
+                                            <dd><code>container</code> - If non-null, this is the parent view that the fragment's UI should be attached to.</dd>
+                                            
+                                            
+                                            
+                                            <dd><code>savedInstanceState</code> - If non-null, this fragment is being re-constructed from a previous saved state as given here.</dd>
+                                            
+                                            
+                                        
+
+                                        
+                                            <dt><span class="returnLabel">Returns:</span></dt>
+                                            <dd><p>The root view for this frament's UI</p></dd>
+                                        
+
+                                        
+
+                                        </dl>
+                                    </li>
+                                </ul>
                                 
                             </li>
                         </ul>
