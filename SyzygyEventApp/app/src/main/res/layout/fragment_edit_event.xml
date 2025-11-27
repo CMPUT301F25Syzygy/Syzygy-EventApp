@@ -95,7 +95,7 @@
                 android:text="Upload"
                 android:textColor="@color/button_text"
                 android:drawableTint="@color/button_text"
-                app:icon="@drawable/upload_arrow" />
+                app:icon="@drawable/outline_file_upload_24" />
 
             <Button
                 android:id="@+id/btnDelete"
