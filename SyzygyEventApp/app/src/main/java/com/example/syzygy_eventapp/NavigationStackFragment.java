@@ -138,6 +138,7 @@ public class NavigationStackFragment extends Fragment implements OnItemSelectedL
      * @param fragment a fragment to replace the screen contents
      */
     public void replaceScreen(Fragment fragment) {
+
         FragmentManager manager = getParentFragmentManager();
         manager.beginTransaction()
                 .replace(R.id.fragment_frame, fragment)
@@ -224,15 +225,18 @@ public class NavigationStackFragment extends Fragment implements OnItemSelectedL
         navBar.inflateMenu(screen.menuResId);
         displayedScreenUUID = screen.uuid;
 
+        // clear selection
+        MenuItem previouslySelected = navBar.getMenu().findItem(navBar.getSelectedItemId());
+        if (previouslySelected != null) {
+            previouslySelected.setChecked(false);
+        }
+
         if (screen.menuSelectedItemId != null) {
             // wait for the nav bar to finish setting up
+            MenuItem toBeSelected = navBar.getMenu().findItem(screen.menuSelectedItemId);
             navBar.post(() -> {
-                navBar.setSelectedItemId(screen.menuSelectedItemId);
+                toBeSelected.setChecked(true);
             });
-        } else {
-            // clear selection
-            MenuItem currentlySelected = navBar.getMenu().findItem(navBar.getSelectedItemId());
-            currentlySelected.setChecked(false);
         }
     }
 
