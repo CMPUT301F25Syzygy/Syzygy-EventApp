@@ -33,7 +33,7 @@
             android:layout_marginBottom="16dp"
             android:text="@string/event_title"
             android:textAlignment="center"
-            android:textColor="?android:attr/colorForeground"
+            android:textColor="?android:attr/textColorPrimary"
             android:textSize="28sp"
             android:textStyle="bold" />
 
@@ -84,7 +84,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="34dp"
                     android:text="@string/Organizer"
-                    android:textColor="?android:attr/colorForeground"
+                    android:textColor="?android:attr/textColorPrimary"
                     android:textSize="20sp"
                     android:textStyle="bold" />
             </LinearLayout>
@@ -113,7 +113,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/location_text"
-                android:textColor="?android:attr/colorForeground"
+                android:textColor="?android:attr/textColorPrimary"
                 android:textSize="14sp"
                 android:textStyle="bold" />
         </LinearLayout>
@@ -140,7 +140,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/time_text"
-                android:textColor="?android:attr/colorForeground"
+                android:textColor="?android:attr/textColorPrimary"
                 android:textSize="14sp"
                 android:textStyle="bold" />
         </LinearLayout>
@@ -154,7 +154,9 @@
             android:backgroundTint="?android:attr/textColorLink"
             android:text="More Details"
             app:icon="@drawable/outline_organize_24"
-            app:iconSize="24dp"/>
+            app:iconSize="24dp"
+            android:textColor="@color/button_text"
+            android:drawableTint="@color/button_text"/>
 
 
         <!-- Accept / Decline Buttons -->
@@ -174,9 +176,10 @@
                 android:padding="10dp"
                 android:radius="20dp"
                 android:text="Decline"
-                android:textColor="?android:attr/colorBackground"
                 app:icon="@drawable/ic_x_mark"
-                app:iconSize="32dp" />
+                app:iconSize="32dp"
+                android:textColor="@color/button_text"
+                android:drawableTint="@color/button_text"/>
 
             <Button
                 android:id="@+id/btn_accept"
@@ -187,9 +190,10 @@
                 android:backgroundTint="@color/green"
                 android:padding="10dp"
                 android:text="Accept"
-                android:textColor="?android:attr/colorBackground"
                 app:icon="@drawable/ic_check"
-                app:iconSize="32dp" />
+                app:iconSize="32dp"
+                android:textColor="@color/button_text"
+                android:drawableTint="@color/button_text"/>
         </LinearLayout>
 
     </LinearLayout>

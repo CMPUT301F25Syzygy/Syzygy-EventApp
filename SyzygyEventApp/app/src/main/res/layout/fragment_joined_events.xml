@@ -26,7 +26,7 @@
                 android:text="My Events"
                 android:textSize="24sp"
                 android:textStyle="bold"
-                android:textColor="?android:attr/colorForeground"/>
+                android:textColor="?android:attr/textColorPrimary"/>
 
             <TextView
                 android:id="@+id/event_count_text"
@@ -34,7 +34,7 @@
                 android:layout_height="wrap_content"
                 android:text="You're registered for 0 events"
                 android:textSize="14sp"
-                android:textColor="?android:attr/colorForeground"
+                android:textColor="?android:attr/textColorPrimary"
                 android:layout_marginTop="4dp"/>
         </LinearLayout>
 

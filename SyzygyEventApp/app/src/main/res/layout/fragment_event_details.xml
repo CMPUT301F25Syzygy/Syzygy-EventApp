@@ -44,7 +44,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/event_detail_orginizer"
-                    android:textColor="?android:attr/colorForeground"
+                    android:textColor="?android:attr/textColorPrimary"
                     android:textSize="14sp" />
             </LinearLayout>
         </LinearLayout>
@@ -97,7 +97,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/event_detail_location"
-                    android:textColor="?android:attr/colorForeground"
+                    android:textColor="?android:attr/textColorPrimary"
                     android:textSize="14sp"
                     android:textStyle="bold"
                     />
@@ -123,7 +123,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/event_detail_time"
-                    android:textColor="?android:attr/colorForeground"
+                    android:textColor="?android:attr/textColorPrimary"
                     android:textSize="14sp"
                     android:textStyle="bold" />
             </LinearLayout>
@@ -148,7 +148,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/event_details_num_entrants"
-                    android:textColor="?android:attr/colorForeground"
+                    android:textColor="?android:attr/textColorPrimary"
                     android:textSize="14sp"
                     android:textStyle="bold" />
             </LinearLayout>
@@ -161,7 +161,7 @@
             android:layout_marginTop="20dp"
             android:backgroundTint="@color/green"
             android:text="Join Waiting List"
-            android:textColor="?android:attr/colorBackground" />
+            android:textColor="@color/button_text"/>
 
         <TextView
             android:id="@+id/joining_status"

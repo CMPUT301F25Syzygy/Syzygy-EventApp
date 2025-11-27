@@ -39,7 +39,8 @@
         android:layout_gravity="center"
         android:layout_marginTop="16dp"
         android:text="Close"
-        android:backgroundTint="#5A5CE1"
-        android:textColor="#FFFFFF" />
+        android:textColor="@color/button_text"
+        android:drawableTint="@color/button_text"
+        android:backgroundTint="?android:attr/textColorLink" />
 
 </LinearLayout>

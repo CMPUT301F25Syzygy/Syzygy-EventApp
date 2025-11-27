@@ -122,7 +122,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Cancel"
-                    android:textAllCaps="false" />
+                    android:textAllCaps="false"
+                    android:textColor="@color/button_text"
+                    android:backgroundTint="?android:attr/textColorLink"/>
 
                 <Button
                     android:id="@+id/btnSend"
@@ -130,7 +132,9 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="10dp"
                     android:text="Send"
-                    android:textAllCaps="false" />
+                    android:textAllCaps="false"
+                    android:textColor="@color/button_text"
+                    android:backgroundTint="?android:attr/textColorLink"/>
             </LinearLayout>
 
         </LinearLayout>

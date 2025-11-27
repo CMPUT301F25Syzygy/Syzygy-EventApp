@@ -94,18 +94,20 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="12dp"
-                android:backgroundTint="#007BFF"
+                android:backgroundTint="@color/blue"
                 android:text="Upload"
-                android:textColor="#FFFFFF"
+                android:textColor="@color/button_text"
+                android:drawableTint="@color/button_text"
                 app:icon="@drawable/upload_arrow" />
 
             <Button
                 android:id="@+id/btnDelete"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:backgroundTint="#DC3545"
+                android:backgroundTint="@color/red"
                 android:text="Delete"
-                android:textColor="#FFFFFF"
+                android:textColor="@color/button_text"
+                android:drawableTint="@color/button_text"
                 app:icon="@drawable/delete" />
         </LinearLayout>
 
@@ -534,8 +536,8 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
             android:text="Generate QR Code"
-            android:backgroundTint="#007BFF"
-            android:textColor="#FFFFFF"
+            android:backgroundTint="@color/blue"
+            android:textColor="@color/button_text"
             android:drawableStart="@android:drawable/ic_menu_gallery"
             android:drawablePadding="8dp" />
 
@@ -555,8 +557,8 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:layout_marginEnd="8dp"
-                android:backgroundTint="#2E7D32"
-                android:textColor="#FFFFFF"
+                android:backgroundTint="@color/green"
+                android:textColor="@color/button_text"
                 android:text="Create" />
 
             <Button
@@ -564,8 +566,8 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:backgroundTint="#DC3545"
-                android:textColor="#FFFFFF"
+                android:backgroundTint="@color/red"
+                android:textColor="@color/button_text"
                 android:text="Cancel" />
 
             <Button
@@ -574,8 +576,8 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:layout_marginEnd="8dp"
-                android:backgroundTint="#2E7D32"
-                android:textColor="#FFFFFF"
+                android:backgroundTint="@color/green"
+                android:textColor="@color/button_text"
                 android:text="Update" />
 
             <Button
@@ -583,8 +585,8 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:backgroundTint="#DC3545"
-                android:textColor="#FFFFFF"
+                android:backgroundTint="@color/red"
+                android:textColor="@color/button_text"
                 android:text="Delete" />
 
         </LinearLayout>

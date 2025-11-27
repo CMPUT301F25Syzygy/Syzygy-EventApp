@@ -18,7 +18,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
             android:text="Event Name"
-            android:textColor="?android:attr/colorForeground"
+            android:textColor="?android:attr/textColorPrimary"
             android:textSize="28sp"
             android:textStyle="bold" />
 
@@ -37,7 +37,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
             android:text="Event description goes here..."
-            android:textColor="?android:attr/colorForeground"
+            android:textColor="?android:attr/textColorPrimary"
             android:textSize="16sp" />
 
         <!-- Location Section -->
@@ -56,13 +56,15 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Location"
-                android:textColor="?android:attr/colorForeground"
+                android:textColor="?android:attr/textColorPrimary"
                 android:textSize="16sp" />
 
             <Button
                 android:id="@+id/open_map_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textColor="@color/button_text"
+                android:drawableTint="@color/button_text"
                 android:backgroundTint="?android:attr/textColorLink"
                 android:text="Open Map"
                 android:textSize="14sp" />
@@ -75,7 +77,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
             android:text="Waiting List: 0 entrants"
-            android:textColor="?android:attr/colorForeground"
+            android:textColor="?android:attr/textColorPrimary"
             android:textSize="16sp"
             android:textStyle="bold" />
 
@@ -129,8 +131,8 @@
             android:layout_marginBottom="12dp"
             android:backgroundTint="?android:attr/textColorLink"
             android:text="Join Waiting List"
-            android:textColor="?android:attr/colorBackground"
-            android:visibility="visible" />
+            android:visibility="visible"
+            android:textColor="@color/button_text"/>
 
         <!-- Leave Waiting List Button -->
         <Button
@@ -140,8 +142,8 @@
             android:layout_marginBottom="12dp"
             android:backgroundTint="@color/red"
             android:text="Leave Waiting List"
-            android:textColor="?android:attr/colorBackground"
-            android:visibility="visible" />
+            android:visibility="visible"
+            android:textColor="@color/button_text"/>
 
     </LinearLayout>
 </ScrollView>
