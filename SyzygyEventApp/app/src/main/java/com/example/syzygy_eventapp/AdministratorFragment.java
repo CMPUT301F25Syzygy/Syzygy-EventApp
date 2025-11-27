@@ -29,6 +29,12 @@ public class AdministratorFragment extends Fragment {
 
     /// Profile button
     private LinearLayout profileButton;
+    /// Event button
+    private LinearLayout eventButton;
+    /// Image button
+    private LinearLayout imageButton;
+    /// Notification button
+    private LinearLayout notificationButton;
 
     /// Navigation stack fragment
     private NavigationStackFragment navStack;
@@ -52,10 +58,22 @@ public class AdministratorFragment extends Fragment {
 
         // Bind buttons
         profileButton = root.findViewById(R.id.profile_button);
+        eventButton = root.findViewById(R.id.event_button);
+        imageButton = root.findViewById(R.id.image_button);
+        notificationButton = root.findViewById(R.id.notification_button);
 
         // Set listeners
         profileButton.setOnClickListener(v -> navStack.pushScreen(
                 new AdminProfileListFragment(navStack)
+        ));
+        eventButton.setOnClickListener(v -> navStack.pushScreen(
+                new AdminEventListFragment(navStack)
+        ));
+        imageButton.setOnClickListener(v -> navStack.pushScreen(
+                new AdminImageListFragment(navStack)
+        ));
+        notificationButton.setOnClickListener(v -> navStack.pushScreen(
+                new AdminNotificationListFragment(navStack)
         ));
 
         return root;

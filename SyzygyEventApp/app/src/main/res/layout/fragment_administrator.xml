@@ -76,6 +76,7 @@
 
             <!-- Events Button -->
             <LinearLayout
+                android:id="@+id/event_button"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_rowWeight="1"
@@ -102,6 +103,7 @@
 
             <!-- Images Button -->
             <LinearLayout
+                android:id="@+id/image_button"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_rowWeight="1"
@@ -128,6 +130,7 @@
 
             <!-- Notifications Button -->
             <LinearLayout
+                android:id="@+id/notification_button"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_rowWeight="1"
