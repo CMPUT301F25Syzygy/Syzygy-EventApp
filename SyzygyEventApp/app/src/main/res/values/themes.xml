@@ -11,4 +11,18 @@
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">50%</item>
     </style>
+
+    <color name="pale_blue">#D1EAFF</color>
+    <color name="pale_green">#CDE7CE</color>
+    <color name="pale_orange">#FFEFC3</color>
+    <color name="pale_red">#FFD3D3</color>
+    <color name="pale_grey">#E4E4E4</color>
+
+    <color name="green">#55B85A</color>
+    <color name="yellow">#FBEA4D</color>
+    <color name="red">#E6403C</color>
+    <color name="blue">#2691E7</color>
+    <color name="grey">#878787</color>
+    <color name="purple">#B53DD7</color>
+    <color name="button_text">#FFFFFF</color>
 </resources>

@@ -26,7 +26,7 @@
                 android:text="My Events"
                 android:textSize="24sp"
                 android:textStyle="bold"
-                android:textColor="?android:attr/colorForeground"/>
+                android:textColor="?android:attr/textColorPrimary"/>
 
             <TextView
                 android:id="@+id/event_count_text"
@@ -34,7 +34,7 @@
                 android:layout_height="wrap_content"
                 android:text="You're registered for 0 events"
                 android:textSize="14sp"
-                android:textColor="?android:attr/colorForeground"
+                android:textColor="?android:attr/textColorPrimary"
                 android:layout_marginTop="4dp"/>
         </LinearLayout>
 
@@ -46,7 +46,7 @@
             android:text="No upcoming events yet.\nBrowse events to get started!"
             android:textAlignment="center"
             android:textSize="16sp"
-            android:textColor="#999999"
+            android:textColor="?android:attr/textColorTertiary"
             android:padding="32dp"
             android:visibility="gone"/>
 
@@ -60,7 +60,7 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="#E0E0E0"
+            android:background="?attr/colorOutline"
             android:layout_marginVertical="8dp"/>
 
         <!-- Past Events Section -->
@@ -71,7 +71,7 @@
             android:text="No past events"
             android:textAlignment="center"
             android:textSize="16sp"
-            android:textColor="#999999"
+            android:textColor="?android:attr/textColorTertiary"
             android:padding="32dp"
             android:visibility="gone"/>
 

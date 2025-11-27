@@ -147,7 +147,6 @@ public class EventSummaryView extends LinearLayout {
         statusChip.setChipBackgroundColor(
                 ContextCompat.getColorStateList(getContext(), color)
         );
-        statusChip.setTextColor(ContextCompat.getColor(getContext(), R.color.white));
     }
 
     /**
@@ -176,7 +175,6 @@ public class EventSummaryView extends LinearLayout {
         statusChip.setChipBackgroundColor(
                 ContextCompat.getColorStateList(getContext(), color)
         );
-        statusChip.setTextColor(ContextCompat.getColor(getContext(), R.color.white));
     }
 
     /**
