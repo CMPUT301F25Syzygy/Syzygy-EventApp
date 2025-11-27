@@ -118,8 +118,8 @@ public class EventControllerTest {
                 TIMEOUT_SEC, TimeUnit.SECONDS);
         assertEquals(0, size);
 
-        // Add user
-        Tasks.await(controller.addToWaitingList(id, "user1"),
+        // Add user (without location, so null for GeoPoint)
+        Tasks.await(controller.addToWaitingList(id, "user1", null),
                 TIMEOUT_SEC, TimeUnit.SECONDS);
         size = Tasks.await(controller.getWaitingListSize(id),
                 TIMEOUT_SEC, TimeUnit.SECONDS);
@@ -131,6 +131,41 @@ public class EventControllerTest {
         size = Tasks.await(controller.getWaitingListSize(id),
                 TIMEOUT_SEC, TimeUnit.SECONDS);
         assertEquals(0, size);
+    }
+
+    /**
+     * Verify waiting list operations with geolocation data.
+     */
+    @Test
+    public void testWaitingListOperationsWithLocation() throws Exception {
+        // Create event
+        Event event = new Event();
+        event.setName("Geolocation Event");
+        event.setOrganizerID(organizerID);
+        event.setGeolocationRequired(true);
+        String id = Tasks.await(controller.createEvent(event),
+                TIMEOUT_SEC, TimeUnit.SECONDS);
+        createdEventIds.add(id);
+
+        // Add user WITH location
+        GeoPoint userLocation = new GeoPoint(53.5461, -113.4938); // Edmonton coordinates
+        Tasks.await(controller.addToWaitingList(id, "user2", userLocation),
+                TIMEOUT_SEC, TimeUnit.SECONDS);
+
+        int size = Tasks.await(controller.getWaitingListSize(id),
+                TIMEOUT_SEC, TimeUnit.SECONDS);
+        assertEquals(1, size);
+
+        // Verify location was stored in subcollection
+        DocumentSnapshot locationDoc = Tasks.await(
+                db.collection("events").document(id)
+                        .collection("entrantLocations").document("user2").get(),
+                TIMEOUT_SEC, TimeUnit.SECONDS);
+
+        assertTrue(locationDoc.exists());
+        assertEquals("user2", locationDoc.getString("userID"));
+        assertNotNull(locationDoc.get("location"));
+        assertNotNull(locationDoc.get("joinedAt"));
     }
 
     /**
@@ -189,13 +224,13 @@ public class EventControllerTest {
                 TIMEOUT_SEC, TimeUnit.SECONDS);
         createdEventIds.add(id);
 
-        // Add once
-        Tasks.await(controller.addToWaitingList(id, "userA"),
+        // Add once (with null location)
+        Tasks.await(controller.addToWaitingList(id, "userA", null),
                 TIMEOUT_SEC, TimeUnit.SECONDS);
 
         // Add again should fail
         Exception ex = assertThrows(Exception.class, () ->
-                Tasks.await(controller.addToWaitingList(id, "userA"),
+                Tasks.await(controller.addToWaitingList(id, "userA", null),
                         TIMEOUT_SEC, TimeUnit.SECONDS));
         assertNotNull(ex);
     }

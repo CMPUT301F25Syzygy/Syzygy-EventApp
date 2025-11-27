@@ -179,6 +179,36 @@ public class EventController {
                 });
     }
 
+    /**
+     * Observe entrant locations for an event in real time.
+     * @param eventID Event document ID
+     * @param onChange Callback with list of location data maps
+     * @param onError Error callback
+     * @return ListenerRegistration to remove when done
+     */
+    public ListenerRegistration observeEntrantLocations(String eventID, Consumer<List<Map<String, Object>>> onChange, Consumer<Exception> onError) {
+        if (eventID == null || eventID.isEmpty()) {
+            throw new IllegalArgumentException("eventID is required");
+        }
+
+        return db.collection("events").document(eventID)
+                .collection("entrantLocations")
+                .addSnapshotListener((snap, error) -> {
+                    if (error != null) {
+                        onError.accept(error);
+                        return;
+                    }
+
+                    List<Map<String, Object>> locations = new ArrayList<>();
+                    if (snap != null) {
+                        for (DocumentSnapshot doc : snap.getDocuments()) {
+                            locations.add(doc.getData());
+                        }
+                    }
+                    onChange.accept(locations);
+                });
+    }
+
     //-----------------------
     // WAITING LIST OPERATIONS
     //-----------------------
@@ -215,7 +245,7 @@ public class EventController {
      * @return Task that completes when the user is added to the waiting list
      * @throws IllegalArgumentException if any parameter is null/empty
      */
-    public Task<Void> addToWaitingList(String eventID, String userID) {
+    public Task<Void> addToWaitingList(String eventID, String userID, GeoPoint userLocation) {
         if (eventID == null || eventID.isEmpty() || userID == null || userID.isEmpty()) {
             return Tasks.forException(new IllegalArgumentException("eventID and userID are required"));
         }
@@ -245,7 +275,33 @@ public class EventController {
                 return Tasks.forException(new IllegalStateException("Waiting list is full"));
             }
             waitingList.add(userID);
-            return doc.update("waitingList", waitingList, "updatedAt", FieldValue.serverTimestamp());
+
+            Map<String, Object> updates = new HashMap<>();
+            updates.put("waitingList", waitingList);
+            updates.put("updatedAt", FieldValue.serverTimestamp());
+
+            // Store location data in a subcollection if provided
+            Task<Void> updateTask = doc.update(updates);
+
+            if (userLocation != null) {
+                return updateTask.continueWithTask(t -> {
+                    if (!t.isSuccessful()) {
+                        return Tasks.forException(Objects.requireNonNull(t.getException()));
+                    }
+                    // Store location in subcollection
+                    Map<String, Object> locationData = new HashMap<>();
+                    locationData.put("userID", userID);
+                    locationData.put("location", userLocation);
+                    locationData.put("joinedAt", FieldValue.serverTimestamp());
+
+                    return db.collection("events").document(eventID)
+                            .collection("entrantLocations").document(userID).set(locationData);
+                });
+            }
+
+            return updateTask;
+
+            // return doc.update("waitingList", waitingList, "updatedAt", FieldValue.serverTimestamp());
         });
 
     }

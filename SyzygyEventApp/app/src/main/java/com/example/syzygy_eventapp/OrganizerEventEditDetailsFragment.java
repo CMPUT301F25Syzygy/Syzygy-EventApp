@@ -52,12 +52,14 @@ import java.util.Objects;
  */
 public class OrganizerEventEditDetailsFragment extends Fragment {
 
+    private View rootView;
+
     // Event detail input fields
     private EditText titleInput, locationInput, entrantLimitInput, descriptionInput, maxWaitingListInput;
     private Button startTimeButton, endTimeButton, startDateButton, endDateButton;
     private Button importPosterButton, deletePosterButton;
     private ImageView posterPreview;
-    private Button createButton, cancelButton, updateButton, deleteButton, generateQRButton;
+    private Button createButton, cancelButton, updateButton, deleteButton, generateQRButton, viewMapButton;
     private androidx.appcompat.widget.SwitchCompat geolocationToggle;
 
     // Controllers for Firebase operations
@@ -208,6 +210,7 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
         endTimeButton = view.findViewById(R.id.btnEndTime);
         generateQRButton = view.findViewById(R.id.generate_qr_button);
         geolocationToggle = view.findViewById(R.id.geolocation_toggle);
+        viewMapButton = view.findViewById(R.id.view_map_button);
 
         // Initialize waiting list UI elements
         acceptedCountText = view.findViewById(R.id.accepted_count);
@@ -381,6 +384,27 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
                 Toast.makeText(getContext(), "Please save the event first", Toast.LENGTH_SHORT).show();
             }
         });
+
+        // View map button
+        if (viewMapButton != null) {
+            viewMapButton.setOnClickListener(v -> {
+                if (event != null && event.isGeolocationRequired() && navStack != null) {
+                    WaitlistMapFragment mapFragment = new WaitlistMapFragment(event, navStack);
+                    navStack.pushScreen(mapFragment);
+                } else if (event != null && !event.isGeolocationRequired()) {
+                    Toast.makeText(getContext(),
+                            "Geolocation was not required for this event",
+                            Toast.LENGTH_SHORT).show();
+                }
+            });
+
+            // Show/hide based on geolocation requirement
+            if (isEditMode && event != null) {
+                viewMapButton.setVisibility(event.isGeolocationRequired() ? View.VISIBLE : View.GONE);
+            } else {
+                viewMapButton.setVisibility(View.GONE);
+            }
+        }
 
         // Action buttons
         createButton.setOnClickListener(v -> createEvent());
