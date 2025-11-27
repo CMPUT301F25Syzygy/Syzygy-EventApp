@@ -284,6 +284,14 @@ public class <span class="typeNameLabel"><a href=EventController.html>EventContr
                                         </tr>
                                         
                                         <tr id="i4" class="altColor">
+                                            <td class="colFirst"><code>ListenerRegistration</code>
+                                            </td>
+                                            <th class="colSecond" scope="row"><code><a href=EventController.html#observeEntrantLocations(java.lang.String,java.util.function.Consumer,java.util.function.Consumer)>observeEntrantLocations</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> eventID, <a href=https://developer.android.com/reference/kotlin/java/util/function/Consumer.html>Consumer</a>&lt;<a href=https://developer.android.com/reference/kotlin/java/util/List.html>List</a>&lt;<a href=https://developer.android.com/reference/kotlin/java/util/Map.html>Map</a>&lt;<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a>, <a href=https://developer.android.com/reference/kotlin/java/lang/Object.html>Object</a>&gt;&gt;&gt; onChange, <a href=https://developer.android.com/reference/kotlin/java/util/function/Consumer.html>Consumer</a>&lt;<a href=https://developer.android.com/reference/kotlin/java/lang/Exception.html>Exception</a>&gt; onError) </code>
+                                            </th>
+                                            <td class="colLast">Observe entrant locations for an event in real time.</td>
+                                        </tr>
+                                        
+                                        <tr id="i5" class="rowColor">
                                             <td class="colFirst"><code>Task&lt;Integer&gt;</code>
                                             </td>
                                             <th class="colSecond" scope="row"><code><a href=EventController.html#getWaitingListSize(java.lang.String)>getWaitingListSize</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> eventID) </code>
@@ -291,15 +299,15 @@ public class <span class="typeNameLabel"><a href=EventController.html>EventContr
                                             <td class="colLast">Get the current number of Entrants on a waiting list for an event.</td>
                                         </tr>
                                         
-                                        <tr id="i5" class="rowColor">
+                                        <tr id="i6" class="altColor">
                                             <td class="colFirst"><code>Task&lt;Void&gt;</code>
                                             </td>
-                                            <th class="colSecond" scope="row"><code><a href=EventController.html#addToWaitingList(java.lang.String,java.lang.String)>addToWaitingList</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> eventID, <a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> userID) </code>
+                                            <th class="colSecond" scope="row"><code><a href=EventController.html#addToWaitingList(java.lang.String,java.lang.String,GeoPoint)>addToWaitingList</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> eventID, <a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> userID, GeoPoint userLocation) </code>
                                             </th>
                                             <td class="colLast">Add a user to the waiting list for an event.</td>
                                         </tr>
                                         
-                                        <tr id="i6" class="altColor">
+                                        <tr id="i7" class="rowColor">
                                             <td class="colFirst"><code>Task&lt;Void&gt;</code>
                                             </td>
                                             <th class="colSecond" scope="row"><code><a href=EventController.html#removeFromWaitingList(java.lang.String,java.lang.String)>removeFromWaitingList</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> eventID, <a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> userID) </code>
@@ -307,7 +315,7 @@ public class <span class="typeNameLabel"><a href=EventController.html>EventContr
                                             <td class="colLast">Remove a user from the waiting list for an event.</td>
                                         </tr>
                                         
-                                        <tr id="i7" class="rowColor">
+                                        <tr id="i8" class="altColor">
                                             <td class="colFirst"><code>Task&lt;Void&gt;</code>
                                             </td>
                                             <th class="colSecond" scope="row"><code><a href=EventController.html#updateEvent(java.lang.String,java.util.Map)>updateEvent</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> eventID, <a href=https://developer.android.com/reference/kotlin/java/util/Map.html>Map</a>&lt;<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a>, <a href=https://developer.android.com/reference/kotlin/java/lang/Object.html>Object</a>&gt; updates) </code>
@@ -315,7 +323,7 @@ public class <span class="typeNameLabel"><a href=EventController.html>EventContr
                                             <td class="colLast">Update event details.</td>
                                         </tr>
                                         
-                                        <tr id="i8" class="altColor">
+                                        <tr id="i9" class="rowColor">
                                             <td class="colFirst"><code>Task&lt;Void&gt;</code>
                                             </td>
                                             <th class="colSecond" scope="row"><code><a href=EventController.html#deleteEvent(java.lang.String)>deleteEvent</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> eventID) </code>
@@ -529,6 +537,47 @@ public class <span class="typeNameLabel"><a href=EventController.html>EventContr
                                     </li>
                                 </ul>
                                 
+                                <a id="observeEntrantLocations(java.lang.String,java.util.function.Consumer,java.util.function.Consumer)">
+                                    <!--   -->
+                                </a>
+                                <ul class=
+                                              "blockList"
+                                          >
+                                    <li class="blockList">
+                                        <h4>observeEntrantLocations</h4>
+                                        <pre class="methodSignature"> ListenerRegistration <a href=EventController.html#observeEntrantLocations(java.lang.String,java.util.function.Consumer,java.util.function.Consumer)>observeEntrantLocations</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> eventID, <a href=https://developer.android.com/reference/kotlin/java/util/function/Consumer.html>Consumer</a>&lt;<a href=https://developer.android.com/reference/kotlin/java/util/List.html>List</a>&lt;<a href=https://developer.android.com/reference/kotlin/java/util/Map.html>Map</a>&lt;<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a>, <a href=https://developer.android.com/reference/kotlin/java/lang/Object.html>Object</a>&gt;&gt;&gt; onChange, <a href=https://developer.android.com/reference/kotlin/java/util/function/Consumer.html>Consumer</a>&lt;<a href=https://developer.android.com/reference/kotlin/java/lang/Exception.html>Exception</a>&gt; onError)</pre>
+                                        <div class="block"><p>Observe entrant locations for an event in real time.</p></div>
+
+                                        <dl>
+
+                                        
+                                            <dt><span class="paramLabel">Parameters:</span></dt>
+                                            
+                                            
+                                            <dd><code>eventID</code> - Event document ID</dd>
+                                            
+                                            
+                                            
+                                            <dd><code>onChange</code> - Callback with list of location data maps</dd>
+                                            
+                                            
+                                            
+                                            <dd><code>onError</code> - Error callback</dd>
+                                            
+                                            
+                                        
+
+                                        
+                                            <dt><span class="returnLabel">Returns:</span></dt>
+                                            <dd><p>ListenerRegistration to remove when done</p></dd>
+                                        
+
+                                        
+
+                                        </dl>
+                                    </li>
+                                </ul>
+                                
                                 <a id="getWaitingListSize(java.lang.String)">
                                     <!--   -->
                                 </a>
@@ -562,7 +611,7 @@ public class <span class="typeNameLabel"><a href=EventController.html>EventContr
                                     </li>
                                 </ul>
                                 
-                                <a id="addToWaitingList(java.lang.String,java.lang.String)">
+                                <a id="addToWaitingList(java.lang.String,java.lang.String,GeoPoint)">
                                     <!--   -->
                                 </a>
                                 <ul class=
@@ -570,7 +619,7 @@ public class <span class="typeNameLabel"><a href=EventController.html>EventContr
                                           >
                                     <li class="blockList">
                                         <h4>addToWaitingList</h4>
-                                        <pre class="methodSignature"> Task&lt;Void&gt; <a href=EventController.html#addToWaitingList(java.lang.String,java.lang.String)>addToWaitingList</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> eventID, <a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> userID)</pre>
+                                        <pre class="methodSignature"> Task&lt;Void&gt; <a href=EventController.html#addToWaitingList(java.lang.String,java.lang.String,GeoPoint)>addToWaitingList</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> eventID, <a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> userID, GeoPoint userLocation)</pre>
                                         <div class="block"><p>Add a user to the waiting list for an event.</p></div>
 
                                         <dl>
@@ -584,6 +633,8 @@ public class <span class="typeNameLabel"><a href=EventController.html>EventContr
                                             
                                             
                                             <dd><code>userID</code> - User document ID</dd>
+                                            
+                                            
                                             
                                             
                                         
