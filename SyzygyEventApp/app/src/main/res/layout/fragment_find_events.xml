@@ -31,9 +31,12 @@
 
         <Button
             android:id="@+id/filterButton"
-            android:layout_width="98dp"
+            android:layout_width="86sp"
             android:layout_height="38dp"
             android:backgroundTint="@color/grey"
+            android:layout_marginLeft="2dp"
+            android:layout_marginRight="4dp"
+
             android:text="Filter"
             android:textColor="@color/button_text"/>
     </LinearLayout>

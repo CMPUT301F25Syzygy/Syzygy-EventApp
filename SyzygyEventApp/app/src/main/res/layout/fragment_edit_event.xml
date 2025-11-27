@@ -155,17 +155,18 @@
             <Button
                 android:id="@+id/btnStartDate"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:text="Oct 25, 2025"
                 android:radius="8dp"
+                android:layout_marginEnd="8dp"
                 android:backgroundTint="?attr/colorPrimaryContainer"
                 android:textColor="?android:attr/textColorPrimary" />
 
             <Button
                 android:id="@+id/btnStartTime"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:text="5:00 PM"
                 android:radius="8dp"
@@ -190,17 +191,18 @@
             <Button
                 android:id="@+id/btnEndDate"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:text="Oct 25, 2025"
                 android:radius="8dp"
+                android:layout_marginEnd="8dp"
                 android:backgroundTint="?attr/colorPrimaryContainer"
                 android:textColor="?android:attr/textColorPrimary" />
 
             <Button
                 android:id="@+id/btnEndTime"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:text="8:00 PM"
                 android:radius="8dp"

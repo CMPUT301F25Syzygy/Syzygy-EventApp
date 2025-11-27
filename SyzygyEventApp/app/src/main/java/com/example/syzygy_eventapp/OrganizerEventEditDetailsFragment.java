@@ -908,10 +908,10 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
         else {
             // Set default text based on which button it is
             if (button.getId() == R.id.btnStartDate) {
-                button.setText("Select Start Date");
+                button.setText("Pick Start Date");
             }
             else if (button.getId() == R.id.btnEndDate) {
-                button.setText("Select End Date");
+                button.setText("Pick End Date");
             }
         }
     }
@@ -930,10 +930,10 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
         else {
             // Set default text based on which button it is
             if (button.getId() == R.id.btnStartTime) {
-                button.setText("Select Start Time");
+                button.setText("Pick Start Time");
             }
             else if (button.getId() == R.id.btnEndTime) {
-                button.setText("Select End Time");
+                button.setText("Pick End Time");
             }
         }
     }

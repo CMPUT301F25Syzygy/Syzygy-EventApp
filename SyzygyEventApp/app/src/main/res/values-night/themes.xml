@@ -8,6 +8,8 @@
     <color name="pale_blue">#0D47A1</color>
     <color name="pale_green">#1B5E20</color>
     <color name="pale_orange">#AD4800</color>
+    <color name="pale_red">#850000</color>
+    <color name="pale_grey">#333333</color>
 
     <color name="green">#88DC8C</color>
     <color name="yellow">#FFF06D</color>
