@@ -68,7 +68,7 @@
             android:layout_weight="1"
             android:layout_marginEnd="8dp"
             android:text="Export QR Code"
-            android:backgroundTint="#2E7D32"
+            android:backgroundTint="@color/green"
             android:textColor="@color/button_text" />
 
         <Button
@@ -78,7 +78,7 @@
             android:layout_weight="1"
             android:layout_marginStart="8dp"
             android:text="Close"
-            android:backgroundTint="#007BFF"
+            android:backgroundTint="@color/blue"
             android:textColor="@color/button_text"/>
     </LinearLayout>
 

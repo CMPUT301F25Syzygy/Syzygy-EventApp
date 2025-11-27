@@ -3,8 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="2dp"
-    android:background="#80000000"> <!-- dim background -->
+    android:background="?attr/scrimBackground"
+    android:padding="2dp"> <!-- dim background -->
 
     <androidx.cardview.widget.CardView
         android:layout_width="300dp"
@@ -15,26 +15,26 @@
         app:cardElevation="6dp">
 
         <LinearLayout
-            android:padding="15dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:padding="15dp">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:paddingBottom="12dp"
                 android:text="Send Notification"
                 android:textSize="18sp"
-                android:textStyle="bold"
-                android:paddingBottom="12dp" />
+                android:textStyle="bold" />
 
             <!-- Title -->
             <EditText
                 android:id="@+id/editTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Title"
                 android:background="@android:color/transparent"
+                android:hint="Title"
                 android:padding="8dp" />
 
             <!-- Body -->
@@ -42,9 +42,9 @@
                 android:id="@+id/editBody"
                 android:layout_width="match_parent"
                 android:layout_height="120dp"
+                android:background="@android:color/transparent"
                 android:gravity="top"
                 android:hint="Body"
-                android:background="@android:color/transparent"
                 android:padding="8dp" />
 
             <!-- Switches -->
