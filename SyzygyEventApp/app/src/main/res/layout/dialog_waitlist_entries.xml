@@ -24,10 +24,10 @@
         android:id="@+id/empty_text"
         android:layout_width="match_parent"
         android:layout_height="300dp"
-        android:gravity="center"
         android:text="No users in this list"
-        android:textColor="?android:attr/textColorTertiary"
+        android:gravity="center"
         android:textSize="16sp"
+        android:textColor="?android:attr/textColorTertiary"
         android:visibility="gone" />
 
     <Button
@@ -37,6 +37,8 @@
         android:layout_gravity="center"
         android:layout_marginTop="16dp"
         android:text="Close"
-        android:backgroundTint="@color/blue"/>
+        android:textColor="@color/button_text"
+        android:drawableTint="@color/button_text"
+        android:backgroundTint="?android:attr/textColorLink" />
 
 </LinearLayout>

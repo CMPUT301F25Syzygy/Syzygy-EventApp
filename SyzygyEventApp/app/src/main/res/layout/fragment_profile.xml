@@ -57,7 +57,7 @@
                 android:layout_weight="1"
                 android:text="Cat Erpillar"
                 android:textAlignment="center"
-                android:textColor="@android:color/black"
+                android:textColor="?android:attr/textColorPrimary"
                 android:textSize="24sp"
                 android:textStyle="bold" />
 
@@ -65,7 +65,7 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:src="@drawable/ic_edit"
-                app:tint="@android:color/black" />
+                app:tint="?android:attr/textColorPrimary"  />
         </LinearLayout>
 
         <com.google.android.material.chip.Chip
@@ -73,7 +73,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Unassigned"
-            android:textColor="?android:attr/colorForeground"
+            android:backgroundTint="@color/grey"
+            android:textColor="@color/button_text"
             android:textSize="14sp"
             android:textStyle="bold"
             app:checkedIconVisible="false"
@@ -122,7 +123,7 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:src="@drawable/ic_email"
-                app:tint="@android:color/black" />
+                app:tint="?android:attr/textColorPrimary" />
 
             <TextView
                 android:id="@+id/profileEmailText"
@@ -132,7 +133,6 @@
                 android:layout_marginStart="10dp"
                 android:layout_marginEnd="10dp"
                 android:text="caterpillar67@example.com"
-                android:textColor="@android:color/black"
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
@@ -140,7 +140,7 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:src="@drawable/ic_edit"
-                app:tint="@android:color/black" />
+                app:tint="?android:attr/textColorPrimary" />
         </LinearLayout>
 
         <!-- Phone panel -->
@@ -162,7 +162,7 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:src="@drawable/ic_phone"
-                app:tint="@android:color/black" />
+                app:tint="?android:attr/textColorPrimary" />
 
             <TextView
                 android:id="@+id/profilePhoneNumberText"
@@ -172,7 +172,6 @@
                 android:layout_marginStart="10dp"
                 android:layout_marginEnd="10dp"
                 android:text="(951) 262-3062"
-                android:textColor="@android:color/black"
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
@@ -180,7 +179,7 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:src="@drawable/ic_edit"
-                app:tint="@android:color/black" />
+                app:tint="?android:attr/textColorPrimary" />
         </LinearLayout>
 
         <!-- Lottery notifications -->
@@ -298,8 +297,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="48dp"
                 android:backgroundTint="@color/red"
+                android:textColor="@color/button_text"
                 android:text="Delete Profile"
-                android:textColor="@color/white"
                 android:paddingLeft="20dp"
                 android:paddingRight="20dp"
                 android:radius="20dp"

@@ -23,6 +23,7 @@
             <com.google.android.material.chip.Chip
                 android:id="@+id/chip_event_status"
                 style="@style/Widget.Material3.Chip.Assist"
+                android:textColor="@color/button_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"

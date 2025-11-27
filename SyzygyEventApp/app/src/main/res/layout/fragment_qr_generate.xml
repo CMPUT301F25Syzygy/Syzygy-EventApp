@@ -4,8 +4,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="24dp"
-    android:gravity="center"
-    android:background="?android:attr/colorBackground">
+    android:gravity="center">
 
     <!-- Title -->
     <TextView
@@ -14,7 +13,7 @@
         android:text="Event QR Code"
         android:textSize="24sp"
         android:textStyle="bold"
-        android:textColor="?android:attr/colorForeground"
+        android:textColor="?android:attr/textColorPrimary"
         android:layout_marginBottom="8dp" />
 
     <!-- Event Name -->
@@ -24,7 +23,7 @@
         android:layout_height="wrap_content"
         android:text="Event Name"
         android:textSize="18sp"
-        android:textColor="?android:attr/colorForeground"
+        android:textColor="?android:attr/textColorPrimary"
         android:layout_marginBottom="24dp" />
 
     <!-- QR Code Image -->
@@ -65,11 +64,11 @@
             android:id="@+id/export_button"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
             android:layout_weight="1"
-            android:backgroundTint="@color/green"
+            android:layout_marginEnd="8dp"
             android:text="Export QR Code"
-            android:textColor="?android:attr/colorBackground" />
+            android:backgroundTint="@color/green"
+            android:textColor="@color/button_text" />
 
         <Button
             android:id="@+id/close_button"
@@ -79,7 +78,7 @@
             android:layout_marginStart="8dp"
             android:text="Close"
             android:backgroundTint="@color/blue"
-            android:textColor="?android:attr/colorBackground" />
+            android:textColor="@color/button_text"/>
     </LinearLayout>
 
 </LinearLayout>
