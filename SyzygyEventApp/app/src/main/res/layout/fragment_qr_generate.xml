@@ -4,8 +4,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="24dp"
-    android:gravity="center"
-    android:background="?android:attr/colorBackground">
+    android:gravity="center">
 
     <!-- Title -->
     <TextView

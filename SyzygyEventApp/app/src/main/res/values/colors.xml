@@ -1,14 +1,3 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
-
-    <color name="green">#66BB6A</color>
-    <color name="yellow">#FFEE58</color>
-    <color name="red">#EF5350</color>
-    <color name="blue">#42A5F5</color>
-    <color name="grey">#BDBDBD</color>
-    <color name="purple">#AB47BC</color>
-    <color name="button_text">#FFFFFF</color>
-
 </resources>

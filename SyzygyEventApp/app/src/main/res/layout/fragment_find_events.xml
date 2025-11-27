@@ -35,7 +35,7 @@
             android:layout_height="38dp"
             android:backgroundTint="@color/grey"
             android:text="Filter"
-            android:textColor="?android:attr/textColorPrimary"/>
+            android:textColor="@color/button_text"/>
     </LinearLayout>
 
     <Button
