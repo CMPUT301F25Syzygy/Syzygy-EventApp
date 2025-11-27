@@ -52,12 +52,15 @@ import java.util.Objects;
  */
 public class OrganizerEventEditDetailsFragment extends Fragment {
 
+    private View rootView;
+
     // Event detail input fields
     private EditText titleInput, locationInput, entrantLimitInput, descriptionInput, maxWaitingListInput;
     private Button startTimeButton, endTimeButton, startDateButton, endDateButton;
     private Button importPosterButton, deletePosterButton;
     private ImageView posterPreview;
-    private Button createButton, cancelButton, updateButton, deleteButton, generateQRButton;
+    private Button createButton, cancelButton, updateButton, deleteButton, generateQRButton, viewMapButton;
+    private androidx.appcompat.widget.SwitchCompat geolocationToggle;
 
     // Controllers for Firebase operations
     private EventController eventController;
@@ -67,6 +70,7 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
     private Organizer organizer;
     private Event event;
     private boolean isEditMode = false;
+    private boolean isViewMode = false;
     private Timestamp startTime, endTime;
     private NavigationStackFragment navStack;
 
@@ -117,6 +121,27 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
         fragment.navStack = navStack;
         fragment.event = existingEvent;
         fragment.isEditMode = existingEvent != null;
+        fragment.organizer = organizer;
+        return fragment;
+    }
+
+    /**
+     * A new instance of this fragment in VIEW-ONLY mode.
+     * To be used so the organizer can retain the ability to view old events and their entrant info, without being able to edit it.
+     *
+     * @param existingEvent The event to view organizer details for
+     * @param organizer The organizer creating or editing the event
+     * @param navStack The nav stack for screen management
+     * @return A new instance of OrganizerEventEditDetailsFragment
+     */
+    public static OrganizerEventEditDetailsFragment newInstanceViewOnly(@Nullable Event existingEvent, @NonNull Organizer organizer, @Nullable NavigationStackFragment navStack) {
+        OrganizerEventEditDetailsFragment fragment = new OrganizerEventEditDetailsFragment();
+        fragment.navStack = navStack;
+        fragment.event = existingEvent;
+        // Set to true so it shows waiting lists
+        fragment.isEditMode = true;
+        // Set view-only mode
+        fragment.isViewMode = true;
         fragment.organizer = organizer;
         return fragment;
     }
@@ -184,6 +209,8 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
         endDateButton = view.findViewById(R.id.btnEndDate);
         endTimeButton = view.findViewById(R.id.btnEndTime);
         generateQRButton = view.findViewById(R.id.generate_qr_button);
+        geolocationToggle = view.findViewById(R.id.geolocation_toggle);
+        viewMapButton = view.findViewById(R.id.view_map_button);
 
         // Initialize waiting list UI elements
         acceptedCountText = view.findViewById(R.id.accepted_count);
@@ -210,6 +237,9 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
         invitationController = new InvitationController();
 
         // Set the appropriate title based on mode
+        if (isViewMode) {
+            fragmentTitle.setText("View Event");
+        }
         if (isEditMode) {
             fragmentTitle.setText("Edit Event");
         }
@@ -225,6 +255,11 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
             // In edit mode, populate the fields with EXISTING event data
             populateFields(event);
             startRealtimeListeners();
+
+            // Disable all inputs if we're in view mode
+            if (isViewMode) {
+                disableAllInputs();
+            }
 
             // Seed test data
             //createFakeUsers();
@@ -270,6 +305,21 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
      * Edit mode shows the update + delete button combo, while create mode shows the create + cancel one.
      */
     private void setupButtonVisibility() {
+        // View only mode has to be added, where all action buttons are hidden, and I'll use the back button from the navStack since that's the only one we need
+        if (isViewMode) {
+            createButton.setVisibility(View.GONE);
+            updateButton.setVisibility(View.GONE);
+            deleteButton.setVisibility(View.GONE);
+            generateQRButton.setVisibility(View.GONE);
+            cancelButton.setVisibility(View.VISIBLE);
+            cancelButton.setText("Back");
+            // Override the cancel button to use navStack
+            cancelButton.setOnClickListener(v -> {
+                if (navStack != null) {
+                    navStack.popScreen();
+                }
+            });
+        }
         if (isEditMode) {
             createButton.setVisibility(View.GONE);
             cancelButton.setVisibility(View.GONE);
@@ -334,6 +384,27 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
                 Toast.makeText(getContext(), "Please save the event first", Toast.LENGTH_SHORT).show();
             }
         });
+
+        // View map button
+        if (viewMapButton != null) {
+            viewMapButton.setOnClickListener(v -> {
+                if (event != null && event.isGeolocationRequired() && navStack != null) {
+                    WaitlistMapFragment mapFragment = new WaitlistMapFragment(event, navStack);
+                    navStack.pushScreen(mapFragment);
+                } else if (event != null && !event.isGeolocationRequired()) {
+                    Toast.makeText(getContext(),
+                            "Geolocation was not required for this event",
+                            Toast.LENGTH_SHORT).show();
+                }
+            });
+
+            // Show/hide based on geolocation requirement
+            if (isEditMode && event != null) {
+                viewMapButton.setVisibility(event.isGeolocationRequired() ? View.VISIBLE : View.GONE);
+            } else {
+                viewMapButton.setVisibility(View.GONE);
+            }
+        }
 
         // Action buttons
         createButton.setOnClickListener(v -> createEvent());
@@ -892,6 +963,17 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
         if (!TextUtils.isEmpty(posterBase64)) {
             loadImageFromBase64(posterBase64);
         }
+
+        // Set the geolocation toggle state
+        geolocationToggle.setChecked(e.isGeolocationRequired());
+
+        // Disable geolocation toggle in edit mode (cannot be changed after creation)
+        if (isEditMode && !isViewMode) {
+            geolocationToggle.setEnabled(false);
+            geolocationToggle.setAlpha(0.6f);
+        }
+
+
     }
 
     /**
@@ -935,9 +1017,11 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
             newEvent.setMaxWaitingList(null);
         }
 
+        // Set geolocation requirement from toggle
+        newEvent.setGeolocationRequired(geolocationToggle.isChecked());
+
         // Set default values for optional fields
         // TODO: Change these if/when they are implemented based on the organizer's choices.
-        newEvent.setGeolocationRequired(false);
         newEvent.setLocationCoordinates(null);
         newEvent.setQrCodeData(null);
         newEvent.setWaitingList(new ArrayList<>());
@@ -1210,6 +1294,45 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
                 })
                 .setNegativeButton("Cancel", null)
                 .show();
+    }
+
+    /**
+     * DIsables all the input fields and buttons, for view-only mode. This will prevent organizers from editing past events.
+     */
+    private void disableAllInputs() {
+        // Disable text inputs
+        titleInput.setEnabled(false);
+        locationInput.setEnabled(false);
+        descriptionInput.setEnabled(false);
+        entrantLimitInput.setEnabled(false);
+        maxWaitingListInput.setEnabled(false);
+
+        // Disable date/time buttons
+        startDateButton.setEnabled(false);
+        startTimeButton.setEnabled(false);
+        endDateButton.setEnabled(false);
+        endTimeButton.setEnabled(false);
+
+        // Disable poster buttons
+        importPosterButton.setEnabled(false);
+        deletePosterButton.setEnabled(false);
+
+        // Disable geolocation toggle
+        geolocationToggle.setEnabled(false);
+
+        // I'm just gonna change the opacity so clear fields are disabled
+        titleInput.setAlpha(0.6f);
+        locationInput.setAlpha(0.6f);
+        descriptionInput.setAlpha(0.6f);
+        entrantLimitInput.setAlpha(0.6f);
+        maxWaitingListInput.setAlpha(0.6f);
+        startDateButton.setAlpha(0.6f);
+        startTimeButton.setAlpha(0.6f);
+        endDateButton.setAlpha(0.6f);
+        endTimeButton.setAlpha(0.6f);
+        importPosterButton.setAlpha(0.6f);
+        deletePosterButton.setAlpha(0.6f);
+        geolocationToggle.setAlpha(0.6f);
     }
 
     @Override
