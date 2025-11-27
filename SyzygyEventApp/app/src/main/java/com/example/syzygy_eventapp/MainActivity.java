@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity implements OnItemSelectedLis
         findFragment = new FindEventsFragment(navStack);
         joinedFragment = new JoinedEventsFragment(navStack);
         organizerFragment = new OrganizerFragment(navStack);
-        adminFragment = new AdministratorFragment();
+        adminFragment = new AdministratorFragment(navStack);
 
         String userID = AppInstallationId.get(this);
         userController = UserController.getInstance();
