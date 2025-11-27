@@ -38,19 +38,122 @@
                 android:layout_marginTop="4dp"/>
         </LinearLayout>
 
-        <!-- User Profile List Section -->
-        <com.example.syzygy_eventapp.UserListView
-            android:id="@+id/user_list_view"
+        <!-- Admin Action Grid -->
+        <GridLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp"/>
+            android:alignmentMode="alignMargins"
+            android:columnCount="2"
+            android:rowCount="2"
+            android:useDefaultMargins="true">
 
-        <!-- Divider -->
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/grey"
-            android:layout_marginVertical="8dp"/>
+            <!-- Profiles Button -->
+            <LinearLayout
+                android:id="@+id/profile_button"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_rowWeight="1"
+                android:layout_columnWeight="1"
+                android:background="@drawable/field_box_background"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <ImageView
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:src="@drawable/outline_profile_24"
+                    app:tint="?android:attr/colorForeground" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Profiles"
+                    android:textColor="?android:attr/colorForeground"
+                    android:textSize="16sp" />
+            </LinearLayout>
+
+            <!-- Events Button -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_rowWeight="1"
+                android:layout_columnWeight="1"
+                android:background="@drawable/field_box_background"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <ImageView
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:src="@drawable/outline_event_24"
+                    app:tint="?android:attr/colorForeground" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Events"
+                    android:textColor="?android:attr/colorForeground"
+                    android:textSize="16sp" />
+            </LinearLayout>
+
+            <!-- Images Button -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_rowWeight="1"
+                android:layout_columnWeight="1"
+                android:background="@drawable/field_box_background"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <ImageView
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:src="@drawable/ic_images"
+                    app:tint="?android:attr/colorForeground" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Images"
+                    android:textColor="?android:attr/colorForeground"
+                    android:textSize="16sp" />
+            </LinearLayout>
+
+            <!-- Notifications Button -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_rowWeight="1"
+                android:layout_columnWeight="1"
+                android:background="@drawable/field_box_background"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <ImageView
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:src="@drawable/ic_notifications"
+                    app:tint="?android:attr/colorForeground" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Notifications"
+                    android:textColor="?android:attr/colorForeground"
+                    android:textSize="16sp" />
+            </LinearLayout>
+
+        </GridLayout>
+
 
     </LinearLayout>
 </ScrollView>
