@@ -58,6 +58,7 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
     private Button importPosterButton, deletePosterButton;
     private ImageView posterPreview;
     private Button createButton, cancelButton, updateButton, deleteButton, generateQRButton;
+    private androidx.appcompat.widget.SwitchCompat geolocationToggle;
 
     // Controllers for Firebase operations
     private EventController eventController;
@@ -206,6 +207,7 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
         endDateButton = view.findViewById(R.id.btnEndDate);
         endTimeButton = view.findViewById(R.id.btnEndTime);
         generateQRButton = view.findViewById(R.id.generate_qr_button);
+        geolocationToggle = view.findViewById(R.id.geolocation_toggle);
 
         // Initialize waiting list UI elements
         acceptedCountText = view.findViewById(R.id.accepted_count);
@@ -937,6 +939,17 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
         if (!TextUtils.isEmpty(posterBase64)) {
             loadImageFromBase64(posterBase64);
         }
+
+        // Set the geolocation toggle state
+        geolocationToggle.setChecked(e.isGeolocationRequired());
+
+        // Disable geolocation toggle in edit mode (cannot be changed after creation)
+        if (isEditMode && !isViewMode) {
+            geolocationToggle.setEnabled(false);
+            geolocationToggle.setAlpha(0.6f);
+        }
+
+
     }
 
     /**
@@ -980,9 +993,11 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
             newEvent.setMaxWaitingList(null);
         }
 
+        // Set geolocation requirement from toggle
+        newEvent.setGeolocationRequired(geolocationToggle.isChecked());
+
         // Set default values for optional fields
         // TODO: Change these if/when they are implemented based on the organizer's choices.
-        newEvent.setGeolocationRequired(false);
         newEvent.setLocationCoordinates(null);
         newEvent.setQrCodeData(null);
         newEvent.setWaitingList(new ArrayList<>());
@@ -1278,6 +1293,9 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
         importPosterButton.setEnabled(false);
         deletePosterButton.setEnabled(false);
 
+        // Disable geolocation toggle
+        geolocationToggle.setEnabled(false);
+
         // I'm just gonna change the opacity so clear fields are disabled
         titleInput.setAlpha(0.6f);
         locationInput.setAlpha(0.6f);
@@ -1290,6 +1308,7 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
         endTimeButton.setAlpha(0.6f);
         importPosterButton.setAlpha(0.6f);
         deletePosterButton.setAlpha(0.6f);
+        geolocationToggle.setAlpha(0.6f);
     }
 
     @Override
