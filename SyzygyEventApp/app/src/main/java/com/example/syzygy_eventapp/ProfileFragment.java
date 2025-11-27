@@ -11,6 +11,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.content.Intent;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -55,6 +56,9 @@ public class ProfileFragment extends Fragment {
     private User currentUser;
     private String userID;
 
+    // Delete Profile Button
+    private View deleteProfileButton;
+
     /**
      * Default constructor.
      */
@@ -95,6 +99,7 @@ public class ProfileFragment extends Fragment {
         profilePhoneNumberText = view.findViewById(R.id.profilePhoneNumberText);
         lotteryNotificationsSwitch = view.findViewById(R.id.lotteryNotificationsSwitch);
         organizerNotificationsSwitch = view.findViewById(R.id.organizerNotificationsSwitch);
+        deleteProfileButton = view.findViewById(R.id.deleteProfileButton);
 
         // Retrieve the userID for this device or authenticated user
         userID = AppInstallationId.get(requireContext());
@@ -141,17 +146,38 @@ public class ProfileFragment extends Fragment {
             }
 
             Role currentRole = currentUser.getRole();
-            Role newRole = (currentRole == Role.ENTRANT)
-                    ? Role.ORGANIZER
-                    : Role.ENTRANT;
 
+            Role newRole = currentRole;
+            switch(currentRole) {
+                case ENTRANT:
+                    newRole = Role.ORGANIZER;
+                    break;
+                case ORGANIZER:
+                    newRole = Role.ADMIN;
+                    break;
+                case ADMIN:
+                    newRole = Role.ENTRANT;
+                    break;
+            }
+
+            Role finalNewRole = newRole;
             userController.setUserRole(userID, newRole)
                     .addOnSuccessListener(updatedUser ->
                             Toast.makeText(getContext(),
-                                    "Role changed to " + newRole.name(),
+                                    "Role changed to " + finalNewRole.name(),
                                     Toast.LENGTH_SHORT).show())
                     .addOnFailureListener(err ->
                             showError("Failed to change role: " + err.getMessage()));
+        });
+
+        deleteProfileButton.setOnClickListener(v -> {
+            // Confirm before deleting
+            new AlertDialog.Builder(requireContext())
+                    .setTitle("Delete profile")
+                    .setMessage("Are you sure you want to permanently delete your profile and data? This cannot be undone.")
+                    .setPositiveButton("Confirm", (dialog, which) -> profileDelete())
+                    .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
+                    .show();
         });
     }
 
@@ -270,5 +296,29 @@ public class ProfileFragment extends Fragment {
         if (getContext() != null) {
             Toast.makeText(getContext(), msg, Toast.LENGTH_LONG).show();
         }
+    }
+
+    /**
+     * Permanently deletes the current user's profile from DB and return to WelcomeActivity.
+     */
+    private void profileDelete() {
+        if (userID == null) {
+            showError("User ID not available.");
+            return;
+        }
+
+        // Remove this fragment's listener
+        if (userListener != null) {
+            userListener.remove();
+            userListener = null;
+        }
+
+        userController.deleteUser(userID)
+                .addOnSuccessListener(aVoid -> {
+                })
+                .addOnFailureListener(err -> {
+                    showError("Failed to delete profile: " +
+                            (err.getMessage() == null ? "unknown error" : err.getMessage()));
+                });
     }
 }
