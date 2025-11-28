@@ -12,41 +12,13 @@
         android:gravity="center_horizontal"
         android:paddingBottom="24dp">
 
-        <LinearLayout
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/event_title"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
-
-            <ImageView
-                android:id="@+id/profile_image"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_marginEnd="8dp"
-                android:background="@drawable/profile_placeholder" />
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/event_title"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/event_detail_event_title"
-                    android:textSize="16sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/eventHost"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/event_detail_orginizer"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:textSize="14sp" />
-            </LinearLayout>
-        </LinearLayout>
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="?android:attr/textColorPrimary"/>
 
         <!-- Event Image Placeholder -->
         <ImageView
@@ -62,7 +34,6 @@
             android:id="@+id/event_description"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/event_details_description"
             android:textAlignment="center"
             android:textColor="?attr/colorSecondary"
             android:textSize="14sp"
@@ -96,7 +67,6 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="@string/event_detail_location"
                     android:textColor="?android:attr/textColorPrimary"
                     android:textSize="14sp"
                     android:textStyle="bold"/>
@@ -131,7 +101,6 @@
                     android:id="@+id/event_time"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/event_detail_time"
                     android:textColor="?android:attr/textColorPrimary"
                     android:textSize="14sp"
                     android:textStyle="bold" />
@@ -156,7 +125,6 @@
                     android:id="@+id/event_entrants"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/event_details_num_entrants"
                     android:textColor="?android:attr/textColorPrimary"
                     android:textSize="14sp"
                     android:textStyle="bold" />
@@ -212,7 +180,7 @@
             android:layout_weight="1"
             android:backgroundTint="@color/blue"
             app:icon="@drawable/outline_notification_add_24"
-            android:text="Send Invites"
+            android:text="Send Notifications"
             android:textColor="@color/button_text" />
 
     </LinearLayout>

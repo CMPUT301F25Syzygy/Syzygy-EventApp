@@ -1,56 +1,29 @@
 package com.example.syzygy_eventapp;
 
-import android.Manifest;
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.DatePickerDialog;
-import android.app.TimePickerDialog;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.ImageDecoder;
-import android.media.Image;
-import android.net.Uri;
-import android.os.Build;
+
 import android.os.Bundle;
-import android.text.TextUtils;
-import android.util.Base64;
+import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.firebase.Timestamp;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.ListenerRegistration;
 
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
 
 /**
  * Fragment class that allows an organizer to create or edit an event's details.
@@ -66,21 +39,21 @@ public class EventOrganizerDetailsView extends Fragment {
     private Button cancelInvitesButton, setInvitesButton, sendNotificationButton;
 
     // Controllers for Firebase operations
-    private EventController eventController;
+    private UserControllerInterface userController;
     private InvitationController invitationController;
 
     // Current user and event data
     private Event event;
-    private NavigationStackFragment navStack;
+    private final NavigationStackFragment navStack;
 
-    private static final String TAG = "OrganizerEventEdit";
+    private ListenerRegistration eventListener;
 
     /**
      * A new instance of this fragment in VIEW-ONLY mode.
      * To be used so the organizer can retain the ability to view old events and their entrant info, without being able to edit it.
      *
-     * @param event The event to view organizer details for
-     * @param navStack      The nav stack for screen management
+     * @param event    The event to view organizer details for
+     * @param navStack The nav stack for screen management
      * @return A new instance of OrganizerEventEditDetailsFragment
      */
     public EventOrganizerDetailsView(@Nullable Event event, @Nullable NavigationStackFragment navStack) {
@@ -115,11 +88,11 @@ public class EventOrganizerDetailsView extends Fragment {
         acceptedListView.setListVisibility(false);
 
         pendingListView = view.findViewById(R.id.pending_list_view);
-        acceptedListView.setTitle("Pending");
+        pendingListView.setTitle("Pending");
         pendingListView.setListVisibility(false);
 
         waitingListView = view.findViewById(R.id.waiting_list_view);
-        acceptedListView.setTitle("Waiting");
+        waitingListView.setTitle("Waiting");
         waitingListView.setListVisibility(false);
 
         openMapButton = view.findViewById(R.id.open_map_button);
@@ -128,8 +101,14 @@ public class EventOrganizerDetailsView extends Fragment {
         sendNotificationButton = view.findViewById(R.id.send_notification_button);
 
         // Initialize controllers for Firebase operations
-        eventController = EventController.getInstance();
+        userController = UserController.getInstance();
         invitationController = new InvitationController();
+
+        EventController eventController = EventController.getInstance();
+        eventListener = eventController.observeEvent(event.getEventID(), (newEvent) -> {
+            event = newEvent;
+            refreshInterface();
+        });
 
         setupListeners();
         setupNavBar();
@@ -143,11 +122,12 @@ public class EventOrganizerDetailsView extends Fragment {
     private void setupListeners() {
         // View map button
         openMapButton.setOnClickListener(v -> {
-            // TODO
+            Maps.openInMaps(requireActivity(), event);
         });
 
         cancelInvitesButton.setOnClickListener(v -> {
             // TODO
+            Toast.makeText(getContext(), "Not implemented", Toast.LENGTH_SHORT).show();
         });
 
         setInvitesButton.setOnClickListener(v -> {
@@ -156,6 +136,7 @@ public class EventOrganizerDetailsView extends Fragment {
 
         sendNotificationButton.setOnClickListener(v -> {
             // TODO
+            Toast.makeText(getContext(), "Not implemented", Toast.LENGTH_SHORT).show();
         });
     }
 
@@ -164,24 +145,106 @@ public class EventOrganizerDetailsView extends Fragment {
      */
     private void setupNavBar() {
         navStack.setScreenNavMenu(R.menu.organizer_event_details, (MenuItem item) -> {
-            if ( item.getItemId() == R.id.back_nav_button) {
+            if (item.getItemId() == R.id.back_nav_button) {
                 navStack.popScreen();
-            } else if ( item.getItemId() == R.id.generate_qr_nav_button) {
+            } else if (item.getItemId() == R.id.generate_qr_nav_button) {
                 QRGenerateFragment qrFragment = new QRGenerateFragment(event, navStack);
                 navStack.pushScreen(qrFragment);
-            } else if ( item.getItemId() == R.id.preview_nav_button) {
+            } else if (item.getItemId() == R.id.preview_nav_button) {
                 EventFragment entrantEventFragment = new EventFragment(navStack, event.getEventID());
                 navStack.pushScreen(entrantEventFragment);
-            } else if ( item.getItemId() == R.id.edit_nav_button) {
+            } else if (item.getItemId() == R.id.edit_nav_button) {
                 // TODO
             }
             return true;
         });
     }
 
+    /**
+     * Fills in information about the event into the UI
+     */
+    private void refreshInterface() {
+        eventNameText.setText(event.getName());
+        eventDescriptionText.setText(event.getDescription());
+
+        locationText.setText(event.getLocationName());
+
+        String eventTime = DateFormat.format("MMM d, yyyy HH:mm", event.getEventTime().toDate()).toString();
+        eventTimeText.setText(eventTime);
+
+        // TODO: setup posterImage;
+
+        refreshInvitedUsers();
+        refreshWaitlistUsers();
+    }
+
+
+    /**
+     * Fills in information about invited users into the UI
+     */
+    private Task<?> refreshWaitlistUsers() {
+        Task<List<User>> loadWaitingUsersTask = userController.getUsers(event.getWaitingList());
+        return loadWaitingUsersTask
+                .addOnSuccessListener(users -> {
+                    waitingListView.setUsers(users);
+                })
+                .addOnFailureListener(error -> {
+                    Toast.makeText(getContext(), "Failed to load waitlist", Toast.LENGTH_SHORT).show();
+                });
+    }
+
+    /**
+     * Fills in information about invited users into the UI
+     */
+    private Task<?> refreshInvitedUsers() {
+        Task<List<Invitation>> loadInvitesTask = invitationController.getEventInvites(event.getEventID());
+
+        return loadInvitesTask.continueWithTask(task -> {
+                    List<Invitation> invites = task.getResult();
+
+                    List<String> acceptedUserIds = new ArrayList<>();
+                    List<String> pendingUserIds = new ArrayList<>();
+
+                    // sort user invites into two groups
+                    for (Invitation invite : invites) {
+                        if (invite.getCancelled()) continue;
+
+                        if (invite.getAccepted()) {
+                            acceptedUserIds.add(invite.getRecipientID());
+                        } else {
+                            pendingUserIds.add(invite.getRecipientID());
+                        }
+                    }
+
+                    Task<List<User>> loadAcceptedUsersTask = userController.getUsers(acceptedUserIds);
+                    loadAcceptedUsersTask
+                            .addOnSuccessListener(users -> {
+                                acceptedListView.setUsers(users);
+                                eventEntrantsText.setText(users.size() + " / " + event.getMaxAttendees());
+                            })
+                            .addOnFailureListener(error -> {
+                                Toast.makeText(getContext(), "Failed to load accepted users", Toast.LENGTH_SHORT).show();
+                            });
+
+                    Task<List<User>> loadPendingUsersTask = userController.getUsers(pendingUserIds);
+                    loadPendingUsersTask
+                            .addOnSuccessListener(users -> {
+                                pendingListView.setUsers(users);
+                            })
+                            .addOnFailureListener(error -> {
+                                Toast.makeText(getContext(), "Failed to load pending users", Toast.LENGTH_SHORT).show();
+                            });
+
+                    return Tasks.whenAllComplete(loadAcceptedUsersTask, loadPendingUsersTask);
+                })
+                .addOnFailureListener(error -> {
+                    Toast.makeText(getContext(), "Failed to load invites", Toast.LENGTH_SHORT).show();
+                });
+    }
+
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        // TODO clean up listeners to prevent memory leaks
+        eventListener.remove();
     }
 }
