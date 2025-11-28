@@ -93,12 +93,23 @@
 
                 <TextView
                     android:id="@+id/event_location"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:text="@string/event_detail_location"
                     android:textColor="?android:attr/textColorPrimary"
                     android:textSize="14sp"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"/>
+
+                <Button
+                    android:id="@+id/open_map_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/button_text"
+                    android:drawableTint="@color/button_text"
+                    android:backgroundTint="?android:attr/textColorLink"
+                    android:text="Open Map"
+                    android:textSize="14sp" />
             </LinearLayout>
 
             <LinearLayout
@@ -142,7 +153,7 @@
                     android:src="@drawable/outline_profile_24" />
 
                 <TextView
-                    android:id="@+id/eventEntrants"
+                    android:id="@+id/event_entrants"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/event_details_num_entrants"
