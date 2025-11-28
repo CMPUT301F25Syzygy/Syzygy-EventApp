@@ -31,11 +31,14 @@
 
         <Button
             android:id="@+id/filterButton"
-            android:layout_width="98dp"
+            android:layout_width="86sp"
             android:layout_height="38dp"
             android:backgroundTint="@color/grey"
+            android:layout_marginLeft="2dp"
+            android:layout_marginRight="4dp"
+
             android:text="Filter"
-            android:textColor="?android:attr/colorForeground"/>
+            android:textColor="@color/button_text"/>
     </LinearLayout>
 
     <Button
@@ -43,12 +46,13 @@
         android:layout_width="fill_parent"
         android:layout_height="44dp"
         android:layout_marginTop="8dp"
-        android:backgroundTint="?android:attr/textColorLink"
         android:drawableLeft="@drawable/qr_code"
         android:drawablePadding="8dp"
         android:gravity="center"
         android:text="Scan QR Code"
-        android:textColor="@android:color/white"
+        android:textColor="@color/button_text"
+        android:drawableTint="@color/button_text"
+        android:backgroundTint="?android:attr/textColorLink"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.482"
         app:layout_constraintStart_toStartOf="parent"

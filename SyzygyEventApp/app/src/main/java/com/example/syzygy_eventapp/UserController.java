@@ -170,13 +170,12 @@ public class UserController implements UserControllerInterface {
     /**
      * Observe all users in real time.
      * @param onChange Callback invoked with the latest list of User objects
-     * @param onError Callback invoked on listener errors
      * @return ListenerRegistration that must be removed when no longer needed
      */
-    public ListenerRegistration observeAllUsers(Consumer<List<User>> onChange, Consumer<Exception> onError) {
+    public ListenerRegistration observeAllUsers(Consumer<List<User>> onChange) {
         return usersRef.addSnapshotListener((snap, error) -> {
             if (error != null) {
-                onError.accept(error);
+                System.err.println(error.toString());
                 return;
             }
 
@@ -191,9 +190,9 @@ public class UserController implements UserControllerInterface {
                             user.setUserID(doc.getId());
                             users.add(user);
                         }
-                    } catch (Exception e) {
+                    } catch (Exception tryError) {
                         // buildUser may fail if fields are malformed
-                        onError.accept(e);
+                        System.err.println(tryError.toString());
                     }
                 }
             }

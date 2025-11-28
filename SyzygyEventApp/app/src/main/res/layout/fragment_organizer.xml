@@ -26,7 +26,7 @@
                 android:text="Organizer Event Management"
                 android:textSize="24sp"
                 android:textStyle="bold"
-                android:textColor="?android:attr/colorForeground"/>
+                android:textColor="?android:attr/textColorPrimary"/>
 
             <TextView
                 android:id="@+id/header_description_text"
@@ -34,7 +34,7 @@
                 android:layout_height="wrap_content"
                 android:text="View and edit the events you're organizing."
                 android:textSize="14sp"
-                android:textColor="?android:attr/colorForeground"
+                android:textColor="?android:attr/textColorPrimary"
                 android:layout_marginTop="4dp"/>
         </LinearLayout>
 
@@ -49,8 +49,8 @@
             android:drawablePadding="8dp"
             android:gravity="center"
             android:text="Create Event"
-            android:textColor="@android:color/white"
-            android:drawableTint="@android:color/white"/>
+            android:textColor="@color/button_text"
+            android:drawableTint="@color/button_text"/>
 
         <!-- Upcoming Events Section -->
         <com.example.syzygy_eventapp.OrganizerEventSummaryListView
@@ -64,7 +64,7 @@
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginVertical="8dp"
-            android:background="@color/grey" />
+            android:background="?attr/colorOutline" />
 
         <!-- Past Events Section -->
         <com.example.syzygy_eventapp.OrganizerEventSummaryListView

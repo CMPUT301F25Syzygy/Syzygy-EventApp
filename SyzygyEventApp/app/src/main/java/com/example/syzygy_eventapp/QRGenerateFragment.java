@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -39,8 +40,6 @@ public class QRGenerateFragment extends Fragment {
 
     private ImageView qrCodeImageView;
     private TextView eventTitleText;
-    private Button exportButton;
-    private Button closeButton;
 
     private Event event;
     private Bitmap qrCodeBitmap;
@@ -79,8 +78,6 @@ public class QRGenerateFragment extends Fragment {
         // Initialize views
         qrCodeImageView = view.findViewById(R.id.qr_code_image);
         eventTitleText = view.findViewById(R.id.event_title_text);
-        exportButton = view.findViewById(R.id.export_button);
-        closeButton = view.findViewById(R.id.close_button);
 
         // Set the event title, shown at the top of the screen
         if (event != null) {
@@ -89,17 +86,24 @@ public class QRGenerateFragment extends Fragment {
 
         // Generate and display QR Code
         generateQRCode();
-
-        // Set up listeners for ther buttons
-        exportButton.setOnClickListener(v -> exportQRCode());
-        closeButton.setOnClickListener(v -> {
-            if (navStack != null) {
-                navStack.popScreen();
-            }
-        });
-
+        
         return view;
 
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        // change nav bar menu
+        navStack.setScreenNavMenu(R.menu.back_export_nav_menu, (MenuItem item) -> {
+            if ( item.getItemId() == R.id.back_nav_button) {
+                navStack.popScreen();
+            } else if ( item.getItemId() == R.id.export_nav_button) {
+                exportQRCode();
+            }
+            return true;
+        });
     }
 
     /**

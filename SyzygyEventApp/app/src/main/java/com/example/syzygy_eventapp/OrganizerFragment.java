@@ -27,11 +27,7 @@ public class OrganizerFragment extends Fragment {
     private OrganizerEventSummaryListView organizerSummaryListViewUpcoming;
     private OrganizerEventSummaryListView organizerSummaryListViewHistory;
     private String userID;
-    private EventController eventController;
     private ListenerRegistration eventsListener;
-
-    // TODO: Add this when EditEventFragment exists
-    // private EditEventFragment editEventFragment;
 
     // required empty constructor
     public OrganizerFragment() {
@@ -66,7 +62,6 @@ public class OrganizerFragment extends Fragment {
 
         // Load current user ID and event controller
         userID = AppInstallationId.get(requireContext());
-        eventController = new EventController();
 
         createEventButton.setOnClickListener(v -> {
             UserController.getInstance().getUser(userID)
@@ -86,8 +81,7 @@ public class OrganizerFragment extends Fragment {
     }
 
     private void startObserver() {
-        eventsListener = eventController.observeAllEvents(events -> {
-
+        EventController.getInstance().observeAllEvents(events -> {
             List<Event> upcoming = new ArrayList<>();
             List<Event> past = new ArrayList<>();
             Date now = new Date();
@@ -95,9 +89,6 @@ public class OrganizerFragment extends Fragment {
             // Filter events for the current organizer
             for (Event event : events) {
 
-                // NOTE: For the demo, I have it to just allow the organizer to edit
-                // any event.
-                // Skip events that the user is NOT the organizer of
                 if (!event.getOrganizerID().equals(userID)) {
                     continue;
                  }
@@ -136,12 +127,22 @@ public class OrganizerFragment extends Fragment {
                         });
             });
 
-            // Populate the past event list. We probably don't need to allow the organizer to edit
-            // these, but if we do, then just reuse the code for clicking the upcoming events above.
+            // Populate the past event list. These are also clickabkle, but in a view-only mode so fields cannot be edited.
             organizerSummaryListViewHistory.setTitle("Past Events");
-            organizerSummaryListViewHistory.setItems(past, false, v -> {});
-        }, error -> {
+            organizerSummaryListViewHistory.setItems(past, false, v -> {
+                Event clicked = (Event) v.getTag();
 
+                UserController.getInstance().getUser(userID)
+                        .addOnSuccessListener(user -> {
+                            navStack.pushScreen(
+                                    // Open in view onlt mode
+                                    OrganizerEventEditDetailsFragment.newInstanceViewOnly(clicked, user.promote(), navStack)
+                            );
+                        })
+                        .addOnFailureListener(e -> {
+                            Log.e("OrganizerFragment", "Failed to get user", e);
+                        });
+            });
         });
     }
 

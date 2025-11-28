@@ -2,7 +2,9 @@ package com.example.syzygy_eventapp;
 
 import static androidx.core.content.ContentProviderCompat.requireContext;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -19,8 +21,13 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.ListenerRegistration;
 
 /**
@@ -69,7 +76,7 @@ public class EventFragment extends Fragment {
         super();
         this.navStack = navStack;
         this.eventID = eventID;
-        this.eventController = new EventController();
+        this.eventController = EventController.getInstance();
     }
 
     // set up onCreate
@@ -96,7 +103,7 @@ public class EventFragment extends Fragment {
         super.onStart();
 
         //start observing the event
-        eventListener = eventController.observeEvent(eventID, this::onEventUpdated, this::onError);
+        eventListener = eventController.observeEvent(eventID, this::onEventUpdated);
     }
 
     @Override
@@ -161,6 +168,11 @@ public class EventFragment extends Fragment {
         } else {
             locationText.setText("Location not specified");
             openMapButton.setVisibility(View.GONE);
+        }
+
+        // Display geolocation requirement
+        if (currentEvent.isGeolocationRequired()) {
+            locationText.setText(currentEvent.getLocationName() + " (Location sharing required)");
         }
 
         // Display waiting list count
@@ -294,9 +306,69 @@ public class EventFragment extends Fragment {
      * Join the event's waiting list
      */
     private void joinWaitingList() {
+        // Check if geolocation is required for this event
+        if (currentEvent != null && currentEvent.isGeolocationRequired()) {
+            // Request location permission and get location before joining
+            requestLocationAndJoin();
+        } else {
+            // No geolocation required, join directly
+            performJoinWaitingList(null);
+        }
+    }
+
+    /**
+     * Request location permission and get user's location
+     */
+    private void requestLocationAndJoin() {
+        if (ContextCompat.checkSelfPermission(requireContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // Request permission
+            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 200);
+        } else {
+            // Permission already granted, get location
+            getUserLocationAndJoin();
+        }
+    }
+
+    /**
+     * Get user's current location and join waiting list
+     */
+    private void getUserLocationAndJoin() {
+        FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity());
+
+        if (ActivityCompat.checkSelfPermission(requireContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            Toast.makeText(requireContext(),
+                    "Location permission required to join this event",
+                    Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        fusedLocationClient.getLastLocation()
+                .addOnSuccessListener(location -> {
+                    if (location != null) {
+                        GeoPoint geoPoint = new GeoPoint(location.getLatitude(), location.getLongitude());
+                        performJoinWaitingList(geoPoint);
+                    } else {
+                        Toast.makeText(requireContext(),
+                                "Unable to get location. Please try again.",
+                                Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(requireContext(),
+                            "Failed to get location: " + e.getMessage(),
+                            Toast.LENGTH_SHORT).show();
+                });
+    }
+
+    /**
+     * Join the event's waiting list
+     */
+    private void performJoinWaitingList(GeoPoint location) {
         joinWaitingListButton.setEnabled(false);
 
-        eventController.addToWaitingList(eventID, userID)
+        eventController.addToWaitingList(eventID, userID, location)
                 .addOnSuccessListener(aVoid -> {
                     if (isAdded()) {
                         Toast.makeText(requireContext(),
@@ -313,6 +385,21 @@ public class EventFragment extends Fragment {
                         joinWaitingListButton.setEnabled(true);
                     }
                 });
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == 200) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                getUserLocationAndJoin();
+            } else {
+                Toast.makeText(requireContext(),
+                        "Location permission is required to join this event",
+                        Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
     /**
@@ -374,17 +461,6 @@ public class EventFragment extends Fragment {
                     Uri.parse("https://www.google.com/maps/search/?api=1&query=" +
                             Uri.encode(currentEvent.getLocationName())));
             startActivity(webIntent);
-        }
-    }
-
-    /**
-     * Handle errors from Firestore
-     */
-    private void onError(Exception e) {
-        if (isAdded()) {
-            Toast.makeText(requireContext(),
-                    "Error loading event: " + e.getMessage(),
-                    Toast.LENGTH_LONG).show();
         }
     }
 }

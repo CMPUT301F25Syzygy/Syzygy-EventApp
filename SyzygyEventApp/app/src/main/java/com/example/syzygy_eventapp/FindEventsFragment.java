@@ -50,7 +50,7 @@ public class FindEventsFragment extends Fragment {
     private NavigationStackFragment navStack;
     private QRScanFragment qrFragment;
     private EventSummaryListView summaryListView;
-    private List<Event> allEvents = new ArrayList<>();
+    private List<Event> joinableEvents = new ArrayList<>();
     private ListenerRegistration eventsListener;
     private EventFilters currentFilters = new EventFilters();
 
@@ -116,31 +116,17 @@ public class FindEventsFragment extends Fragment {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         String currentUserID = AppInstallationId.get(requireContext());
 
-        eventsListener = db.collection("events").addSnapshotListener((snapshots, e) -> {
-            if (e != null) return;
+        EventController.getInstance().observeAllEvents((events) -> {
+            joinableEvents.clear();
+            for (Event event : events) {
+                boolean isOwnEvent = currentUserID.equals(event.getOrganizerID());
 
-            List<Event> events = new ArrayList<>();
-            if (snapshots != null) {
-                for (DocumentSnapshot doc : snapshots.getDocuments()) {
-                    Event event = doc.toObject(Event.class);
-                    if (event != null) {
-                        event.setEventID(doc.getId());
-
-                        // only include events that are still open
-                        boolean isOpen = !event.isLotteryComplete() && event.getRegistrationEnd() != null && event.getRegistrationEnd().toDate().after(new Date());
-
-                        // don't show events organized by the current user
-                        boolean isNotOwnEvent = !currentUserID.equals(event.getOrganizerID());
-
-                        if (isOpen && isNotOwnEvent) {
-                            events.add(event);
-                        }
-                    }
+                if (event.isOpen() && !isOwnEvent) {
+                    joinableEvents.add(event);
                 }
             }
 
             // store all events, and call the helper applySearchFilter to show events based on the search text
-            allEvents = events;
             applySearchFilter(searchBox.getText().toString());
 
         });
@@ -162,7 +148,7 @@ public class FindEventsFragment extends Fragment {
         List<Event> filtered = new ArrayList<>();
         String lowerQuery = query.toLowerCase().trim();
 
-        for (Event e : allEvents) {
+        for (Event e : joinableEvents) {
             if (e.getName().toLowerCase().contains(lowerQuery) ||
                     (e.getDescription() != null && e.getDescription().toLowerCase().contains(lowerQuery)) ||
                     (e.getLocationName() != null && e.getLocationName().toLowerCase().contains(lowerQuery))) {
@@ -232,7 +218,7 @@ public class FindEventsFragment extends Fragment {
      */
     private void applyFullFilter() {
         // Start with all events
-        List<Event> filtered = new ArrayList<>(allEvents);
+        List<Event> filtered = new ArrayList<>(joinableEvents);
 
         // Apply search text filter if there's text in the search box
         EditText searchBox = getView() != null ? getView().findViewById(R.id.searchEvents) : null;
