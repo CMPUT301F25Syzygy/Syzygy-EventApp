@@ -103,7 +103,7 @@ public class EventFragment extends Fragment {
         super.onStart();
 
         //start observing the event
-        eventListener = eventController.observeEvent(eventID, this::onEventUpdated, this::onError);
+        eventListener = eventController.observeEvent(eventID, this::onEventUpdated);
     }
 
     @Override
@@ -461,17 +461,6 @@ public class EventFragment extends Fragment {
                     Uri.parse("https://www.google.com/maps/search/?api=1&query=" +
                             Uri.encode(currentEvent.getLocationName())));
             startActivity(webIntent);
-        }
-    }
-
-    /**
-     * Handle errors from Firestore
-     */
-    private void onError(Exception e) {
-        if (isAdded()) {
-            Toast.makeText(requireContext(),
-                    "Error loading event: " + e.getMessage(),
-                    Toast.LENGTH_LONG).show();
         }
     }
 }

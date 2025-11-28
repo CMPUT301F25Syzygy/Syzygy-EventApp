@@ -107,8 +107,7 @@ public class EventListFragment extends Fragment {
             // Observe only organizer's events
             eventListener = eventController.observeOrganizerEvents(
                     organizerID,
-                    this::onEventsUpdated,
-                    this::onError
+                    this::onEventsUpdated
             );
         } else {
             // Observe all events
@@ -241,18 +240,6 @@ public class EventListFragment extends Fragment {
         // Open EventView for everyone, implement the TODO above in the future
         EventFragment eventFragment = new EventFragment(navStack, event.getEventID());
         navStack.pushScreen(eventFragment);
-    }
-
-    /**
-     * Handle errors from Firestore
-     */
-    private void onError(Exception e) {
-        if (isAdded()) {
-            loadingSpinner.setVisibility(View.GONE);
-            Toast.makeText(requireContext(),
-                    "Error loading events: " + e.getMessage(),
-                    Toast.LENGTH_LONG).show();
-        }
     }
 
     /**

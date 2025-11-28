@@ -82,16 +82,7 @@ public class WaitlistMapFragment extends Fragment {
         locationListener = eventController.observeEntrantLocations(
                 event.getEventID(),
                 // Success callback
-                this::displayLocationsOnMap,
-                error -> {
-                    // Error callback
-                    Log.e(TAG, "Error loading locations", error);
-                    if (isAdded()) {
-                        Toast.makeText(requireContext(),
-                                "Error loading locations: " + error.getMessage(),
-                                Toast.LENGTH_SHORT).show();
-                    }
-                }
+                this::displayLocationsOnMap
         );
     }
 

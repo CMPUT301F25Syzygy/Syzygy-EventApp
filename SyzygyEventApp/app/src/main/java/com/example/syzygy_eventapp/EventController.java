@@ -97,11 +97,10 @@ public class EventController {
      * Real time observers; observes a single event in real time
      * @param eventID Event document ID to observe
      * @param onEventChange Callback invoked with the latest Event object
-     * @param onError Callback invoked on listener errors
      * @return ListenerRegistration that must be removed when no longer needed
      * @throws IllegalArgumentException if eventID is null/empty
      */
-    public ListenerRegistration observeEvent(String eventID, Consumer<Event> onEventChange, Consumer<Exception> onError) {
+    public ListenerRegistration observeEvent(String eventID, Consumer<Event> onEventChange) {
         if (eventID == null || eventID.isEmpty()) {
             throw new IllegalArgumentException("eventID is required");
         }
@@ -109,11 +108,10 @@ public class EventController {
         return doc.addSnapshotListener((snap, error) -> {
             // snap can't be null because none of it's implementations can return null
             if (error != null) {
-                onError.accept(error);
+                System.err.println(error.toString());
                 return;
             }
-            if (snap == null || !snap.exists()) {
-                onError.accept(new IllegalStateException("Event: " + eventID + " not found."));
+            if (!snap.exists()) {
                 return;
             }
             // Convert to Event object
@@ -132,7 +130,6 @@ public class EventController {
     /**
      * Observe all events in real time.
      * @param onChange Callback invoked with the latest list of Event objects
-     * @param onError Callback invoked on listener errors
      * @return ListenerRegistration that must be removed when no longer needed
      */
     public ListenerRegistration observeAllEvents(Consumer<List<Event>> onChange) {
@@ -160,11 +157,10 @@ public class EventController {
      * Observe all events owned by an organizer in real time.
      * @param organizerID Organizer document ID to observe
      * @param onChange Callback invoked with the latest list of Event objects
-     * @param onError Callback invoked on listener errors
      * @return ListenerRegistration that must be removed when no longer needed
      * @throws IllegalArgumentException if organizerID is null/empty
      */
-    public ListenerRegistration observeOrganizerEvents(String organizerID, Consumer<List<Event>> onChange, Consumer<Exception> onError) {
+    public ListenerRegistration observeOrganizerEvents(String organizerID, Consumer<List<Event>> onChange) {
         if (organizerID == null || organizerID.isEmpty()) {
             throw new IllegalArgumentException("organizerID is required");
         }
@@ -172,7 +168,7 @@ public class EventController {
         return eventsRef.whereEqualTo("organizerID", organizerID)
                 .addSnapshotListener((snap, error) -> {
                     if (error != null) {
-                        onError.accept(error);
+                        System.err.println(error.toString());
                         return;
                     }
 
@@ -194,10 +190,9 @@ public class EventController {
      * Observe entrant locations for an event in real time.
      * @param eventID Event document ID
      * @param onChange Callback with list of location data maps
-     * @param onError Error callback
      * @return ListenerRegistration to remove when done
      */
-    public ListenerRegistration observeEntrantLocations(String eventID, Consumer<List<Map<String, Object>>> onChange, Consumer<Exception> onError) {
+    public ListenerRegistration observeEntrantLocations(String eventID, Consumer<List<Map<String, Object>>> onChange) {
         if (eventID == null || eventID.isEmpty()) {
             throw new IllegalArgumentException("eventID is required");
         }
@@ -206,7 +201,7 @@ public class EventController {
                 .collection("entrantLocations")
                 .addSnapshotListener((snap, error) -> {
                     if (error != null) {
-                        onError.accept(error);
+                        System.err.println(error.toString());
                         return;
                     }
 

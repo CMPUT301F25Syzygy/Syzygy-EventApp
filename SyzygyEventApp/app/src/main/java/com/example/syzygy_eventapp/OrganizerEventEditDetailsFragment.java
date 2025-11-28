@@ -676,8 +676,6 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
             event = updatedEvent;
             waitingListUsers = event.getWaitingList() != null ? event.getWaitingList() : new ArrayList<>();
             updateWaitingCount();
-        }, error -> {
-            Log.e(TAG, "Error observing event", error);
         });
 
         // Listen to invitations changes (for accepted, pending, rejected, or cancelled)

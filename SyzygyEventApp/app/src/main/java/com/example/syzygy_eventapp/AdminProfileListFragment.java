@@ -79,10 +79,7 @@ public class AdminProfileListFragment extends Fragment {
 
     private void setupUserObservers() {
         userListener = UserController.getInstance()
-                .observeAllUsers(
-                        this::onUsersChanged,
-                        Throwable::printStackTrace
-                );
+                .observeAllUsers(this::onUsersChanged);
     }
 
     private void onUsersChanged(List<User> users) {
