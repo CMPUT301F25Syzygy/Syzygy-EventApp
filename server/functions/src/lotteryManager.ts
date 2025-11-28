@@ -286,14 +286,11 @@ class LotteryManager {
         const eventRef = eventsCollection.doc(eventId);
         const eventSnap = await eventRef.get();
 
-        if (eventSnap.get("lotteryComplete")) {
-            return;
-        }
-
         // get event info
         const maxAttendees = eventSnap.get("maxAttendees") ?? Infinity as number;
         const waitingList = eventSnap.get("waitingList") as string[];
         const organizerId = eventSnap.get("organizerID") as string;
+        const invites = eventSnap.get("invites") ?? [] as string[];
         if (debug) logger.debug("drawLottery B", maxAttendees, waitingList, organizerId);
 
 
@@ -306,7 +303,7 @@ class LotteryManager {
         }
 
         const invitesIds = [];
-        const inviteCount = Math.min(maxAttendees, waitingList.length);
+        const inviteCount = Math.min(maxAttendees - invites.length, waitingList.length);
 
         const tasks: Promise<unknown>[] = [];
 

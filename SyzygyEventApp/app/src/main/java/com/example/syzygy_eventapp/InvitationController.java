@@ -110,6 +110,7 @@ public class InvitationController {
      * @param fields The fields in the database to update
      * @param condition The condition under which the update should be made, takes a DocumentSnapshot of the invite
      * @return Task that completes when updated, results to true if updated
+     * @return Task that completes when updated, results to true if updated
      * @throws IllegalStateException if not found
      */
 
@@ -183,7 +184,7 @@ public class InvitationController {
             put("cancelled", true);
             put("cancelTime", FieldValue.serverTimestamp());
         }}, (snap) -> {
-            return snap.get("responseTime") == null;
+            return snap.get("responseTime") == null && !snap.getBoolean("cancelled");
         });
     }
 

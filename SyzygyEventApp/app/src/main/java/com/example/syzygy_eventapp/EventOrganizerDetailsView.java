@@ -49,6 +49,7 @@ public class EventOrganizerDetailsView extends Fragment {
     private final NavigationStackFragment navStack;
 
     private ListenerRegistration eventListener;
+    private ListenerRegistration inviteListener;
 
     /**
      * A new instance of this fragment in VIEW-ONLY mode.
@@ -61,13 +62,6 @@ public class EventOrganizerDetailsView extends Fragment {
     public EventOrganizerDetailsView(@Nullable Event event, @Nullable NavigationStackFragment navStack) {
         this.event = event;
         this.navStack = navStack;
-    }
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        // TODO: load invites
     }
 
     @Nullable
@@ -103,12 +97,15 @@ public class EventOrganizerDetailsView extends Fragment {
         sendNotificationButton = view.findViewById(R.id.send_notification_button);
 
         // Initialize controllers for Firebase operations
+        eventController = EventController.getInstance();
         userController = UserController.getInstance();
         invitationController = new InvitationController();
 
-        eventController = EventController.getInstance();
         eventListener = eventController.observeEvent(event.getEventID(), (newEvent) -> {
             event = newEvent;
+            refreshInterface();
+        });
+        inviteListener = invitationController.observeEventInvites(event.getEventID(), (newEvent) -> {
             refreshInterface();
         });
 
@@ -128,17 +125,16 @@ public class EventOrganizerDetailsView extends Fragment {
         });
 
         cancelInvitesButton.setOnClickListener(v -> {
-            // TODO
-            Toast.makeText(getContext(), "Not implemented", Toast.LENGTH_SHORT).show();
+            cancelInvites();
         });
 
         sendInvitesButton.setOnClickListener(v -> {
+            Toast.makeText(getContext(), "Starting lottery...", Toast.LENGTH_SHORT).show();
             eventController.drawLotteryEarly(event.getEventID())
                     .addOnSuccessListener((result) -> {
                         Toast.makeText(getContext(), "Lottery drawn", Toast.LENGTH_SHORT).show();
                     })
                     .addOnFailureListener((result) -> {
-                        System.err.println(result.toString());
                         Toast.makeText(getContext(), "Failed to draw lottery", Toast.LENGTH_SHORT).show();
                     });
         });
@@ -164,6 +160,7 @@ public class EventOrganizerDetailsView extends Fragment {
                 navStack.pushScreen(entrantEventFragment);
             } else if (item.getItemId() == R.id.edit_nav_button) {
                 // TODO
+                Toast.makeText(getContext(), "Not implemented", Toast.LENGTH_SHORT).show();
             }
             return true;
         });
@@ -256,9 +253,56 @@ public class EventOrganizerDetailsView extends Fragment {
                 });
     }
 
+    private Task<Void> cancelInvites() {
+        List<String> inviteIds = event.getInvites();
+
+        if(pendingListView.getUsers().size() == 0) {
+            Toast.makeText(getContext(), "There are pending invites", Toast.LENGTH_SHORT).show();
+            return Tasks.forResult(null);
+        }
+
+        List<Task<Boolean>> cancelTasks = new ArrayList<>();
+        for (String inviteId : inviteIds) {
+            cancelTasks.add(invitationController.cancelInvite(inviteId));
+        }
+
+        return Tasks.whenAllComplete(cancelTasks)
+                .continueWithTask(allCompleteTask -> {
+                    List<Task<Boolean>> tasks = (List<Task<Boolean>>) (List<?>) allCompleteTask.getResult();
+
+                    boolean someSucceded = false;
+                    boolean someFailed = false;
+
+                    for (Task<Boolean> task : tasks) {
+                        if (!task.isSuccessful()) {
+                            someFailed = true;
+                        } else if (task.getResult() == true) {
+                            someSucceded = true;
+                        }
+                    }
+
+                    if (someSucceded) {
+                        if (someFailed) {
+                            Toast.makeText(getContext(), "Cancelled some invites, others failed", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(getContext(), "Cancelled all invites", Toast.LENGTH_SHORT).show();
+                        }
+                    } else {
+                        if (someFailed) {
+                            Toast.makeText(getContext(), "Failed to cancel all invites", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(getContext(), "There are pending invites", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    return Tasks.forResult(null);
+                });
+    }
+
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         eventListener.remove();
+        inviteListener.remove();
     }
 }

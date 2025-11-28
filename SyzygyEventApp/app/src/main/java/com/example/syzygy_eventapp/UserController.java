@@ -170,9 +170,7 @@ public class UserController implements UserControllerInterface {
         return Tasks.whenAllSuccess(userTasks)
                 .continueWithTask(task -> {
                     if (task.isSuccessful()) {
-                        List<Object> results = task.getResult();
-
-                        List<User> users = (List<User>) (List<?>) results;
+                        List<User> users = (List<User>) (List<?>) task.getResult();
                         return Tasks.forResult(users);
                     } else {
                         return Tasks.forException(task.getException());

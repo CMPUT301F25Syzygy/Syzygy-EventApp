@@ -135,6 +135,14 @@ public class UserListView extends LinearLayout {
     }
 
     /**
+     * Gets the entire user list
+     * @return The list of users.
+     */
+    public List<User> getUsers() {
+        return users;
+    }
+
+    /**
      * Sets the title shown in the header (e.g., "Events", "Upcoming", "History").
      *
      * @param title the title text to display
