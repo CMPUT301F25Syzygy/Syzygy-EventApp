@@ -98,6 +98,8 @@ public class InvitationController {
     public Task<Void> updateInvite(String invitationID, HashMap<String, Object> fields) {
         return updateInvite(invitationID, fields, (snap) -> {
             return true;
+        }).onSuccessTask((nothing) -> {
+            return Tasks.forResult(null);
         });
     }
 
@@ -107,11 +109,11 @@ public class InvitationController {
      * @param invitationID Invitation document ID
      * @param fields The fields in the database to update
      * @param condition The condition under which the update should be made, takes a DocumentSnapshot of the invite
-     * @return Task that completes when updated
+     * @return Task that completes when updated, results to true if updated
      * @throws IllegalStateException if not found
      */
 
-    public Task<Void> updateInvite(String invitationID, HashMap<String, Object> fields, Predicate<DocumentSnapshot> condition) {
+    public Task<Boolean> updateInvite(String invitationID, HashMap<String, Object> fields, Predicate<DocumentSnapshot> condition) {
         DocumentReference doc = invitationsRef.document(invitationID);
 
         return doc.get().continueWithTask(task -> {
@@ -125,9 +127,11 @@ public class InvitationController {
             }
 
             if (condition.test(snap)) {
-                return doc.set(fields, SetOptions.merge());
+                return doc.set(fields, SetOptions.merge()).onSuccessTask((nothing) -> {
+                    return Tasks.forResult(true);
+                });
             } else {
-                return Tasks.forResult(null);
+                return Tasks.forResult(false);
             }
         });
     }
@@ -137,10 +141,10 @@ public class InvitationController {
      * Sets accepted = true and responseTime = serverTimestamp().
      *
      * @param invitationID Invitation document ID (required, non-empty)
-     * @return Task that completes when updated
+     * @return Task that completes when updated, results to true if updated
      * @throws IllegalStateException if not found
      */
-    public Task<Void> acceptInvite(String invitationID) {
+    public Task<Boolean> acceptInvite(String invitationID) {
         return updateInvite(invitationID, new HashMap<>(){{
             put("accepted", true);
             put("responseTime", FieldValue.serverTimestamp());
@@ -154,10 +158,10 @@ public class InvitationController {
      * Sets accepted = false and responseTime = serverTimestamp().
      *
      * @param invitationID Invitation document ID (required, non-empty)
-     * @return Task that completes when updated
+     * @return Task that completes when updated, results to true if updated
      * @throws IllegalStateException if not found
      */
-    public Task<Void> declineInvite(String invitationID) {
+    public Task<Boolean> declineInvite(String invitationID) {
         return updateInvite(invitationID, new HashMap<>(){{
             put("accepted", false);
             put("responseTime", FieldValue.serverTimestamp());
@@ -171,10 +175,10 @@ public class InvitationController {
      * Sets cancelled = true and cancelTime = serverTimestamp().
      *
      * @param invitationID Invitation document ID (required, non-empty)
-     * @return Task that completes when updated
+     * @return Task that completes when updated, results to true if updated
      * @throws IllegalStateException if not found
      */
-    public Task<Void> cancelInvite(String invitationID) {
+    public Task<Boolean> cancelInvite(String invitationID) {
         return updateInvite(invitationID, new HashMap<>(){{
             put("cancelled", true);
             put("cancelTime", FieldValue.serverTimestamp());
