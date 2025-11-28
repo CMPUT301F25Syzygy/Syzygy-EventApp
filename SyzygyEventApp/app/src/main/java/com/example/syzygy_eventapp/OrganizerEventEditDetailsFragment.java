@@ -83,9 +83,6 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
     private String posterBase64;
     private boolean posterDeleted = false;
 
-    // Firestore listeners for real-time updates
-    private ListenerRegistration eventListener;
-    private ListenerRegistration invitationsListener;
 
     // Activity result launcher for image selection
     private ActivityResultLauncher<Intent> imagePickerLauncher;
@@ -98,7 +95,7 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
      */
     public OrganizerEventEditDetailsFragment(@NonNull String organizerID, @Nullable NavigationStackFragment navStack) {
         this.event = null;
-        this.isEditMode = true;
+        this.isEditMode = false;
         this.organizerID = organizerID;
         this.navStack = navStack;
     }
@@ -111,7 +108,7 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
      */
     public OrganizerEventEditDetailsFragment(@NonNull Event event, @Nullable NavigationStackFragment navStack) {
         this.event = event;
-        this.isEditMode = false;
+        this.isEditMode = true;
         this.organizerID = event.getOrganizerID();
         this.navStack = navStack;
     }
@@ -170,19 +167,11 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
         setupButtonVisibility();
         setupListeners();
 
-        if (isEditMode && event != null) {
+        if (isEditMode) {
             // In edit mode, populate the fields with EXISTING event data
             populateFields(event);
-
-            // Seed test data
-            //createFakeUsers();
-
-            // Wait 2 seconds for users to be created, then seed invitations
-            //new android.os.Handler().postDelayed(() -> {
-            //    seedTestInvitations();
-            //}, 2000);
         } else {
-            // In creatre mode, set the default button text
+            // In create mode, set the default button text
             updateDateButtonText(startDateButton, null);
             updateDateButtonText(endDateButton, null);
             updateTimeButtonText(startTimeButton, null);
@@ -200,9 +189,25 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
         // View only mode has to be added, where all action buttons are hidden, and I'll use the back button from the navStack since that's the only one we need
         // TODO: implement
         if (isEditMode) {
-
+            navStack.setScreenNavMenu(R.menu.edit_event_menu, (item) -> {
+                if (item.getItemId() == R.id.undo_nav_button) {
+                    navStack.popScreen();
+                } else if (item.getItemId() == R.id.delete_nav_button) {
+                    // TODO
+                } else if (item.getItemId() == R.id.save_nav_button) {
+                    // TODO
+                }
+                return true;
+            });
         } else {
-
+            navStack.setScreenNavMenu(R.menu.create_event_menu, (item) -> {
+                if (item.getItemId() == R.id.cancel_nav_button) {
+                    navStack.popScreen();
+                } else if (item.getItemId() == R.id.create_nav_button) {
+                    // TODO
+                }
+                return true;
+            });
         }
     }
 
@@ -989,15 +994,7 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
             }
         }
     }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        // Clean up listeners to prevent memory leaks
-        eventListener.remove();
-        invitationsListener.remove();
-    }
-
+    
     /**
      * Callback interface for time selection from TimePickerDialog
      */

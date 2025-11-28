@@ -68,7 +68,7 @@ public class OrganizerFragment extends Fragment {
         createEventButton.setOnClickListener(v -> {
             UserController.getInstance().getUser(userID)
                     .addOnSuccessListener(user -> {
-                       navStack.pushScreen(
+                        navStack.pushScreen(
                                new OrganizerEventEditDetailsFragment(userID, navStack));
                     })
                     .addOnFailureListener(e -> {

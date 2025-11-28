@@ -159,8 +159,9 @@ public class EventOrganizerDetailsView extends Fragment {
                 EventFragment entrantEventFragment = new EventFragment(navStack, event.getEventID());
                 navStack.pushScreen(entrantEventFragment);
             } else if (item.getItemId() == R.id.edit_nav_button) {
-                // TODO
-                Toast.makeText(getContext(), "Not implemented", Toast.LENGTH_SHORT).show();
+                navStack.pushScreen(
+                        new OrganizerEventEditDetailsFragment(event, navStack)
+                );
             }
             return true;
         });

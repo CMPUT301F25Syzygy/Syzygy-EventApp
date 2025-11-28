@@ -233,7 +233,6 @@ public class EventFragment extends Fragment {
                 if (bitmap != null) {
                     posterImage.setImageBitmap(bitmap);
                     posterImage.setVisibility(View.VISIBLE);
-                    Log.d(TAG, "Poster loaded successfully");
                 } else {
                     Log.e(TAG, "Failed to decode bitmap from Base64");
                     posterImage.setImageResource(R.drawable.image_placeholder);
