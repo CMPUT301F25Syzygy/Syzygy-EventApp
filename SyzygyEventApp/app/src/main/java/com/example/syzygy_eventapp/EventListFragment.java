@@ -76,7 +76,7 @@ public class EventListFragment extends Fragment {
         this.navStack = navStack;
         this.isOrganizerView = isOrganizerView;
         this.organizerID = organizerID;
-        this.eventController = new EventController();
+        this.eventController = EventController.getInstance();
         this.allEvents = new ArrayList<>();
         this.filteredEvents = new ArrayList<>();
     }

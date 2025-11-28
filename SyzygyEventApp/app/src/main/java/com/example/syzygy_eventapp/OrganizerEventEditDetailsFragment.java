@@ -233,7 +233,7 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
         listCancelled = view.findViewById(R.id.listCancelled);
 
         // Initialize controllers for Firebase operations
-        eventController = new EventController();
+        eventController = EventController.getInstance();
         invitationController = new InvitationController();
 
         // Set the appropriate title based on mode

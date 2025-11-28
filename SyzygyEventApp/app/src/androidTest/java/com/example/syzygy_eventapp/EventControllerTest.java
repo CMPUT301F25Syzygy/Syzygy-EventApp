@@ -41,7 +41,7 @@ public class EventControllerTest {
         } catch (IllegalStateException ignore) {}
 
         db = FirebaseFirestore.getInstance();
-        controller = new EventController();
+        controller = EventController.getInstance();
 
         String run = UUID.randomUUID().toString().replace("-", "").substring(0, 8);
         organizerID = "organizer_" + run;

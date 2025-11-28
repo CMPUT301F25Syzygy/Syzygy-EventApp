@@ -20,13 +20,24 @@ import java.util.function.Consumer;
  * Firestore is the source of truth; views have real-time listeners.
  */
 public class EventController {
+    private static EventController singletonInstance = null;
 
-    private final FirebaseFirestore db;
     private final CollectionReference eventsRef;
 
-    public EventController() {
-        this.db = FirebaseFirestore.getInstance();
+    private EventController() {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
         this.eventsRef = db.collection("events");
+    }
+
+    /**
+     * Gets a single global instance of the EventController
+     * @return a UserController singleton
+     */
+    public static EventController getInstance() {
+        if (singletonInstance == null)
+            singletonInstance = new EventController();
+
+        return singletonInstance;
     }
 
     //-----------------------
@@ -191,7 +202,7 @@ public class EventController {
             throw new IllegalArgumentException("eventID is required");
         }
 
-        return db.collection("events").document(eventID)
+        return eventsRef.document(eventID)
                 .collection("entrantLocations")
                 .addSnapshotListener((snap, error) -> {
                     if (error != null) {
@@ -294,7 +305,7 @@ public class EventController {
                     locationData.put("location", userLocation);
                     locationData.put("joinedAt", FieldValue.serverTimestamp());
 
-                    return db.collection("events").document(eventID)
+                    return eventsRef.document(eventID)
                             .collection("entrantLocations").document(userID).set(locationData);
                 });
             }

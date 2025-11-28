@@ -76,7 +76,7 @@ public class EventFragment extends Fragment {
         super();
         this.navStack = navStack;
         this.eventID = eventID;
-        this.eventController = new EventController();
+        this.eventController = EventController.getInstance();
     }
 
     // set up onCreate

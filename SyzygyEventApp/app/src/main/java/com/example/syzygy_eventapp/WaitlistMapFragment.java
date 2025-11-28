@@ -43,7 +43,7 @@ public class WaitlistMapFragment extends Fragment {
     public WaitlistMapFragment(Event event, NavigationStackFragment navStack) {
         this.event = event;
         this.navStack = navStack;
-        this.eventController = new EventController();
+        this.eventController = EventController.getInstance();
     }
 
     @Nullable
