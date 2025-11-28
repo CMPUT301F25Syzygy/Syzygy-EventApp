@@ -601,24 +601,13 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
      *
      * @param base64String The Base64 encoded image string
      */
-    private void loadImageFromBase64(String base64String) {
-        if (TextUtils.isEmpty(base64String)) {
-            posterPreview.setImageResource(R.drawable.image_placeholder);
-            deletePosterButton.setVisibility(View.GONE);
-            return;
-        }
+    private void loadImageFromBase64(Event event) {
+        Bitmap bitmap = event.getPosterBitmap();
 
-        try {
-            // Decode the Base64 string to a byte array
-            byte[] decodedBytes = Base64.decode(base64String, Base64.DEFAULT);
-            Bitmap bitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
-            posterPreview.setImageBitmap(bitmap);
-            deletePosterButton.setVisibility(View.VISIBLE);
-        }
-        catch (Exception e) {
-            Log.e(TAG, "Failed to load image from Base64", e);
+        if (bitmap == null) {
             posterPreview.setImageResource(R.drawable.image_placeholder);
-            deletePosterButton.setVisibility(View.GONE);
+        } else {
+            posterPreview.setImageBitmap(bitmap);
         }
     }
 
@@ -687,10 +676,7 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
         updateTimeButtonText(endTimeButton, endTime);
 
         // Load the poster is available
-        posterBase64 = e.getPosterUrl();
-        if (!TextUtils.isEmpty(posterBase64)) {
-            loadImageFromBase64(posterBase64);
-        }
+        loadImageFromBase64(e);
 
         // Set the geolocation toggle state
         geolocationToggle.setChecked(e.isGeolocationRequired());

@@ -136,6 +136,15 @@ public class Event {
     public String getPosterUrl() { return posterUrl; }
     public void setPosterUrl(String posterUrl) { this.posterUrl = posterUrl; }
 
+    public Bitmap getPosterBitmap() {
+        try {
+            byte[] decodedBytes = Base64.decode(posterUrl, Base64.DEFAULT);
+            return BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     public int getWaitingSize() {
         if (waitingList == null)
             return 0;

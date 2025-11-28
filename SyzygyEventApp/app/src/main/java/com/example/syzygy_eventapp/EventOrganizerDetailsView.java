@@ -1,6 +1,7 @@
 package com.example.syzygy_eventapp;
 
 
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.text.format.DateFormat;
 import android.util.Log;
@@ -180,7 +181,12 @@ public class EventOrganizerDetailsView extends Fragment {
         String eventTime = DateFormat.format("MMM d, yyyy HH:mm", event.getEventTime().toDate()).toString();
         eventTimeText.setText(eventTime);
 
-        // TODO: setup posterImage;
+        Bitmap bitmap = event.getPosterBitmap();
+        if (bitmap == null) {
+            posterImage.setImageResource(R.drawable.image_placeholder);
+        } else {
+            posterImage.setImageBitmap(bitmap);
+        }
 
         refreshInvitedUsers();
         refreshWaitlistUsers();
