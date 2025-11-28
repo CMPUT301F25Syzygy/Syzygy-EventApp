@@ -52,12 +52,12 @@ public class EventOrganizerDetailsView extends Fragment {
     private ListenerRegistration inviteListener;
 
     /**
-     * A new instance of this fragment in VIEW-ONLY mode.
-     * To be used so the organizer can retain the ability to view old events and their entrant info, without being able to edit it.
+     * A new instance of EventOrganizerDetailsView.
+     * To be used so the organizer to view old events and their entrant info, without being able to edit it directly.
      *
      * @param event    The event to view organizer details for
      * @param navStack The nav stack for screen management
-     * @return A new instance of OrganizerEventEditDetailsFragment
+     * @return A new instance of EventOrganizerDetailsView
      */
     public EventOrganizerDetailsView(@Nullable Event event, @Nullable NavigationStackFragment navStack) {
         this.event = event;

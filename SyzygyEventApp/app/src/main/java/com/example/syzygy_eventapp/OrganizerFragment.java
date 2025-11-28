@@ -68,10 +68,8 @@ public class OrganizerFragment extends Fragment {
         createEventButton.setOnClickListener(v -> {
             UserController.getInstance().getUser(userID)
                     .addOnSuccessListener(user -> {
-                        // TODO: update call once OrganizerEventEditDetailsFragment is fixed up
-//                        navStack.pushScreen(
-//                                OrganizerEventEditDetailsFragment.newInstance(null, user.promote(), navStack)
-//                        );
+                       navStack.pushScreen(
+                               new OrganizerEventEditDetailsFragment(userID, navStack));
                     })
                     .addOnFailureListener(e -> {
                         Log.e("OrganizerFragment", "Failed to get user", e);
