@@ -2,6 +2,8 @@ package com.example.syzygy_eventapp;
 
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.GeoPoint;
+
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -112,6 +114,12 @@ public class Event {
     public String getPosterUrl() { return posterUrl; }
     public void setPosterUrl(String posterUrl) { this.posterUrl = posterUrl; }
 
+    public int getWaitingSize() {
+        if (waitingList == null)
+            return 0;
+        return waitingList.size();
+    }
+
     public List<String> getWaitingList() { return waitingList; }
     public void setWaitingList(List<String> waitingList) { this.waitingList = waitingList; }
 
@@ -129,6 +137,10 @@ public class Event {
 
     public boolean isLotteryComplete() { return lotteryComplete; }
     public void setLotteryComplete(boolean lotteryComplete) { this.lotteryComplete = lotteryComplete; }
+
+    public boolean isOpen() {
+        return !lotteryComplete && registrationEnd.toDate().after(new Date());
+    }
 
     public String getQrCodeData() { return qrCodeData; }
     public void setQrCodeData(String qrCodeData) { this.qrCodeData = qrCodeData; }

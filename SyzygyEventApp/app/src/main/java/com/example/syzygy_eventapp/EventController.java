@@ -20,13 +20,24 @@ import java.util.function.Consumer;
  * Firestore is the source of truth; views have real-time listeners.
  */
 public class EventController {
+    private static EventController singletonInstance = null;
 
-    private final FirebaseFirestore db;
     private final CollectionReference eventsRef;
 
-    public EventController() {
-        this.db = FirebaseFirestore.getInstance();
+    private EventController() {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
         this.eventsRef = db.collection("events");
+    }
+
+    /**
+     * Gets a single global instance of the EventController
+     * @return a UserController singleton
+     */
+    public static EventController getInstance() {
+        if (singletonInstance == null)
+            singletonInstance = new EventController();
+
+        return singletonInstance;
     }
 
     //-----------------------
@@ -86,11 +97,10 @@ public class EventController {
      * Real time observers; observes a single event in real time
      * @param eventID Event document ID to observe
      * @param onEventChange Callback invoked with the latest Event object
-     * @param onError Callback invoked on listener errors
      * @return ListenerRegistration that must be removed when no longer needed
      * @throws IllegalArgumentException if eventID is null/empty
      */
-    public ListenerRegistration observeEvent(String eventID, Consumer<Event> onEventChange, Consumer<Exception> onError) {
+    public ListenerRegistration observeEvent(String eventID, Consumer<Event> onEventChange) {
         if (eventID == null || eventID.isEmpty()) {
             throw new IllegalArgumentException("eventID is required");
         }
@@ -98,11 +108,10 @@ public class EventController {
         return doc.addSnapshotListener((snap, error) -> {
             // snap can't be null because none of it's implementations can return null
             if (error != null) {
-                onError.accept(error);
+                System.err.println(error.toString());
                 return;
             }
-            if (snap == null || !snap.exists()) {
-                onError.accept(new IllegalStateException("Event: " + eventID + " not found."));
+            if (!snap.exists()) {
                 return;
             }
             // Convert to Event object
@@ -121,13 +130,12 @@ public class EventController {
     /**
      * Observe all events in real time.
      * @param onChange Callback invoked with the latest list of Event objects
-     * @param onError Callback invoked on listener errors
      * @return ListenerRegistration that must be removed when no longer needed
      */
-    public ListenerRegistration observeAllEvents(Consumer<List<Event>> onChange, Consumer<Exception> onError) {
+    public ListenerRegistration observeAllEvents(Consumer<List<Event>> onChange) {
         return eventsRef.addSnapshotListener((snap, error) -> {
             if (error != null) {
-                onError.accept(error);
+                System.err.println(error.toString());
                 return;
             }
 
@@ -149,11 +157,10 @@ public class EventController {
      * Observe all events owned by an organizer in real time.
      * @param organizerID Organizer document ID to observe
      * @param onChange Callback invoked with the latest list of Event objects
-     * @param onError Callback invoked on listener errors
      * @return ListenerRegistration that must be removed when no longer needed
      * @throws IllegalArgumentException if organizerID is null/empty
      */
-    public ListenerRegistration observeOrganizerEvents(String organizerID, Consumer<List<Event>> onChange, Consumer<Exception> onError) {
+    public ListenerRegistration observeOrganizerEvents(String organizerID, Consumer<List<Event>> onChange) {
         if (organizerID == null || organizerID.isEmpty()) {
             throw new IllegalArgumentException("organizerID is required");
         }
@@ -161,7 +168,7 @@ public class EventController {
         return eventsRef.whereEqualTo("organizerID", organizerID)
                 .addSnapshotListener((snap, error) -> {
                     if (error != null) {
-                        onError.accept(error);
+                        System.err.println(error.toString());
                         return;
                     }
 
@@ -183,19 +190,18 @@ public class EventController {
      * Observe entrant locations for an event in real time.
      * @param eventID Event document ID
      * @param onChange Callback with list of location data maps
-     * @param onError Error callback
      * @return ListenerRegistration to remove when done
      */
-    public ListenerRegistration observeEntrantLocations(String eventID, Consumer<List<Map<String, Object>>> onChange, Consumer<Exception> onError) {
+    public ListenerRegistration observeEntrantLocations(String eventID, Consumer<List<Map<String, Object>>> onChange) {
         if (eventID == null || eventID.isEmpty()) {
             throw new IllegalArgumentException("eventID is required");
         }
 
-        return db.collection("events").document(eventID)
+        return eventsRef.document(eventID)
                 .collection("entrantLocations")
                 .addSnapshotListener((snap, error) -> {
                     if (error != null) {
-                        onError.accept(error);
+                        System.err.println(error.toString());
                         return;
                     }
 
@@ -294,7 +300,7 @@ public class EventController {
                     locationData.put("location", userLocation);
                     locationData.put("joinedAt", FieldValue.serverTimestamp());
 
-                    return db.collection("events").document(eventID)
+                    return eventsRef.document(eventID)
                             .collection("entrantLocations").document(userID).set(locationData);
                 });
             }
@@ -359,6 +365,25 @@ public class EventController {
         // Always update the updatedAt timestamp
         updates.put("updatedAt", FieldValue.serverTimestamp());
         return eventsRef.document(eventID).update(updates);
+    }
+
+    /**
+     * Gets an event object from the database
+     * @param eventID event ID
+     * @return Task that completes when the event found, null if the event does not exist
+     */
+    public Task<Event> getEvent(String eventID) {
+        return eventsRef.document(eventID).get().continueWith(task -> {
+            if (!task.isSuccessful()) {
+                return null;
+            }
+            DocumentSnapshot snap = task.getResult();
+            if (!snap.exists()) {
+                return null;
+            }
+
+            return snap.toObject(Event.class);
+        });
     }
 
     public Task<Void> deleteEvent(String eventID) {

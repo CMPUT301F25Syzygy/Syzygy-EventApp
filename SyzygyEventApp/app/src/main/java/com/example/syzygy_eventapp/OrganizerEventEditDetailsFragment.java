@@ -32,6 +32,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.Filter;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
 
@@ -233,7 +234,7 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
         listCancelled = view.findViewById(R.id.listCancelled);
 
         // Initialize controllers for Firebase operations
-        eventController = new EventController();
+        eventController = EventController.getInstance();
         invitationController = new InvitationController();
 
         // Set the appropriate title based on mode
@@ -542,7 +543,7 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
         }
 
         // For invitation-based statuses, get the timestamps from invitation data via Firestore
-        invitationController.observeEventInvitations(event.getEventID(), invitations -> {
+        invitationController.observeEventInvites(event.getEventID(), invitations -> {
             // Create a map of userID and invitation for quick lookup
             Map<String, Invitation> invitationMap = new HashMap<>();
             for (Invitation invitation : invitations) {
@@ -598,8 +599,6 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
                     }
                 });
             }
-        }, error -> {
-            Log.e(TAG, "Error loading invitations for timestamps", error);
         });
     }
 
@@ -677,12 +676,10 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
             event = updatedEvent;
             waitingListUsers = event.getWaitingList() != null ? event.getWaitingList() : new ArrayList<>();
             updateWaitingCount();
-        }, error -> {
-            Log.e(TAG, "Error observing event", error);
         });
 
         // Listen to invitations changes (for accepted, pending, rejected, or cancelled)
-        invitationsListener = invitationController.observeEventInvitations(event.getEventID(), invitations -> {
+        invitationsListener = invitationController.observeEventInvites(event.getEventID(), invitations -> {
             acceptedUsers = new ArrayList<>();
             pendingUsers = new ArrayList<>();
             rejectedUsers = new ArrayList<>();
@@ -715,8 +712,6 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
             updatePendingCount();
             updateRejectedCount();
             updateCancelledCount();
-        }, error -> {
-            Log.e(TAG, "Error observing invitations", error);
         });
     }
 

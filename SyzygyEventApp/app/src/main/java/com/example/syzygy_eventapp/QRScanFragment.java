@@ -49,7 +49,7 @@ public class QRScanFragment extends Fragment {
     private NavigationStackFragment navStack;
     private ExecutorService cameraExecutor;
     private PreviewView previewView;
-    private boolean isProcessingQR = false;
+    private boolean foundQRcode = false;
 
     // permissions launcher
     private ActivityResultLauncher<String> requestPermissionLauncher;
@@ -62,7 +62,7 @@ public class QRScanFragment extends Fragment {
     public void onResume() {
         super.onResume();
         // allow scanning again when returning from an EventView
-        isProcessingQR = false;
+        foundQRcode = false;
     }
 
     @Override
@@ -198,8 +198,8 @@ public class QRScanFragment extends Fragment {
      * Handles detected QR codes directly; Will scan and open events.
      */
     private void handleDetectedBarcodes(List<Barcode> barcodes) {
-        // Pause scanning so the same QR Code doesn't keep being processed
-        if (isProcessingQR) {
+        // Ignore any more callbacks if a code has already been scanned
+        if (foundQRcode) {
             return;
         }
 
@@ -209,50 +209,39 @@ public class QRScanFragment extends Fragment {
                 String eventID = extractEventID(rawValue);
 
                 if (eventID != null) {
-                    // Set isProcessingQR to true
-                    isProcessingQR = true;
-
-                    // Toast indicating a successful scan
-                    Toast.makeText(requireContext(), "QR Code scanned", Toast.LENGTH_SHORT).show();
-
                     // Get event from firestore
-                    FirebaseFirestore db = FirebaseFirestore.getInstance();
-                    db.collection("events").document(eventID)
-                            .get()
-                            .addOnSuccessListener(snapshot -> {
-                                if (snapshot != null && snapshot.exists()) {
-                                    // Check if event is within the registration period
-                                    Timestamp registrationStart = snapshot.getTimestamp("registrationStart");
-                                    Timestamp registrationEnd = snapshot.getTimestamp("registrationEnd");
-                                    Date now = new Date();
-
-                                    // No registration date provided
-                                    if (registrationStart == null || registrationEnd == null) {
-                                        Toast.makeText(requireContext(), "This event has incomplete registration info.", Toast.LENGTH_SHORT).show();
-                                    }
-                                    // Too early
-                                    else if (now.before(registrationStart.toDate())) {
-                                        Toast.makeText(requireContext(), "Registration for this event has not started yet.", Toast.LENGTH_SHORT).show();
-                                    }
-                                    // Too late/expired
-                                    else if (now.after(registrationEnd.toDate())) {
-                                        Toast.makeText(requireContext(), "Registration for this event has ended.", Toast.LENGTH_SHORT).show();
-                                    }
-                                    else {
-                                        // Event was found and is within registration period, use the navStack to navigate to the scanned event's details
-                                        navStack.replaceScreen(new EventFragment(navStack, eventID));
-                                    }
-                                }
-                                else {
+                    EventController.getInstance().getEvent(eventID)
+                            .addOnSuccessListener(event -> {
+                                if (event == null) {
                                     Toast.makeText(requireContext(), "Event not found", Toast.LENGTH_SHORT).show();
+                                    return;
                                 }
-                                // resume scanning
-                                isProcessingQR = false;
+
+                                // Check if event is within the registration period
+                                Timestamp registrationStart = event.getRegistrationStart();
+                                Timestamp registrationEnd = event.getRegistrationEnd();
+                                Date now = new Date();
+
+                                // No registration date provided
+                                if (registrationStart == null || registrationEnd == null) {
+                                    Toast.makeText(requireContext(), "This event has incomplete registration info.", Toast.LENGTH_SHORT).show();
+                                } else if (now.before(registrationStart.toDate())) { // Too early
+                                    Toast.makeText(requireContext(), "Registration for this event has not started yet.", Toast.LENGTH_SHORT).show();
+                                } else if (now.after(registrationEnd.toDate())) { // Too late/expired
+                                    Toast.makeText(requireContext(), "Registration for this event has ended.", Toast.LENGTH_SHORT).show();
+                                }  else {
+                                    // Toast indicating a successful scan
+                                    Toast.makeText(requireContext(), "QR Code scanned", Toast.LENGTH_SHORT).show();
+
+                                    // stop more callbacks to handleDetectedBarcodes()
+                                    foundQRcode = true;
+
+                                    // Event was found and is within registration period, use the navStack to navigate to the scanned event's details
+                                    navStack.replaceScreen(new EventFragment(navStack, eventID));
+                                }
                             })
                             .addOnFailureListener(e -> {
                                 Toast.makeText(requireContext(), "Error loading event: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                                // resume scanning
-                                isProcessingQR = false;
                             });
 
                     // Stop after first valid QR is scanned

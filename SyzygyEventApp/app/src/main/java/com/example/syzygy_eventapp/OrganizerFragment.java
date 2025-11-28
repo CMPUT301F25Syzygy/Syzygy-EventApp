@@ -27,7 +27,6 @@ public class OrganizerFragment extends Fragment {
     private OrganizerEventSummaryListView organizerSummaryListViewUpcoming;
     private OrganizerEventSummaryListView organizerSummaryListViewHistory;
     private String userID;
-    private EventController eventController;
     private ListenerRegistration eventsListener;
 
     // required empty constructor
@@ -63,7 +62,6 @@ public class OrganizerFragment extends Fragment {
 
         // Load current user ID and event controller
         userID = AppInstallationId.get(requireContext());
-        eventController = new EventController();
 
         createEventButton.setOnClickListener(v -> {
             UserController.getInstance().getUser(userID)
@@ -83,8 +81,7 @@ public class OrganizerFragment extends Fragment {
     }
 
     private void startObserver() {
-        eventsListener = eventController.observeAllEvents(events -> {
-
+        EventController.getInstance().observeAllEvents(events -> {
             List<Event> upcoming = new ArrayList<>();
             List<Event> past = new ArrayList<>();
             Date now = new Date();
@@ -146,8 +143,6 @@ public class OrganizerFragment extends Fragment {
                             Log.e("OrganizerFragment", "Failed to get user", e);
                         });
             });
-        }, error -> {
-
         });
     }
 
