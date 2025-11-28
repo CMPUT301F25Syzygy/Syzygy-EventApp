@@ -3,6 +3,7 @@ package com.example.syzygy_eventapp;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.GeoPoint;
 
+import java.sql.Time;
 import java.util.Date;
 import java.util.List;
 
@@ -32,6 +33,9 @@ public class Event {
     private String description;
     private String organizerID;
 
+    // --- Time ---
+    private Timestamp eventTime;
+
     // --- Location ---
     private String locationName;          // e.g., "10230 Jasper Ave, Edmonton, AB"
     private GeoPoint locationCoordinates; // Firestore-compatible coordinates
@@ -43,6 +47,9 @@ public class Event {
     // --- Waiting List ---
     private List<String> waitingList;     // List of user IDs in waiting list
     private Integer maxWaitingList;       // null or 0 = unlimited
+
+    // --- Invites list ---
+    private List<String> invites;
 
     // --- Registration Period ---
     private Timestamp registrationStart;
@@ -63,9 +70,9 @@ public class Event {
     public Event() {}
 
     // --- Full constructor (optional, for easier testing / creation) ---
-    public Event(String eventID, String name, String description, String organizerID,
+    public Event(String eventID, String name, String description, String organizerID, Timestamp eventTime,
                  String locationName, GeoPoint locationCoordinates, boolean geolocationRequired,
-                 String posterUrl, List<String> waitingList, Integer maxWaitingList,
+                 String posterUrl, List<String> waitingList, List<String> invites, Integer maxWaitingList,
                  Timestamp registrationStart, Timestamp registrationEnd,
                  Integer maxAttendees, boolean lotteryComplete, String qrCodeData,
                  Timestamp createdAt, Timestamp updatedAt) {
@@ -73,11 +80,13 @@ public class Event {
         this.name = name;
         this.description = description;
         this.organizerID = organizerID;
+        this.eventTime = eventTime;
         this.locationName = locationName;
         this.locationCoordinates = locationCoordinates;
         this.geolocationRequired = geolocationRequired;
         this.posterUrl = posterUrl;
         this.waitingList = waitingList;
+        this.invites = invites;
         this.maxWaitingList = maxWaitingList;
         this.registrationStart = registrationStart;
         this.registrationEnd = registrationEnd;
@@ -102,6 +111,15 @@ public class Event {
     public String getOrganizerID() { return organizerID; }
     public void setOrganizerID(String organizerID) { this.organizerID = organizerID; }
 
+    public Timestamp getEventTime() {
+        if (eventTime == null) {
+            return registrationEnd;
+        } else {
+            return eventTime;
+        }
+    }
+    public void setEventTime(Timestamp eventTime) { this.eventTime = eventTime; }
+
     public String getLocationName() { return locationName; }
     public void setLocationName(String locationName) { this.locationName = locationName; }
 
@@ -122,6 +140,9 @@ public class Event {
 
     public List<String> getWaitingList() { return waitingList; }
     public void setWaitingList(List<String> waitingList) { this.waitingList = waitingList; }
+
+    public List<String> getInvites() { return invites; }
+    public void setInvites(List<String> invites) { this.invites = invites; }
 
     public Integer getMaxWaitingList() { return maxWaitingList; }
     public void setMaxWaitingList(Integer maxWaitingList) { this.maxWaitingList = maxWaitingList; }
