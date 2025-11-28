@@ -210,35 +210,34 @@ public class QRScanFragment extends Fragment {
 
                 if (eventID != null) {
                     // Get event from firestore
-                    FirebaseFirestore db = FirebaseFirestore.getInstance();
-                    db.collection("events").document(eventID)
-                            .get()
-                            .addOnSuccessListener(snapshot -> {
-                                if (snapshot != null && snapshot.exists()) {
-                                    // Check if event is within the registration period
-                                    Timestamp registrationStart = snapshot.getTimestamp("registrationStart");
-                                    Timestamp registrationEnd = snapshot.getTimestamp("registrationEnd");
-                                    Date now = new Date();
-
-                                    // No registration date provided
-                                    if (registrationStart == null || registrationEnd == null) {
-                                        Toast.makeText(requireContext(), "This event has incomplete registration info.", Toast.LENGTH_SHORT).show();
-                                    } else if (now.before(registrationStart.toDate())) { // Too early
-                                        Toast.makeText(requireContext(), "Registration for this event has not started yet.", Toast.LENGTH_SHORT).show();
-                                    } else if (now.after(registrationEnd.toDate())) { // Too late/expired
-                                        Toast.makeText(requireContext(), "Registration for this event has ended.", Toast.LENGTH_SHORT).show();
-                                    }  else {
-                                        // Toast indicating a successful scan
-                                        Toast.makeText(requireContext(), "QR Code scanned", Toast.LENGTH_SHORT).show();
-
-                                        // stop more callbacks to handleDetectedBarcodes()
-                                        foundQRcode = true;
-
-                                        // Event was found and is within registration period, use the navStack to navigate to the scanned event's details
-                                        navStack.replaceScreen(new EventFragment(navStack, eventID));
-                                    }
-                                } else {
+                    EventController.getInstance().getEvent(eventID)
+                            .addOnSuccessListener(event -> {
+                                if (event == null) {
                                     Toast.makeText(requireContext(), "Event not found", Toast.LENGTH_SHORT).show();
+                                    return;
+                                }
+
+                                // Check if event is within the registration period
+                                Timestamp registrationStart = event.getRegistrationStart();
+                                Timestamp registrationEnd = event.getRegistrationEnd();
+                                Date now = new Date();
+
+                                // No registration date provided
+                                if (registrationStart == null || registrationEnd == null) {
+                                    Toast.makeText(requireContext(), "This event has incomplete registration info.", Toast.LENGTH_SHORT).show();
+                                } else if (now.before(registrationStart.toDate())) { // Too early
+                                    Toast.makeText(requireContext(), "Registration for this event has not started yet.", Toast.LENGTH_SHORT).show();
+                                } else if (now.after(registrationEnd.toDate())) { // Too late/expired
+                                    Toast.makeText(requireContext(), "Registration for this event has ended.", Toast.LENGTH_SHORT).show();
+                                }  else {
+                                    // Toast indicating a successful scan
+                                    Toast.makeText(requireContext(), "QR Code scanned", Toast.LENGTH_SHORT).show();
+
+                                    // stop more callbacks to handleDetectedBarcodes()
+                                    foundQRcode = true;
+
+                                    // Event was found and is within registration period, use the navStack to navigate to the scanned event's details
+                                    navStack.replaceScreen(new EventFragment(navStack, eventID));
                                 }
                             })
                             .addOnFailureListener(e -> {

@@ -112,10 +112,7 @@ public class EventListFragment extends Fragment {
             );
         } else {
             // Observe all events
-            eventListener = eventController.observeAllEvents(
-                    this::onEventsUpdated,
-                    this::onError
-            );
+            eventListener = eventController.observeAllEvents(this::onEventsUpdated);
         }
     }
 

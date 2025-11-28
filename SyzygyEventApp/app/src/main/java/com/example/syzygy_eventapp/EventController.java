@@ -135,10 +135,10 @@ public class EventController {
      * @param onError Callback invoked on listener errors
      * @return ListenerRegistration that must be removed when no longer needed
      */
-    public ListenerRegistration observeAllEvents(Consumer<List<Event>> onChange, Consumer<Exception> onError) {
+    public ListenerRegistration observeAllEvents(Consumer<List<Event>> onChange) {
         return eventsRef.addSnapshotListener((snap, error) -> {
             if (error != null) {
-                onError.accept(error);
+                System.err.println(error.toString());
                 return;
             }
 

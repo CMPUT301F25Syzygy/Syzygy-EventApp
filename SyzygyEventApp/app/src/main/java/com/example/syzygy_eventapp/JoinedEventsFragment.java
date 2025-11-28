@@ -138,8 +138,6 @@ public class JoinedEventsFragment extends Fragment {
 
             // Populate the past event list. I don't think past events need to be clickable, but this part can be modified if needed
             historyListView.setItems(past, false, v -> {});
-        }, error -> {
-
         });
     }
 

@@ -164,20 +164,9 @@ public class OrganizerEventSummaryFragment extends LinearLayout {
                 });
 
         // Get interested count (basically just get the waiting list size from the event)
-        db.collection("events")
-                .document(eventID)
-                .get()
-                .addOnSuccessListener(eventDoc -> {
-                    int waitingListSize = 0;
-                    if (eventDoc.exists() && eventDoc.contains("waitingList")) {
-                        Object waitingListObj = eventDoc.get("waitingList");
-                        if (waitingListObj instanceof java.util.List) {
-                            waitingListSize = ((java.util.List<?>) waitingListObj).size();
-                        }
-                    }
-
-                    interestedCountText.setText(String.valueOf(waitingListSize));
-
+        EventController.getInstance().getEvent(eventID)
+                .addOnSuccessListener(event -> {
+                    interestedCountText.setText(String.valueOf(event.getWaitingSize()));
                 })
                 .addOnFailureListener(e -> {
                     interestedCountText.setText("0");

@@ -82,7 +82,6 @@ public class OrganizerFragment extends Fragment {
 
     private void startObserver() {
         EventController.getInstance().observeAllEvents(events -> {
-
             List<Event> upcoming = new ArrayList<>();
             List<Event> past = new ArrayList<>();
             Date now = new Date();
@@ -144,8 +143,6 @@ public class OrganizerFragment extends Fragment {
                             Log.e("OrganizerFragment", "Failed to get user", e);
                         });
             });
-        }, error -> {
-
         });
     }
 
