@@ -4,4 +4,8 @@
         android:id="@+id/back_nav_button"
         android:title="Back"
         android:icon="@drawable/outline_arrow_back_24"/>
+    <item
+        android:id="@+id/export_nav_button"
+        android:title="Export"
+        android:icon="@drawable/outline_download_24"/>
 </menu>
