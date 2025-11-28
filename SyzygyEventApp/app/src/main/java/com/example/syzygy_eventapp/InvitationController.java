@@ -138,7 +138,7 @@ public class InvitationController {
     }
 
     /**
-     * Mark an invitation as accepted by its recipient, as long as it hasn't been cancelled.
+     * Mark an invitation as accepted by its recipient, as long as it hasn't been cancelled or decliend.
      * Sets accepted = true and responseTime = serverTimestamp().
      *
      * @param invitationID Invitation document ID (required, non-empty)
@@ -150,7 +150,8 @@ public class InvitationController {
             put("accepted", true);
             put("responseTime", FieldValue.serverTimestamp());
         }}, (snap) -> {
-            return !snap.getBoolean("cancelled");
+            boolean isDecliend = snap.get("responseTime") != null && !snap.getBoolean("accepted");
+            return !snap.getBoolean("cancelled") && !isDecliend;
         });
     }
 
