@@ -12,6 +12,7 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.chip.Chip;
 import com.google.firebase.Timestamp;
+import com.google.firebase.firestore.Filter;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.DateFormat;
@@ -34,10 +35,11 @@ public class OrganizerEventSummaryFragment extends LinearLayout {
     /**
      * Represents the status of an entrant for a given event.
      */
-    public enum AttendeeStatus { WAITLIST, NOT_SELECTED, PENDING, ACCEPTED, REJECTED }
+    public enum AttendeeStatus {WAITLIST, NOT_SELECTED, PENDING, ACCEPTED, REJECTED}
 
     /**
      * Default constructor for inflating via code.
+     *
      * @param context the current {@link Context}.
      */
     public OrganizerEventSummaryFragment(Context context) {
@@ -47,8 +49,9 @@ public class OrganizerEventSummaryFragment extends LinearLayout {
 
     /**
      * Constructor called when inflating from XML.
+     *
      * @param context the current {@link Context}.
-     * @param attrs the {@link AttributeSet} from XML.
+     * @param attrs   the {@link AttributeSet} from XML.
      */
     public OrganizerEventSummaryFragment(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -57,8 +60,9 @@ public class OrganizerEventSummaryFragment extends LinearLayout {
 
     /**
      * Constructor called when inflating from XML with a style attribute.
-     * @param context the current {@link Context}.
-     * @param attrs the {@link AttributeSet} from XML.
+     *
+     * @param context      the current {@link Context}.
+     * @param attrs        the {@link AttributeSet} from XML.
      * @param defStyleAttr the default style to apply to this view.
      */
     public OrganizerEventSummaryFragment(Context context, AttributeSet attrs, int defStyleAttr) {
@@ -68,6 +72,7 @@ public class OrganizerEventSummaryFragment extends LinearLayout {
 
     /**
      * Initializes and inflates the layout, binding all child views.
+     *
      * @param context the current {@link Context}.
      */
     private void init(Context context) {
@@ -89,7 +94,7 @@ public class OrganizerEventSummaryFragment extends LinearLayout {
      * Binds an {@link Event} object to the summary view, updating text fields and chip color.
      * Also controls admin button visibility.
      *
-     * @param event the {@link Event} to display.
+     * @param event          the {@link Event} to display.
      * @param attendeeStatus the status of the current entrant, or {@code null} if admin view.
      */
     public void bind(Event event, AttendeeStatus attendeeStatus) {
@@ -135,7 +140,7 @@ public class OrganizerEventSummaryFragment extends LinearLayout {
     /**
      * Gets accepted and interested counts from Firestore and updates the UI.
      *
-     * @param eventID The ID of the event to get counts for
+     * @param eventID      The ID of the event to get counts for
      * @param maxAttendees The maximum number of attendees for this event
      */
     private void getAndUpdateCounts(String eventID, Integer maxAttendees) {
@@ -150,19 +155,16 @@ public class OrganizerEventSummaryFragment extends LinearLayout {
         interestedCountText.setText("—");
 
         // Get accepted count (accepted = true, cancelled = false)
-        db.collection("invitations")
-                .whereEqualTo("event", eventID)
-                .whereEqualTo("accepted", true)
-                .whereEqualTo("cancelled", false)
-                .get()
-                .addOnSuccessListener(querySnapshot -> {
-                    int acceptedCount = querySnapshot.size();
-                    acceptedCountText.setText(acceptedCount + "/" + maxAttendees);
-                })
-                .addOnFailureListener(e -> {
-                    acceptedCountText.setText("0");
-                });
 
+        Filter acceptedFilter = Filter
+                .equalTo("event", eventID)
+                .equalTo("accepted", true)
+                .equalTo("cancelled", false);
+        
+        new InvitationController().observeInvites(acceptedFilter, (invitations) -> {
+            int acceptedCount = invitations.size();
+            acceptedCountText.setText(acceptedCount + "/" + maxAttendees);
+        });
         // Get interested count (basically just get the waiting list size from the event)
         EventController.getInstance().getEvent(eventID)
                 .addOnSuccessListener(event -> {
@@ -243,6 +245,7 @@ public class OrganizerEventSummaryFragment extends LinearLayout {
     /**
      * Sets a click listener for when the user taps the event card
      * to open event details.
+     *
      * @param listener the {@link OnClickListener} to invoke when the card is clicked.
      */
     public void setOnOpenDetailsClickListener(OnClickListener listener) {
