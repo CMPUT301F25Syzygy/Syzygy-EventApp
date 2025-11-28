@@ -186,7 +186,7 @@
             <Button
                 android:id="@+id/cancel_invites_button"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:layout_marginEnd="8dp"
                 android:backgroundTint="@color/red"
@@ -197,7 +197,7 @@
             <Button
                 android:id="@+id/send_invites_button"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:backgroundTint="@color/green"
                 app:icon="@drawable/ic_check"
@@ -214,16 +214,6 @@
             app:icon="@drawable/outline_notification_add_24"
             android:text="Send Invites"
             android:textColor="@color/button_text" />
-
-        <TextView
-            android:id="@+id/joining_status"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:text="@string/event_details_num_people"
-            android:textColor="?attr/colorSecondary"
-            android:textSize="13sp" />
-
 
     </LinearLayout>
 </ScrollView>

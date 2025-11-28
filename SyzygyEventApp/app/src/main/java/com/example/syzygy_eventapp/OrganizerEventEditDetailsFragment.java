@@ -31,9 +31,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.Timestamp;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.Filter;
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
 
 import java.io.ByteArrayOutputStream;
@@ -52,7 +49,6 @@ import java.util.Objects;
  * Provides functionality for managing event info, including dates, times, posters, and for viewing waiting lists or invitation statuses in real-time
  */
 public class OrganizerEventEditDetailsFragment extends Fragment {
-
     private View rootView;
 
     // Event detail input fields
@@ -60,7 +56,7 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
     private Button startTimeButton, endTimeButton, startDateButton, endDateButton;
     private Button importPosterButton, deletePosterButton;
     private ImageView posterPreview;
-    private Button createButton, cancelButton, updateButton, deleteButton, generateQRButton, viewMapButton;
+    private Button viewMapButton;
     private androidx.appcompat.widget.SwitchCompat geolocationToggle;
 
     // Controllers for Firebase operations
@@ -71,7 +67,6 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
     private Organizer organizer;
     private Event event;
     private boolean isEditMode = false;
-    private boolean isViewMode = false;
     private Timestamp startTime, endTime;
     private NavigationStackFragment navStack;
 
@@ -83,18 +78,6 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
     private String posterBase64;
     private boolean posterDeleted = false;
     private static final int MAX_IMAGE_SIZE = 800;
-
-    // Waiting list UI elements
-    private TextView acceptedCountText, pendingCountText, waitingCountText, rejectedCountText, cancelledCountText;
-    private LinearLayout acceptedLabelLayout, pendingLabelLayout, waitingLabelLayout, rejectedLabelLayout, cancelledLabelLayout;
-    private ListView listAccepted, listPending, listWaiting, listRejected, listCancelled;
-
-    // Real-time data lists for different invitation statuses
-    private List<String> waitingListUsers = new ArrayList<>();
-    private List<String> acceptedUsers = new ArrayList<>();
-    private List<String> pendingUsers = new ArrayList<>();
-    private List<String> rejectedUsers = new ArrayList<>();
-    private List<String> cancelledUsers = new ArrayList<>();
 
     // Firestore listeners for real-time updates
     private ListenerRegistration eventListener;
@@ -122,27 +105,6 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
         fragment.navStack = navStack;
         fragment.event = existingEvent;
         fragment.isEditMode = existingEvent != null;
-        fragment.organizer = organizer;
-        return fragment;
-    }
-
-    /**
-     * A new instance of this fragment in VIEW-ONLY mode.
-     * To be used so the organizer can retain the ability to view old events and their entrant info, without being able to edit it.
-     *
-     * @param existingEvent The event to view organizer details for
-     * @param organizer The organizer creating or editing the event
-     * @param navStack The nav stack for screen management
-     * @return A new instance of OrganizerEventEditDetailsFragment
-     */
-    public static OrganizerEventEditDetailsFragment newInstanceViewOnly(@Nullable Event existingEvent, @NonNull Organizer organizer, @Nullable NavigationStackFragment navStack) {
-        OrganizerEventEditDetailsFragment fragment = new OrganizerEventEditDetailsFragment();
-        fragment.navStack = navStack;
-        fragment.event = existingEvent;
-        // Set to true so it shows waiting lists
-        fragment.isEditMode = true;
-        // Set view-only mode
-        fragment.isViewMode = true;
         fragment.organizer = organizer;
         return fragment;
     }
@@ -198,10 +160,6 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
         posterPreview = view.findViewById(R.id.edit_poster);
         importPosterButton = view.findViewById(R.id.btnUpload);
         deletePosterButton = view.findViewById(R.id.btnDelete);
-        createButton = view.findViewById(R.id.create_button);
-        cancelButton = view.findViewById(R.id.cancel_button);
-        updateButton = view.findViewById(R.id.update_button);
-        deleteButton = view.findViewById(R.id.delete_button);
         entrantLimitInput = view.findViewById(R.id.max_entrants);
         maxWaitingListInput = view.findViewById(R.id.max_waiting_list);
 
@@ -209,38 +167,14 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
         startTimeButton = view.findViewById(R.id.btnStartTime);
         endDateButton = view.findViewById(R.id.btnEndDate);
         endTimeButton = view.findViewById(R.id.btnEndTime);
-        generateQRButton = view.findViewById(R.id.generate_qr_button);
         geolocationToggle = view.findViewById(R.id.geolocation_toggle);
         viewMapButton = view.findViewById(R.id.view_map_button);
-
-        // Initialize waiting list UI elements
-        acceptedCountText = view.findViewById(R.id.accepted_count);
-        pendingCountText = view.findViewById(R.id.pending_count);
-        waitingCountText = view.findViewById(R.id.Waiting_count);
-        rejectedCountText = view.findViewById(R.id.rejected_count);
-        cancelledCountText = view.findViewById(R.id.cancelled_count);
-
-        // Get parent layouts for label sections (so we can handle clicks)
-        acceptedLabelLayout = view.findViewById(R.id.tvAcceptedLabel).getParent() instanceof LinearLayout ? (LinearLayout) view.findViewById(R.id.tvAcceptedLabel).getParent() : null;
-        pendingLabelLayout = view.findViewById(R.id.tvPendingLabel).getParent() instanceof LinearLayout ? (LinearLayout) view.findViewById(R.id.tvPendingLabel).getParent() : null;
-        waitingLabelLayout = view.findViewById(R.id.WaitingLabel).getParent() instanceof LinearLayout ? (LinearLayout) view.findViewById(R.id.WaitingLabel).getParent() : null;
-        rejectedLabelLayout = view.findViewById(R.id.RejectedLabel).getParent() instanceof LinearLayout ? (LinearLayout) view.findViewById(R.id.RejectedLabel).getParent() : null;
-        cancelledLabelLayout = view.findViewById(R.id.CancelledLabel).getParent() instanceof LinearLayout ? (LinearLayout) view.findViewById(R.id.CancelledLabel).getParent() : null;
-
-        listAccepted = view.findViewById(R.id.listAccepted);
-        listPending = view.findViewById(R.id.listPending);
-        listWaiting = view.findViewById(R.id.listWaiting);
-        listRejected = view.findViewById(R.id.listRejected);
-        listCancelled = view.findViewById(R.id.listCancelled);
 
         // Initialize controllers for Firebase operations
         eventController = EventController.getInstance();
         invitationController = new InvitationController();
 
         // Set the appropriate title based on mode
-        if (isViewMode) {
-            fragmentTitle.setText("View Event");
-        }
         if (isEditMode) {
             fragmentTitle.setText("Edit Event");
         }
@@ -250,17 +184,10 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
 
         setupButtonVisibility();
         setupListeners();
-        setupWaitingListListeners();
 
         if (isEditMode && event != null) {
             // In edit mode, populate the fields with EXISTING event data
             populateFields(event);
-            startRealtimeListeners();
-
-            // Disable all inputs if we're in view mode
-            if (isViewMode) {
-                disableAllInputs();
-            }
 
             // Seed test data
             //createFakeUsers();
@@ -269,36 +196,15 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
             //new android.os.Handler().postDelayed(() -> {
             //    seedTestInvitations();
             //}, 2000);
-        }
-        else {
+        } else {
             // In creatre mode, set the default button text
             updateDateButtonText(startDateButton, null);
             updateDateButtonText(endDateButton, null);
             updateTimeButtonText(startTimeButton, null);
             updateTimeButtonText(endTimeButton, null);
-
-            // Hide waiting list sections in create mode
-            hideWaitingListSections();
         }
 
         return view;
-    }
-
-    /**
-     * Hides all waiting list sections in the UI. Used when creating a new event where no waiting lists exist yet.
-     */
-    private void hideWaitingListSections() {
-        if (acceptedLabelLayout != null) acceptedLabelLayout.setVisibility(View.GONE);
-        if (pendingLabelLayout != null) pendingLabelLayout.setVisibility(View.GONE);
-        if (waitingLabelLayout != null) waitingLabelLayout.setVisibility(View.GONE);
-        if (rejectedLabelLayout != null) rejectedLabelLayout.setVisibility(View.GONE);
-        if (cancelledLabelLayout != null) cancelledLabelLayout.setVisibility(View.GONE);
-
-        if (listAccepted != null) listAccepted.setVisibility(View.GONE);
-        if (listPending != null) listPending.setVisibility(View.GONE);
-        if (listWaiting != null) listWaiting.setVisibility(View.GONE);
-        if (listRejected != null) listRejected.setVisibility(View.GONE);
-        if (listCancelled != null) listCancelled.setVisibility(View.GONE);
     }
 
     /**
@@ -307,33 +213,11 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
      */
     private void setupButtonVisibility() {
         // View only mode has to be added, where all action buttons are hidden, and I'll use the back button from the navStack since that's the only one we need
-        if (isViewMode) {
-            createButton.setVisibility(View.GONE);
-            updateButton.setVisibility(View.GONE);
-            deleteButton.setVisibility(View.GONE);
-            generateQRButton.setVisibility(View.GONE);
-            cancelButton.setVisibility(View.VISIBLE);
-            cancelButton.setText("Back");
-            // Override the cancel button to use navStack
-            cancelButton.setOnClickListener(v -> {
-                if (navStack != null) {
-                    navStack.popScreen();
-                }
-            });
-        }
+        // TODO: implement
         if (isEditMode) {
-            createButton.setVisibility(View.GONE);
-            cancelButton.setVisibility(View.GONE);
-            updateButton.setVisibility(View.VISIBLE);
-            deleteButton.setVisibility(View.VISIBLE);
-            generateQRButton.setVisibility(View.VISIBLE);
-        }
-        else {
-            createButton.setVisibility(View.VISIBLE);
-            cancelButton.setVisibility(View.VISIBLE);
-            updateButton.setVisibility(View.GONE);
-            deleteButton.setVisibility(View.GONE);
-            generateQRButton.setVisibility(View.GONE);
+
+        } else {
+
         }
     }
 
@@ -375,17 +259,6 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
             updateTimeButtonText(endTimeButton, endTime);
         }));
 
-        // QR Code generate button
-        generateQRButton.setOnClickListener(v -> {
-            if (event != null && navStack != null) {
-                QRGenerateFragment qrFragment = new QRGenerateFragment(event, navStack);
-                navStack.pushScreen(qrFragment);
-            }
-            else {
-                Toast.makeText(getContext(), "Please save the event first", Toast.LENGTH_SHORT).show();
-            }
-        });
-
         // View map button
         if (viewMapButton != null) {
             viewMapButton.setOnClickListener(v -> {
@@ -408,57 +281,13 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
         }
 
         // Action buttons
-        createButton.setOnClickListener(v -> createEvent());
-        updateButton.setOnClickListener(v -> updateEvent());
-        cancelButton.setOnClickListener(v -> {
-            if (navStack != null) navStack.popScreen();
-        });
-        deleteButton.setOnClickListener(v -> deleteEvent());
-    }
-
-    /**
-     * Sets up click listeners for waiting list sections. Each section opens a dialog showinf the list of users in that status.
-     */
-    private void setupWaitingListListeners() {
-        // Click listeners for accepted users
-        if (acceptedLabelLayout != null) {
-            acceptedLabelLayout.setOnClickListener(v -> showUserListDialog("Accepted Users", acceptedUsers, "accepted"));
-        }
-        if (acceptedCountText != null) {
-            acceptedCountText.setOnClickListener(v -> showUserListDialog("Accepted Users", acceptedUsers, "accepted"));
-        }
-
-        // Click listeners for pending users
-        if (pendingLabelLayout != null) {
-            pendingLabelLayout.setOnClickListener(v -> showUserListDialog("Pending Users", pendingUsers, "pending"));
-        }
-        if (pendingCountText != null) {
-            pendingCountText.setOnClickListener(v -> showUserListDialog("Pending Users", pendingUsers, "pending"));
-        }
-
-        // Click listeners for waiting users
-        if (waitingLabelLayout != null) {
-            waitingLabelLayout.setOnClickListener(v -> showUserListDialog("Waiting List Users", waitingListUsers, "waiting"));
-        }
-        if (waitingCountText != null) {
-            waitingCountText.setOnClickListener(v -> showUserListDialog("Waiting List Users", waitingListUsers, "waiting"));
-        }
-
-        // Click listeners for rejected users
-        if (rejectedLabelLayout != null) {
-            rejectedLabelLayout.setOnClickListener(v -> showUserListDialog("Rejected Users", rejectedUsers, "rejected"));
-        }
-        if (rejectedCountText != null) {
-            rejectedCountText.setOnClickListener(v -> showUserListDialog("Rejected Users", rejectedUsers, "rejected"));
-        }
-
-        // Click listeners for cancelled invitations
-        if (cancelledLabelLayout != null) {
-            cancelledLabelLayout.setOnClickListener(v -> showUserListDialog("Cancelled Invitations", cancelledUsers, "cancelled"));
-        }
-        if (cancelledCountText != null) {
-            cancelledCountText.setOnClickListener(v -> showUserListDialog("Cancelled Invitations", cancelledUsers, "cancelled"));
-        }
+        // TODO: replace with nav stack
+//        createButton.setOnClickListener(v -> createEvent());
+//        updateButton.setOnClickListener(v -> updateEvent());
+//        cancelButton.setOnClickListener(v -> {
+//            if (navStack != null) navStack.popScreen();
+//        });
+//        deleteButton.setOnClickListener(v -> deleteEvent());
     }
 
     /**
@@ -665,102 +494,6 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
     }
 
     /**
-     * Starts the FIrestore listeners to observe changes to the event and/or invitations.
-     * Updates UI automatically when data changes.
-     */
-    private void startRealtimeListeners() {
-        if (event == null || event.getEventID() == null) return;
-
-        // Listen to event changes (for waiting list)
-        eventListener = eventController.observeEvent(event.getEventID(), updatedEvent -> {
-            event = updatedEvent;
-            waitingListUsers = event.getWaitingList() != null ? event.getWaitingList() : new ArrayList<>();
-            updateWaitingCount();
-        });
-
-        // Listen to invitations changes (for accepted, pending, rejected, or cancelled)
-        invitationsListener = invitationController.observeEventInvites(event.getEventID(), invitations -> {
-            acceptedUsers = new ArrayList<>();
-            pendingUsers = new ArrayList<>();
-            rejectedUsers = new ArrayList<>();
-            cancelledUsers = new ArrayList<>();
-
-            // Categorize invitations by status
-            for (Invitation invitation : invitations) {
-                if (Boolean.TRUE.equals(invitation.getCancelled())) {
-                    cancelledUsers.add(invitation.getRecipientID());
-                    continue;
-                }
-
-                Boolean accepted = invitation.getAccepted();
-                if (accepted == null) {
-                    // Pending (null means that the user hasn't responded yet)
-                    pendingUsers.add(invitation.getRecipientID());
-                }
-                else if (accepted) {
-                    // Accepted
-                    acceptedUsers.add(invitation.getRecipientID());
-                }
-                else {
-                    // Rejected (accepted == false)
-                    rejectedUsers.add(invitation.getRecipientID());
-                }
-            }
-
-            // Call methods to update counts
-            updateAcceptedCount();
-            updatePendingCount();
-            updateRejectedCount();
-            updateCancelledCount();
-        });
-    }
-
-    /**
-     * Updates the accepted users count display
-     */
-    private void updateAcceptedCount() {
-        if (acceptedCountText != null) {
-            acceptedCountText.setText(String.valueOf(acceptedUsers.size()));
-        }
-    }
-
-    /**
-     * Updates the rejected users count display
-     */
-    private void updateRejectedCount() {
-        if (rejectedCountText != null) {
-            rejectedCountText.setText(String.valueOf(rejectedUsers.size()));
-        }
-    }
-
-    /**
-     * Updates the pending users count display
-     */
-    private void updatePendingCount() {
-        if (pendingCountText != null) {
-            pendingCountText.setText(String.valueOf(pendingUsers.size()));
-        }
-    }
-
-    /**
-     * Updates the waiting users count display
-     */
-    private void updateWaitingCount() {
-        if (waitingCountText != null) {
-            waitingCountText.setText(String.valueOf(waitingListUsers.size()));
-        }
-    }
-
-    /**
-     * Updates the cancelled users count display
-     */
-    private void updateCancelledCount() {
-        if (cancelledCountText != null) {
-            cancelledCountText.setText(String.valueOf(cancelledUsers.size()));
-        }
-    }
-
-    /**
      * Opens the device's image picker to allow the user to select a poster image.
      * It will request the needed permissions based on Android's version before opening.
      */
@@ -963,7 +696,7 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
         geolocationToggle.setChecked(e.isGeolocationRequired());
 
         // Disable geolocation toggle in edit mode (cannot be changed after creation)
-        if (isEditMode && !isViewMode) {
+        if (isEditMode) {
             geolocationToggle.setEnabled(false);
             geolocationToggle.setAlpha(0.6f);
         }
@@ -1289,45 +1022,6 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
                 })
                 .setNegativeButton("Cancel", null)
                 .show();
-    }
-
-    /**
-     * DIsables all the input fields and buttons, for view-only mode. This will prevent organizers from editing past events.
-     */
-    private void disableAllInputs() {
-        // Disable text inputs
-        titleInput.setEnabled(false);
-        locationInput.setEnabled(false);
-        descriptionInput.setEnabled(false);
-        entrantLimitInput.setEnabled(false);
-        maxWaitingListInput.setEnabled(false);
-
-        // Disable date/time buttons
-        startDateButton.setEnabled(false);
-        startTimeButton.setEnabled(false);
-        endDateButton.setEnabled(false);
-        endTimeButton.setEnabled(false);
-
-        // Disable poster buttons
-        importPosterButton.setEnabled(false);
-        deletePosterButton.setEnabled(false);
-
-        // Disable geolocation toggle
-        geolocationToggle.setEnabled(false);
-
-        // I'm just gonna change the opacity so clear fields are disabled
-        titleInput.setAlpha(0.6f);
-        locationInput.setAlpha(0.6f);
-        descriptionInput.setAlpha(0.6f);
-        entrantLimitInput.setAlpha(0.6f);
-        maxWaitingListInput.setAlpha(0.6f);
-        startDateButton.setAlpha(0.6f);
-        startTimeButton.setAlpha(0.6f);
-        endDateButton.setAlpha(0.6f);
-        endTimeButton.setAlpha(0.6f);
-        importPosterButton.setAlpha(0.6f);
-        deletePosterButton.setAlpha(0.6f);
-        geolocationToggle.setAlpha(0.6f);
     }
 
     @Override
