@@ -361,6 +361,25 @@ public class EventController {
         return eventsRef.document(eventID).update(updates);
     }
 
+    /**
+     * Gets an event object from the database
+     * @param eventID event ID
+     * @return Task that completes when the event found, null if the event does not exist
+     */
+    public Task<Event> getEvent(String eventID) {
+        return eventsRef.document(eventID).get().continueWith(task -> {
+            if (!task.isSuccessful()) {
+                return null;
+            }
+            DocumentSnapshot snap = task.getResult();
+            if (!snap.exists()) {
+                return null;
+            }
+
+            return snap.toObject(Event.class);
+        });
+    }
+
     public Task<Void> deleteEvent(String eventID) {
         if (eventID == null || eventID.isEmpty()) {
             return Tasks.forException(new IllegalArgumentException("eventID is required"));
