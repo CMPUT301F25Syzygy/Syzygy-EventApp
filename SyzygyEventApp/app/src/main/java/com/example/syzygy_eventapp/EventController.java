@@ -6,6 +6,9 @@ import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.*;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.functions.FirebaseFunctions;
+import com.google.firebase.functions.HttpsCallableReference;
+import com.google.firebase.functions.HttpsCallableResult;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,10 +26,14 @@ public class EventController {
     private static EventController singletonInstance = null;
 
     private final CollectionReference eventsRef;
+    private final HttpsCallableReference drawLotteryEarly;
 
     private EventController() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        this.eventsRef = db.collection("events");
+        eventsRef = db.collection("events");
+
+        FirebaseFunctions fbFunctions = FirebaseFunctions.getInstance();
+        drawLotteryEarly = fbFunctions.getHttpsCallable("drawLotteryEarly");
     }
 
     /**
@@ -391,6 +398,18 @@ public class EventController {
             return Tasks.forException(new IllegalArgumentException("eventID is required"));
         }
         return eventsRef.document(eventID).delete();
+    }
+
+    /**
+     * Tell the server to draw the lottery of an event right now
+     *
+     * @param eventId
+     * @return
+     */
+    public Task<HttpsCallableResult> drawLotteryEarly(String eventId) {
+        return drawLotteryEarly.call(new HashMap<>(){{
+            put("lotteryID", eventId);
+        }});
     }
 }
 

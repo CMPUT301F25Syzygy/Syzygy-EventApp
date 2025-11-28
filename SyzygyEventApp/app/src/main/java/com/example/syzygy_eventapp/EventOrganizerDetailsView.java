@@ -36,9 +36,10 @@ public class EventOrganizerDetailsView extends Fragment {
     private Button openMapButton;
     private UserListView acceptedListView, pendingListView, waitingListView;
     private ImageView posterImage;
-    private Button cancelInvitesButton, setInvitesButton, sendNotificationButton;
+    private Button cancelInvitesButton, sendInvitesButton, sendNotificationButton;
 
     // Controllers for Firebase operations
+    private EventController eventController;
     private UserControllerInterface userController;
     private InvitationController invitationController;
 
@@ -97,14 +98,14 @@ public class EventOrganizerDetailsView extends Fragment {
 
         openMapButton = view.findViewById(R.id.open_map_button);
         cancelInvitesButton = view.findViewById(R.id.cancel_invites_button);
-        setInvitesButton = view.findViewById(R.id.send_invites_button);
+        sendInvitesButton = view.findViewById(R.id.send_invites_button);
         sendNotificationButton = view.findViewById(R.id.send_notification_button);
 
         // Initialize controllers for Firebase operations
         userController = UserController.getInstance();
         invitationController = new InvitationController();
 
-        EventController eventController = EventController.getInstance();
+        eventController = EventController.getInstance();
         eventListener = eventController.observeEvent(event.getEventID(), (newEvent) -> {
             event = newEvent;
             refreshInterface();
@@ -130,8 +131,15 @@ public class EventOrganizerDetailsView extends Fragment {
             Toast.makeText(getContext(), "Not implemented", Toast.LENGTH_SHORT).show();
         });
 
-        setInvitesButton.setOnClickListener(v -> {
-            // TODO
+        sendInvitesButton.setOnClickListener(v -> {
+            eventController.drawLotteryEarly(event.getEventID())
+                    .addOnSuccessListener((result) -> {
+                        Toast.makeText(getContext(), "Lottery drawn", Toast.LENGTH_SHORT).show();
+                    })
+                    .addOnFailureListener((result) -> {
+                        System.err.println(result.toString());
+                        Toast.makeText(getContext(), "Failed to draw lottery", Toast.LENGTH_SHORT).show();
+                    });
         });
 
         sendNotificationButton.setOnClickListener(v -> {
