@@ -55,7 +55,7 @@
             android:layout_height="180dp"
             android:layout_marginTop="16dp"
             android:background="@drawable/field_box_background"
-            android:src="@drawable/image_placeholder"/>
+            android:src="@drawable/image_placeholder" />
 
         <!-- Description -->
         <TextView
@@ -125,7 +125,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="8dp"
-                    android:src="@drawable/clock_outline"/>
+                    android:src="@drawable/clock_outline" />
 
                 <TextView
                     android:id="@+id/event_time"
@@ -150,10 +150,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="8dp"
-                    android:src="@drawable/outline_profile_24"/>
+                    android:src="@drawable/outline_profile_24" />
 
                 <TextView
-                    android:id="@+id/eventEntrants"
+                    android:id="@+id/event_entrants"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/event_details_num_entrants"
@@ -163,24 +163,57 @@
             </LinearLayout>
         </LinearLayout>
 
+        <com.example.syzygy_eventapp.UserListView
+            android:id="@+id/accepted_list_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <com.example.syzygy_eventapp.UserListView
+            android:id="@+id/pending_list_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <com.example.syzygy_eventapp.UserListView
+            android:id="@+id/waiting_list_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+            <Button
+                android:id="@+id/cancel_invites_button"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp"
+                android:backgroundTint="@color/red"
+                app:icon="@drawable/ic_x_mark"
+                android:text="Cancle Invites"
+                android:textColor="@color/button_text" />
+
+            <Button
+                android:id="@+id/send_invites_button"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:backgroundTint="@color/green"
+                app:icon="@drawable/ic_check"
+                android:text="Send Invites"
+                android:textColor="@color/button_text" />
+        </LinearLayout>
+
         <Button
-            android:id="@+id/join_Btn"
-            android:layout_width="wrap_content"
+            android:id="@+id/send_notification_button"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:backgroundTint="@color/green"
-            android:text="Join Waiting List"
-            android:textColor="@color/button_text"/>
-
-        <TextView
-            android:id="@+id/joining_status"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:text="@string/event_details_num_people"
-            android:textColor="?attr/colorSecondary"
-            android:textSize="13sp" />
-
+            android:layout_weight="1"
+            android:backgroundTint="@color/blue"
+            app:icon="@drawable/outline_notification_add_24"
+            android:text="Send Invites"
+            android:textColor="@color/button_text" />
 
     </LinearLayout>
 </ScrollView>

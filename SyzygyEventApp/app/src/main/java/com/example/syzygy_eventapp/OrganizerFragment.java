@@ -27,7 +27,6 @@ public class OrganizerFragment extends Fragment {
     private OrganizerEventSummaryListView organizerSummaryListViewUpcoming;
     private OrganizerEventSummaryListView organizerSummaryListViewHistory;
     private String userID;
-    private EventController eventController;
     private ListenerRegistration eventsListener;
 
     // required empty constructor
@@ -57,34 +56,35 @@ public class OrganizerFragment extends Fragment {
 
         // Initialize the summary lists
         organizerSummaryListViewUpcoming = view.findViewById(R.id.upcoming_event_list);
+        organizerSummaryListViewUpcoming.setTitle("Upcoming Events");
         organizerSummaryListViewHistory = view.findViewById(R.id.history_event_list);
+        organizerSummaryListViewHistory.setTitle("Past Events");
 
         Button createEventButton = view.findViewById(R.id.create_event_button);
 
         // Load current user ID and event controller
         userID = AppInstallationId.get(requireContext());
-        eventController = new EventController();
 
         createEventButton.setOnClickListener(v -> {
             UserController.getInstance().getUser(userID)
                     .addOnSuccessListener(user -> {
-                        navStack.pushScreen(
-                                OrganizerEventEditDetailsFragment.newInstance(null, user.promote(), navStack)
-                        );
+                        // TODO: update call once OrganizerEventEditDetailsFragment is fixed up
+//                        navStack.pushScreen(
+//                                OrganizerEventEditDetailsFragment.newInstance(null, user.promote(), navStack)
+//                        );
                     })
                     .addOnFailureListener(e -> {
                         Log.e("OrganizerFragment", "Failed to get user", e);
                     });
         });
 
-        startObserver();
+        startEventObserver();
 
         return view;
     }
 
-    private void startObserver() {
-        eventsListener = eventController.observeAllEvents(events -> {
-
+    private void startEventObserver() {
+        EventController.getInstance().observeAllEvents(events -> {
             List<Event> upcoming = new ArrayList<>();
             List<Event> past = new ArrayList<>();
             Date now = new Date();
@@ -101,54 +101,22 @@ public class OrganizerFragment extends Fragment {
 
                 if (isPast) {
                     past.add(event);
-                }
-                else {
+                } else {
                     upcoming.add(event);
                 }
             }
 
-            // Populate the upcoming events list. Upcoming events should be clickable and take
-            // the organizer to the event edit page
-            organizerSummaryListViewUpcoming.setTitle("Upcoming Events");
-            organizerSummaryListViewUpcoming.setItems(upcoming, false, v -> {
-                Event clicked = (Event) v.getTag();
+            // Populate the upcoming events list.
+            organizerSummaryListViewUpcoming.setItems(upcoming, false, this::eventClickedCallback);
 
-                UserController.getInstance().getUser(userID)
-                        .addOnSuccessListener(user -> {
-                            navStack.pushScreen(
-                                    // Here we assume that the user is an organizer if they managed to get
-                                    // to this screen.
-                                    // TODO: Maybe add a stricter check here to make sure the user is actually
-                                    // an organizer, even though this shouldn't really ever be an issue unless
-                                    // someone is hacking our app...
-                                    OrganizerEventEditDetailsFragment.newInstance(clicked, user.promote(), navStack)
-                            );
-                        })
-                        .addOnFailureListener(e -> {
-                            // Handle error (optional)
-                            Log.e("syzygy_eventapp", "Failed to get user", e);
-                        });
-            });
-
-            // Populate the past event list. These are also clickabkle, but in a view-only mode so fields cannot be edited.
-            organizerSummaryListViewHistory.setTitle("Past Events");
-            organizerSummaryListViewHistory.setItems(past, false, v -> {
-                Event clicked = (Event) v.getTag();
-
-                UserController.getInstance().getUser(userID)
-                        .addOnSuccessListener(user -> {
-                            navStack.pushScreen(
-                                    // Open in view onlt mode
-                                    OrganizerEventEditDetailsFragment.newInstanceViewOnly(clicked, user.promote(), navStack)
-                            );
-                        })
-                        .addOnFailureListener(e -> {
-                            Log.e("OrganizerFragment", "Failed to get user", e);
-                        });
-            });
-        }, error -> {
-
+            // Populate the past event list.
+            organizerSummaryListViewHistory.setItems(past, false, this::eventClickedCallback);
         });
+    }
+
+    private void eventClickedCallback(View view) {
+        Event event = (Event) view.getTag();
+        navStack.pushScreen(new EventOrganizerDetailsView(event, navStack));
     }
 
     /**
@@ -162,5 +130,4 @@ public class OrganizerFragment extends Fragment {
             eventsListener = null;
         }
     }
-
 }

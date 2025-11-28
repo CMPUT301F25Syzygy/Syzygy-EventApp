@@ -6,8 +6,10 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
+import com.google.firebase.firestore.Filter;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.WriteBatch;
 
 import java.util.ArrayList;
@@ -211,79 +213,53 @@ public class InvitationController {
     }
 
     /**
-     * Observe all invitations for a given event in real time.
+     * Observe invitations to an event in real time.
      * Caller must hold the returned ListenerRegistration and remove it appropriately.
-     * @param event Event document ID to observe
      * @param onChange Callback invoked with the latest list of Invitation objects
-     * @param onError Callback invoked on listener errors
-     * @return ListenerRegistration that must be removed when no longer needed
-     * @throws IllegalArgumentException if event is null/empty
      */
-    public ListenerRegistration observeEventInvitations(String event, Consumer<List<Invitation>> onChange, Consumer<Exception> onError) {
-        if (event == null || event.isEmpty()) {
-            throw new IllegalArgumentException("event is required");
+    public ListenerRegistration observeEventInvites(String eventId, Consumer<List<Invitation>> onChange) {
+        return observeInvites(Filter.equalTo("event", eventId), onChange);
+    }
+
+    /**
+     * Observe *all* invitations for a given event in real time.
+     * Caller must hold the returned ListenerRegistration and remove it appropriately.
+     * @param onChange Callback invoked with the latest list of Invitation objects
+     */
+    public ListenerRegistration observeAllInvites(Consumer<List<Invitation>> onChange) {
+        return observeInvites(null, onChange);
+    }
+
+    /**
+     * Observe invitations for a given event in real time.
+     * Caller must hold the returned ListenerRegistration and remove it appropriately.
+     * @param filter Filter to select which invites to observe
+     * @param onChange Callback invoked with the latest list of Invitation objects
+     */
+    public ListenerRegistration observeInvites(Filter filter, Consumer<List<Invitation>> onChange) {
+        Query query = invitationsRef;
+        if (filter != null) {
+            query = query.where(filter);
         }
 
-        return invitationsRef.whereEqualTo("event", event).addSnapshotListener((snap, error) -> {
+        return query.addSnapshotListener((snap, error) -> {
             if (error != null) {
-                onError.accept(error);
+                System.err.println(error.toString());
                 return;
             }
 
-            List<Invitation> list = new ArrayList<>();
+            List<Invitation> matchingInvites = new ArrayList<>();
             if (snap != null) {
                 for (DocumentSnapshot doc : snap.getDocuments()) {
-                    Invitation inv = doc.toObject(Invitation.class);
-                    if (inv != null) {
-                        if (inv.getInvitation() == null) {
-                            inv.setInvitation(doc.getId());
-                        }
-                        list.add(inv);
+                    Invitation invite = doc.toObject(Invitation.class);
+                    if (invite != null) {
+                        invite.setInvitation(doc.getId());
+                        matchingInvites.add(invite);
                     }
                 }
             }
 
-            onChange.accept(list);
+            onChange.accept(matchingInvites);
         });
-    }
-
-    /**
-     * Observe all pending (accepted == null and not cancelled) invitations for a recipient in real time.
-     * @param recipientID User ID of the invitation recipient.
-     * @param onChange    Callback invoked with the latest list of pending invitations.
-     * @param onError     Callback invoked on Firestore listener errors.
-     * @return ListenerRegistration that must be removed when no longer needed.
-     */
-    public ListenerRegistration observePending(String recipientID, Consumer<List<Invitation>> onChange, Consumer<Exception> onError) {
-        if (recipientID == null || recipientID.isEmpty()) {
-            throw new IllegalArgumentException("recipientID is required");
-        }
-
-        return invitationsRef.whereEqualTo("recipientID", recipientID).whereEqualTo("accepted", null).addSnapshotListener((snap, e) -> {
-                    if (e != null) {
-                        onError.accept(e);
-                        return;
-                    }
-
-                    List<Invitation> list = new ArrayList<>();
-                    if (snap != null) {
-                        for (DocumentSnapshot doc : snap.getDocuments()) {
-                            Boolean canceled = doc.getBoolean("cancelled");
-                            if (Boolean.TRUE.equals(canceled)) {
-                                continue; // skip cancelled invites
-                            }
-
-                            Invitation inv = doc.toObject(Invitation.class);
-                            if (inv != null && inv.getInvitation() == null) {
-                                inv.setInvitation(doc.getId());
-                            }
-                            if (inv != null) {
-                                list.add(inv);
-                            }
-                        }
-                    }
-
-                    onChange.accept(list);
-                });
     }
 }

@@ -30,7 +30,7 @@ public class UserControllerMock implements UserControllerInterface {
         };
     }
 
-    public ListenerRegistration observeAllUsers(Consumer<List<User>> onChange, Consumer<Exception> onError) {
+    public ListenerRegistration observeAllUsers(Consumer<List<User>> onChange) {
         return () -> {
         };
     }
