@@ -1,5 +1,7 @@
 package com.example.syzygy_eventapp;
 
+import android.widget.Toast;
+
 import androidx.annotation.Nullable;
 
 import com.google.android.gms.tasks.Task;
@@ -21,8 +23,8 @@ import java.util.stream.IntStream;
 /**
  * Controller for reading/writing {@link User} data in Firestore DB.
  * <p>
- *     UserViews will call this class to create, update, and delete users and to get changes from the User model.
- *     Firestore has the true data, and snapshots are converted to {@link User} and delivered back to the UserView.
+ * UserViews will call this class to create, update, and delete users and to get changes from the User model.
+ * Firestore has the true data, and snapshots are converted to {@link User} and delivered back to the UserView.
  * </p>
  */
 
@@ -39,6 +41,7 @@ public class UserController implements UserControllerInterface {
 
     /**
      * Gets a single global instance of the UserController
+     *
      * @return a UserController singleton
      */
     public static UserControllerInterface getInstance() {
@@ -50,6 +53,7 @@ public class UserController implements UserControllerInterface {
 
     /**
      * Override singleton with an external instance, likely for testing
+     *
      * @param instance the external instance
      */
 
@@ -59,6 +63,7 @@ public class UserController implements UserControllerInterface {
 
     /**
      * Calls {@link #createUserFromClass(Supplier, String)} to create a {@link User} (entrant).
+     *
      * @return A new entrant with default fields.
      */
     public Task<User> createEntrant(String userID) {
@@ -67,6 +72,7 @@ public class UserController implements UserControllerInterface {
 
     /**
      * Calls {@link #createUserFromClass(Supplier, String)} to create an {@link Organizer}.
+     *
      * @return A new organizer with default fields.
      */
     public Task<Organizer> createOrganizer(String userID) {
@@ -75,6 +81,7 @@ public class UserController implements UserControllerInterface {
 
     /**
      * Calls {@link #createUserFromClass(Supplier, String)} to create an {@link Admin}.
+     *
      * @return A new admin with default fields.
      */
     public Task<Admin> createAdmin(String userID) {
@@ -84,6 +91,7 @@ public class UserController implements UserControllerInterface {
     /**
      * Creates a new {@link User}, or any subclass of it, and checks it's ID doesn't collide in the database.
      * The user will have the default fields.
+     *
      * @param userID The ID that the newly created user will have.
      * @return Task that completes when the document is created or if it already exists
      */
@@ -119,6 +127,7 @@ public class UserController implements UserControllerInterface {
     /**
      * Retrieves a user from the database
      * Results in a IllegalArgumentException if the userID isn't in the database
+     *
      * @param userID the userID to get a {@link User} for
      * @return the {@link User} found in the database
      */
@@ -126,24 +135,55 @@ public class UserController implements UserControllerInterface {
         DocumentReference doc = usersRef.document(userID);
 
         return doc.get().continueWithTask(task -> {
-            // snap can't be null because none of it's implementations can return null
-            DocumentSnapshot snap = task.getResult();
+            if (task.isSuccessful()) {
+                // snap can't be null because none of it's implementations can return null
+                DocumentSnapshot snap = task.getResult();
 
-            if (!snap.exists()) {
-                return Tasks.forException(
-                        new IllegalArgumentException("User: " + userID + " not found.")
-                );
+                if (!snap.exists()) {
+                    return Tasks.forException(
+                            new IllegalArgumentException("User: " + userID + " not found.")
+                    );
+                }
+
+                User user = buildUser(snap);
+
+                return Tasks.forResult(user);
+            } else {
+                return Tasks.forException(task.getException());
             }
-
-            User user = buildUser(snap);
-
-            return Tasks.forResult(user);
         });
     }
 
     /**
+     * Retrieves a list of users from the database
+     * Results in a IllegalArgumentException if the userID isn't in the database
+     *
+     * @param userIDs the userID to get a {@link User} for
+     * @return the list of {@link User} found in the database
+     */
+    public Task<List<User>> getUsers(List<String> userIDs) {
+        List<Task<User>> userTasks = new ArrayList<>();
+        for (String waitingUserId : userIDs) {
+            userTasks.add(getUser(waitingUserId));
+        }
+
+        return Tasks.whenAllSuccess(userTasks)
+                .continueWithTask(task -> {
+                    if (task.isSuccessful()) {
+                        List<Object> results = task.getResult();
+
+                        List<User> users = (List<User>) (List<?>) results;
+                        return Tasks.forResult(users);
+                    } else {
+                        return Tasks.forException(task.getException());
+                    }
+                });
+    }
+
+    /**
      * Observes userID and pushes the current {@link User} on each change. <u>This should never be used outside of {@link User}.</u>
-     * @param userID Document ID to observe
+     *
+     * @param userID   Document ID to observe
      * @param onUpdate Callback for changed versions of the {@link User}
      * @param onDelete Callback for when the user is deleted
      * @return ListenerRegistration for stopping the observation
@@ -152,30 +192,31 @@ public class UserController implements UserControllerInterface {
         DocumentReference doc = usersRef.document(userID);
 
         return doc.addSnapshotListener((snap, error) -> {
-           if (snap != null) {
-               if (snap.exists()) {
-                   User user = buildUser(snap);
-                   onUpdate.accept(user);
-               } else {
-                   onDelete.run();
-               }
-           }
+            if (snap != null) {
+                if (snap.exists()) {
+                    User user = buildUser(snap);
+                    onUpdate.accept(user);
+                } else {
+                    onDelete.run();
+                }
+            }
 
-           if (error != null) {
-               System.err.println("Error on user snapshot listener: " + error.toString());
-           }
+            if (error != null) {
+                System.err.println("Error on user snapshot listener: " + error);
+            }
         });
     }
 
     /**
      * Observe all users in real time.
+     *
      * @param onChange Callback invoked with the latest list of User objects
      * @return ListenerRegistration that must be removed when no longer needed
      */
     public ListenerRegistration observeAllUsers(Consumer<List<User>> onChange) {
         return usersRef.addSnapshotListener((snap, error) -> {
             if (error != null) {
-                System.err.println(error.toString());
+                System.err.println(error);
                 return;
             }
 
@@ -192,7 +233,7 @@ public class UserController implements UserControllerInterface {
                         }
                     } catch (Exception tryError) {
                         // buildUser may fail if fields are malformed
-                        System.err.println(tryError.toString());
+                        System.err.println(tryError);
                     }
                 }
             }
@@ -203,6 +244,7 @@ public class UserController implements UserControllerInterface {
 
     /**
      * Partially update a user's fields. <u>This should never be used outside of {@link User}.</u>
+     *
      * @param userID Document ID
      * @param fields A map of field names and new values
      * @return Task that completes when the merge is written
@@ -259,6 +301,7 @@ public class UserController implements UserControllerInterface {
 
     /**
      * Permanently delete this user.
+     *
      * @param userID The user document ID
      * @return Task that completes when the document is deleted
      */
