@@ -196,12 +196,6 @@ public class <span class="typeNameLabel"><a href=EventController.html>EventContr
                                         </tr>
 
                                         
-                                            <tr class="altColor">
-                                                <th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a
-                                                        href="#EventController()">EventController</a></span>()</code></th>
-                                                <td class="colLast"></td>
-                                            </tr>
-                                        
 
                                         </tbody>
                                     </table>
@@ -252,6 +246,14 @@ public class <span class="typeNameLabel"><a href=EventController.html>EventContr
                                         </tr>
                                         
                                         <tr id="i0" class="altColor">
+                                            <td class="colFirst"><code>static <a href=EventController.html>EventController</a></code>
+                                            </td>
+                                            <th class="colSecond" scope="row"><code><a href=EventController.html#getInstance()>getInstance</a>() </code>
+                                            </th>
+                                            <td class="colLast">Gets a single global instance of the EventController</td>
+                                        </tr>
+                                        
+                                        <tr id="i1" class="rowColor">
                                             <td class="colFirst"><code>Task&lt;String&gt;</code>
                                             </td>
                                             <th class="colSecond" scope="row"><code><a href=EventController.html#createEvent(com.example.syzygy_eventapp.Event)>createEvent</a>(<a href=Event.html>Event</a> event) </code>
@@ -259,39 +261,39 @@ public class <span class="typeNameLabel"><a href=EventController.html>EventContr
                                             <td class="colLast">Create a new event with provided details.</td>
                                         </tr>
                                         
-                                        <tr id="i1" class="rowColor">
-                                            <td class="colFirst"><code>ListenerRegistration</code>
-                                            </td>
-                                            <th class="colSecond" scope="row"><code><a href=EventController.html#observeEvent(java.lang.String,java.util.function.Consumer,java.util.function.Consumer)>observeEvent</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> eventID, <a href=https://developer.android.com/reference/kotlin/java/util/function/Consumer.html>Consumer</a>&lt;<a href=Event.html>Event</a>&gt; onEventChange, <a href=https://developer.android.com/reference/kotlin/java/util/function/Consumer.html>Consumer</a>&lt;<a href=https://developer.android.com/reference/kotlin/java/lang/Exception.html>Exception</a>&gt; onError) </code>
-                                            </th>
-                                            <td class="colLast">Real time observers; observes a single event in real time</td>
-                                        </tr>
-                                        
                                         <tr id="i2" class="altColor">
                                             <td class="colFirst"><code>ListenerRegistration</code>
                                             </td>
-                                            <th class="colSecond" scope="row"><code><a href=EventController.html#observeAllEvents(java.util.function.Consumer,java.util.function.Consumer)>observeAllEvents</a>(<a href=https://developer.android.com/reference/kotlin/java/util/function/Consumer.html>Consumer</a>&lt;<a href=https://developer.android.com/reference/kotlin/java/util/List.html>List</a>&lt;<a href=Event.html>Event</a>&gt;&gt; onChange, <a href=https://developer.android.com/reference/kotlin/java/util/function/Consumer.html>Consumer</a>&lt;<a href=https://developer.android.com/reference/kotlin/java/lang/Exception.html>Exception</a>&gt; onError) </code>
+                                            <th class="colSecond" scope="row"><code><a href=EventController.html#observeEvent(java.lang.String,java.util.function.Consumer)>observeEvent</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> eventID, <a href=https://developer.android.com/reference/kotlin/java/util/function/Consumer.html>Consumer</a>&lt;<a href=Event.html>Event</a>&gt; onEventChange) </code>
                                             </th>
-                                            <td class="colLast">Observe all events in real time.</td>
+                                            <td class="colLast">Real time observers; observes a single event in real time</td>
                                         </tr>
                                         
                                         <tr id="i3" class="rowColor">
                                             <td class="colFirst"><code>ListenerRegistration</code>
                                             </td>
-                                            <th class="colSecond" scope="row"><code><a href=EventController.html#observeOrganizerEvents(java.lang.String,java.util.function.Consumer,java.util.function.Consumer)>observeOrganizerEvents</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> organizerID, <a href=https://developer.android.com/reference/kotlin/java/util/function/Consumer.html>Consumer</a>&lt;<a href=https://developer.android.com/reference/kotlin/java/util/List.html>List</a>&lt;<a href=Event.html>Event</a>&gt;&gt; onChange, <a href=https://developer.android.com/reference/kotlin/java/util/function/Consumer.html>Consumer</a>&lt;<a href=https://developer.android.com/reference/kotlin/java/lang/Exception.html>Exception</a>&gt; onError) </code>
+                                            <th class="colSecond" scope="row"><code><a href=EventController.html#observeAllEvents(java.util.function.Consumer)>observeAllEvents</a>(<a href=https://developer.android.com/reference/kotlin/java/util/function/Consumer.html>Consumer</a>&lt;<a href=https://developer.android.com/reference/kotlin/java/util/List.html>List</a>&lt;<a href=Event.html>Event</a>&gt;&gt; onChange) </code>
                                             </th>
-                                            <td class="colLast">Observe all events owned by an organizer in real time.</td>
+                                            <td class="colLast">Observe all events in real time.</td>
                                         </tr>
                                         
                                         <tr id="i4" class="altColor">
                                             <td class="colFirst"><code>ListenerRegistration</code>
                                             </td>
-                                            <th class="colSecond" scope="row"><code><a href=EventController.html#observeEntrantLocations(java.lang.String,java.util.function.Consumer,java.util.function.Consumer)>observeEntrantLocations</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> eventID, <a href=https://developer.android.com/reference/kotlin/java/util/function/Consumer.html>Consumer</a>&lt;<a href=https://developer.android.com/reference/kotlin/java/util/List.html>List</a>&lt;<a href=https://developer.android.com/reference/kotlin/java/util/Map.html>Map</a>&lt;<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a>, <a href=https://developer.android.com/reference/kotlin/java/lang/Object.html>Object</a>&gt;&gt;&gt; onChange, <a href=https://developer.android.com/reference/kotlin/java/util/function/Consumer.html>Consumer</a>&lt;<a href=https://developer.android.com/reference/kotlin/java/lang/Exception.html>Exception</a>&gt; onError) </code>
+                                            <th class="colSecond" scope="row"><code><a href=EventController.html#observeOrganizerEvents(java.lang.String,java.util.function.Consumer)>observeOrganizerEvents</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> organizerID, <a href=https://developer.android.com/reference/kotlin/java/util/function/Consumer.html>Consumer</a>&lt;<a href=https://developer.android.com/reference/kotlin/java/util/List.html>List</a>&lt;<a href=Event.html>Event</a>&gt;&gt; onChange) </code>
+                                            </th>
+                                            <td class="colLast">Observe all events owned by an organizer in real time.</td>
+                                        </tr>
+                                        
+                                        <tr id="i5" class="rowColor">
+                                            <td class="colFirst"><code>ListenerRegistration</code>
+                                            </td>
+                                            <th class="colSecond" scope="row"><code><a href=EventController.html#observeEntrantLocations(java.lang.String,java.util.function.Consumer)>observeEntrantLocations</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> eventID, <a href=https://developer.android.com/reference/kotlin/java/util/function/Consumer.html>Consumer</a>&lt;<a href=https://developer.android.com/reference/kotlin/java/util/List.html>List</a>&lt;<a href=https://developer.android.com/reference/kotlin/java/util/Map.html>Map</a>&lt;<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a>, <a href=https://developer.android.com/reference/kotlin/java/lang/Object.html>Object</a>&gt;&gt;&gt; onChange) </code>
                                             </th>
                                             <td class="colLast">Observe entrant locations for an event in real time.</td>
                                         </tr>
                                         
-                                        <tr id="i5" class="rowColor">
+                                        <tr id="i6" class="altColor">
                                             <td class="colFirst"><code>Task&lt;Integer&gt;</code>
                                             </td>
                                             <th class="colSecond" scope="row"><code><a href=EventController.html#getWaitingListSize(java.lang.String)>getWaitingListSize</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> eventID) </code>
@@ -299,7 +301,7 @@ public class <span class="typeNameLabel"><a href=EventController.html>EventContr
                                             <td class="colLast">Get the current number of Entrants on a waiting list for an event.</td>
                                         </tr>
                                         
-                                        <tr id="i6" class="altColor">
+                                        <tr id="i7" class="rowColor">
                                             <td class="colFirst"><code>Task&lt;Void&gt;</code>
                                             </td>
                                             <th class="colSecond" scope="row"><code><a href=EventController.html#addToWaitingList(java.lang.String,java.lang.String,GeoPoint)>addToWaitingList</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> eventID, <a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> userID, GeoPoint userLocation) </code>
@@ -307,7 +309,7 @@ public class <span class="typeNameLabel"><a href=EventController.html>EventContr
                                             <td class="colLast">Add a user to the waiting list for an event.</td>
                                         </tr>
                                         
-                                        <tr id="i7" class="rowColor">
+                                        <tr id="i8" class="altColor">
                                             <td class="colFirst"><code>Task&lt;Void&gt;</code>
                                             </td>
                                             <th class="colSecond" scope="row"><code><a href=EventController.html#removeFromWaitingList(java.lang.String,java.lang.String)>removeFromWaitingList</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> eventID, <a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> userID) </code>
@@ -315,7 +317,7 @@ public class <span class="typeNameLabel"><a href=EventController.html>EventContr
                                             <td class="colLast">Remove a user from the waiting list for an event.</td>
                                         </tr>
                                         
-                                        <tr id="i8" class="altColor">
+                                        <tr id="i9" class="rowColor">
                                             <td class="colFirst"><code>Task&lt;Void&gt;</code>
                                             </td>
                                             <th class="colSecond" scope="row"><code><a href=EventController.html#updateEvent(java.lang.String,java.util.Map)>updateEvent</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> eventID, <a href=https://developer.android.com/reference/kotlin/java/util/Map.html>Map</a>&lt;<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a>, <a href=https://developer.android.com/reference/kotlin/java/lang/Object.html>Object</a>&gt; updates) </code>
@@ -323,7 +325,15 @@ public class <span class="typeNameLabel"><a href=EventController.html>EventContr
                                             <td class="colLast">Update event details.</td>
                                         </tr>
                                         
-                                        <tr id="i9" class="rowColor">
+                                        <tr id="i10" class="altColor">
+                                            <td class="colFirst"><code>Task&lt;Event&gt;</code>
+                                            </td>
+                                            <th class="colSecond" scope="row"><code><a href=EventController.html#getEvent(java.lang.String)>getEvent</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> eventID) </code>
+                                            </th>
+                                            <td class="colLast">Gets an event object from the database</td>
+                                        </tr>
+                                        
+                                        <tr id="i11" class="rowColor">
                                             <td class="colFirst"><code>Task&lt;Void&gt;</code>
                                             </td>
                                             <th class="colSecond" scope="row"><code><a href=EventController.html#deleteEvent(java.lang.String)>deleteEvent</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> eventID) </code>
@@ -362,16 +372,6 @@ public class <span class="typeNameLabel"><a href=EventController.html>EventContr
                             </a>
                                 <h3>Constructor Detail</h3>
                                 
-                                <a name="EventController()"></a>
-                                <ul class="blockList">
-                                    <li class="blockList">
-                                        <h4>EventController</h4>
-                                        <pre>EventController()</pre>
-                                        <div class="block"></div>
-                                        
-                                    </li>
-                                </ul>
-                                
                             </li>
                         </ul>
                     </section>
@@ -384,6 +384,32 @@ public class <span class="typeNameLabel"><a href=EventController.html>EventContr
                                 <!--   -->
                             </a>
                                 <h3>Method Detail</h3>
+                                
+                                <a id="getInstance()">
+                                    <!--   -->
+                                </a>
+                                <ul class=
+                                              "blockList"
+                                          >
+                                    <li class="blockList">
+                                        <h4>getInstance</h4>
+                                        <pre class="methodSignature"> static <a href=EventController.html>EventController</a> <a href=EventController.html#getInstance()>getInstance</a>()</pre>
+                                        <div class="block"><p>Gets a single global instance of the EventController</p></div>
+
+                                        <dl>
+
+                                        
+
+                                        
+                                            <dt><span class="returnLabel">Returns:</span></dt>
+                                            <dd><p>a UserController singleton</p></dd>
+                                        
+
+                                        
+
+                                        </dl>
+                                    </li>
+                                </ul>
                                 
                                 <a id="createEvent(com.example.syzygy_eventapp.Event)">
                                     <!--   -->
@@ -418,7 +444,7 @@ public class <span class="typeNameLabel"><a href=EventController.html>EventContr
                                     </li>
                                 </ul>
                                 
-                                <a id="observeEvent(java.lang.String,java.util.function.Consumer,java.util.function.Consumer)">
+                                <a id="observeEvent(java.lang.String,java.util.function.Consumer)">
                                     <!--   -->
                                 </a>
                                 <ul class=
@@ -426,7 +452,7 @@ public class <span class="typeNameLabel"><a href=EventController.html>EventContr
                                           >
                                     <li class="blockList">
                                         <h4>observeEvent</h4>
-                                        <pre class="methodSignature"> ListenerRegistration <a href=EventController.html#observeEvent(java.lang.String,java.util.function.Consumer,java.util.function.Consumer)>observeEvent</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> eventID, <a href=https://developer.android.com/reference/kotlin/java/util/function/Consumer.html>Consumer</a>&lt;<a href=Event.html>Event</a>&gt; onEventChange, <a href=https://developer.android.com/reference/kotlin/java/util/function/Consumer.html>Consumer</a>&lt;<a href=https://developer.android.com/reference/kotlin/java/lang/Exception.html>Exception</a>&gt; onError)</pre>
+                                        <pre class="methodSignature"> ListenerRegistration <a href=EventController.html#observeEvent(java.lang.String,java.util.function.Consumer)>observeEvent</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> eventID, <a href=https://developer.android.com/reference/kotlin/java/util/function/Consumer.html>Consumer</a>&lt;<a href=Event.html>Event</a>&gt; onEventChange)</pre>
                                         <div class="block"><p>Real time observers; observes a single event in real time</p></div>
 
                                         <dl>
@@ -442,10 +468,6 @@ public class <span class="typeNameLabel"><a href=EventController.html>EventContr
                                             <dd><code>onEventChange</code> - Callback invoked with the latest Event object</dd>
                                             
                                             
-                                            
-                                            <dd><code>onError</code> - Callback invoked on listener errors</dd>
-                                            
-                                            
                                         
 
                                         
@@ -459,7 +481,7 @@ public class <span class="typeNameLabel"><a href=EventController.html>EventContr
                                     </li>
                                 </ul>
                                 
-                                <a id="observeAllEvents(java.util.function.Consumer,java.util.function.Consumer)">
+                                <a id="observeAllEvents(java.util.function.Consumer)">
                                     <!--   -->
                                 </a>
                                 <ul class=
@@ -467,7 +489,7 @@ public class <span class="typeNameLabel"><a href=EventController.html>EventContr
                                           >
                                     <li class="blockList">
                                         <h4>observeAllEvents</h4>
-                                        <pre class="methodSignature"> ListenerRegistration <a href=EventController.html#observeAllEvents(java.util.function.Consumer,java.util.function.Consumer)>observeAllEvents</a>(<a href=https://developer.android.com/reference/kotlin/java/util/function/Consumer.html>Consumer</a>&lt;<a href=https://developer.android.com/reference/kotlin/java/util/List.html>List</a>&lt;<a href=Event.html>Event</a>&gt;&gt; onChange, <a href=https://developer.android.com/reference/kotlin/java/util/function/Consumer.html>Consumer</a>&lt;<a href=https://developer.android.com/reference/kotlin/java/lang/Exception.html>Exception</a>&gt; onError)</pre>
+                                        <pre class="methodSignature"> ListenerRegistration <a href=EventController.html#observeAllEvents(java.util.function.Consumer)>observeAllEvents</a>(<a href=https://developer.android.com/reference/kotlin/java/util/function/Consumer.html>Consumer</a>&lt;<a href=https://developer.android.com/reference/kotlin/java/util/List.html>List</a>&lt;<a href=Event.html>Event</a>&gt;&gt; onChange)</pre>
                                         <div class="block"><p>Observe all events in real time.</p></div>
 
                                         <dl>
@@ -479,10 +501,6 @@ public class <span class="typeNameLabel"><a href=EventController.html>EventContr
                                             <dd><code>onChange</code> - Callback invoked with the latest list of Event objects</dd>
                                             
                                             
-                                            
-                                            <dd><code>onError</code> - Callback invoked on listener errors</dd>
-                                            
-                                            
                                         
 
                                         
@@ -496,7 +514,7 @@ public class <span class="typeNameLabel"><a href=EventController.html>EventContr
                                     </li>
                                 </ul>
                                 
-                                <a id="observeOrganizerEvents(java.lang.String,java.util.function.Consumer,java.util.function.Consumer)">
+                                <a id="observeOrganizerEvents(java.lang.String,java.util.function.Consumer)">
                                     <!--   -->
                                 </a>
                                 <ul class=
@@ -504,7 +522,7 @@ public class <span class="typeNameLabel"><a href=EventController.html>EventContr
                                           >
                                     <li class="blockList">
                                         <h4>observeOrganizerEvents</h4>
-                                        <pre class="methodSignature"> ListenerRegistration <a href=EventController.html#observeOrganizerEvents(java.lang.String,java.util.function.Consumer,java.util.function.Consumer)>observeOrganizerEvents</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> organizerID, <a href=https://developer.android.com/reference/kotlin/java/util/function/Consumer.html>Consumer</a>&lt;<a href=https://developer.android.com/reference/kotlin/java/util/List.html>List</a>&lt;<a href=Event.html>Event</a>&gt;&gt; onChange, <a href=https://developer.android.com/reference/kotlin/java/util/function/Consumer.html>Consumer</a>&lt;<a href=https://developer.android.com/reference/kotlin/java/lang/Exception.html>Exception</a>&gt; onError)</pre>
+                                        <pre class="methodSignature"> ListenerRegistration <a href=EventController.html#observeOrganizerEvents(java.lang.String,java.util.function.Consumer)>observeOrganizerEvents</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> organizerID, <a href=https://developer.android.com/reference/kotlin/java/util/function/Consumer.html>Consumer</a>&lt;<a href=https://developer.android.com/reference/kotlin/java/util/List.html>List</a>&lt;<a href=Event.html>Event</a>&gt;&gt; onChange)</pre>
                                         <div class="block"><p>Observe all events owned by an organizer in real time.</p></div>
 
                                         <dl>
@@ -520,10 +538,6 @@ public class <span class="typeNameLabel"><a href=EventController.html>EventContr
                                             <dd><code>onChange</code> - Callback invoked with the latest list of Event objects</dd>
                                             
                                             
-                                            
-                                            <dd><code>onError</code> - Callback invoked on listener errors</dd>
-                                            
-                                            
                                         
 
                                         
@@ -537,7 +551,7 @@ public class <span class="typeNameLabel"><a href=EventController.html>EventContr
                                     </li>
                                 </ul>
                                 
-                                <a id="observeEntrantLocations(java.lang.String,java.util.function.Consumer,java.util.function.Consumer)">
+                                <a id="observeEntrantLocations(java.lang.String,java.util.function.Consumer)">
                                     <!--   -->
                                 </a>
                                 <ul class=
@@ -545,7 +559,7 @@ public class <span class="typeNameLabel"><a href=EventController.html>EventContr
                                           >
                                     <li class="blockList">
                                         <h4>observeEntrantLocations</h4>
-                                        <pre class="methodSignature"> ListenerRegistration <a href=EventController.html#observeEntrantLocations(java.lang.String,java.util.function.Consumer,java.util.function.Consumer)>observeEntrantLocations</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> eventID, <a href=https://developer.android.com/reference/kotlin/java/util/function/Consumer.html>Consumer</a>&lt;<a href=https://developer.android.com/reference/kotlin/java/util/List.html>List</a>&lt;<a href=https://developer.android.com/reference/kotlin/java/util/Map.html>Map</a>&lt;<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a>, <a href=https://developer.android.com/reference/kotlin/java/lang/Object.html>Object</a>&gt;&gt;&gt; onChange, <a href=https://developer.android.com/reference/kotlin/java/util/function/Consumer.html>Consumer</a>&lt;<a href=https://developer.android.com/reference/kotlin/java/lang/Exception.html>Exception</a>&gt; onError)</pre>
+                                        <pre class="methodSignature"> ListenerRegistration <a href=EventController.html#observeEntrantLocations(java.lang.String,java.util.function.Consumer)>observeEntrantLocations</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> eventID, <a href=https://developer.android.com/reference/kotlin/java/util/function/Consumer.html>Consumer</a>&lt;<a href=https://developer.android.com/reference/kotlin/java/util/List.html>List</a>&lt;<a href=https://developer.android.com/reference/kotlin/java/util/Map.html>Map</a>&lt;<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a>, <a href=https://developer.android.com/reference/kotlin/java/lang/Object.html>Object</a>&gt;&gt;&gt; onChange)</pre>
                                         <div class="block"><p>Observe entrant locations for an event in real time.</p></div>
 
                                         <dl>
@@ -559,10 +573,6 @@ public class <span class="typeNameLabel"><a href=EventController.html>EventContr
                                             
                                             
                                             <dd><code>onChange</code> - Callback with list of location data maps</dd>
-                                            
-                                            
-                                            
-                                            <dd><code>onError</code> - Error callback</dd>
                                             
                                             
                                         
@@ -716,6 +726,39 @@ public class <span class="typeNameLabel"><a href=EventController.html>EventContr
                                         
                                             <dt><span class="returnLabel">Returns:</span></dt>
                                             <dd><p>Task that completes when the event is updated</p></dd>
+                                        
+
+                                        
+
+                                        </dl>
+                                    </li>
+                                </ul>
+                                
+                                <a id="getEvent(java.lang.String)">
+                                    <!--   -->
+                                </a>
+                                <ul class=
+                                              "blockList"
+                                          >
+                                    <li class="blockList">
+                                        <h4>getEvent</h4>
+                                        <pre class="methodSignature"> Task&lt;Event&gt; <a href=EventController.html#getEvent(java.lang.String)>getEvent</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> eventID)</pre>
+                                        <div class="block"><p>Gets an event object from the database</p></div>
+
+                                        <dl>
+
+                                        
+                                            <dt><span class="paramLabel">Parameters:</span></dt>
+                                            
+                                            
+                                            <dd><code>eventID</code> - event ID</dd>
+                                            
+                                            
+                                        
+
+                                        
+                                            <dt><span class="returnLabel">Returns:</span></dt>
+                                            <dd><p>Task that completes when the event found, null if the event does not exist</p></dd>
                                         
 
                                         
