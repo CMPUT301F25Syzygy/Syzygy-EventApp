@@ -32,7 +32,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.Timestamp;
-import com.google.firebase.firestore.ListenerRegistration;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -44,9 +43,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 /**
  * Fragment class that allows an organizer to create or edit an event's details.
@@ -78,12 +75,6 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
 
     private static final String TAG = "OrganizerEventEdit";
 
-    // Image handling vars
-    private Uri selectedImageUri;
-    private String posterBase64;
-    private boolean posterDeleted = false;
-
-
     // Activity result launcher for image selection
     private ActivityResultLauncher<Intent> imagePickerLauncher;
 
@@ -94,7 +85,9 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
      * @param navStack    The nav stack for screen management
      */
     public OrganizerEventEditDetailsFragment(@NonNull String organizerID, @Nullable NavigationStackFragment navStack) {
-        this.event = null;
+        event = new Event();
+        event.setOrganizerID(organizerID);
+
         this.isEditMode = false;
         this.organizerID = organizerID;
         this.navStack = navStack;
@@ -121,7 +114,7 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
                     if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
-                        selectedImageUri = result.getData().getData();
+                        Uri selectedImageUri = result.getData().getData();
                         if (selectedImageUri != null) {
                             loadAndConvertImage(selectedImageUri);
                         }
@@ -157,20 +150,16 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
         eventController = EventController.getInstance();
         invitationController = new InvitationController();
 
-        // Set the appropriate title based on mode
-        if (isEditMode) {
-            fragmentTitle.setText("Edit Event");
-        } else {
-            fragmentTitle.setText("Create Event");
-        }
-
-        setupButtonVisibility();
         setupListeners();
 
         if (isEditMode) {
+            fragmentTitle.setText("Edit Event");
+            setupEditNavButtons();
             // In edit mode, populate the fields with EXISTING event data
             populateFields(event);
         } else {
+            fragmentTitle.setText("Create Event");
+            setupCreateNavButtons();
             // In create mode, set the default button text
             updateDateButtonText(startDateButton, null);
             updateDateButtonText(endDateButton, null);
@@ -185,31 +174,34 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
      * Configures button visibility based on whether we're in edit or create mode.
      * Edit mode shows the update + delete button combo, while create mode shows the create + cancel one.
      */
-    private void setupButtonVisibility() {
-        // View only mode has to be added, where all action buttons are hidden, and I'll use the back button from the navStack since that's the only one we need
-        // TODO: implement
-        if (isEditMode) {
-            navStack.setScreenNavMenu(R.menu.edit_event_menu, (item) -> {
-                if (item.getItemId() == R.id.undo_nav_button) {
-                    navStack.popScreen();
-                } else if (item.getItemId() == R.id.delete_nav_button) {
-                    // TODO
-                } else if (item.getItemId() == R.id.save_nav_button) {
-                    // TODO
-                }
-                return true;
-            });
-        } else {
-            navStack.setScreenNavMenu(R.menu.create_event_menu, (item) -> {
-                if (item.getItemId() == R.id.cancel_nav_button) {
-                    navStack.popScreen();
-                } else if (item.getItemId() == R.id.create_nav_button) {
-                    // TODO
-                }
-                return true;
-            });
-        }
+    private void setupEditNavButtons() {
+        navStack.setScreenNavMenu(R.menu.edit_event_menu, (item) -> {
+            if (item.getItemId() == R.id.undo_nav_button) {
+                navStack.popScreen();
+            } else if (item.getItemId() == R.id.delete_nav_button) {
+                deleteEvent();
+            } else if (item.getItemId() == R.id.save_nav_button) {
+                // TODO
+            }
+            return true;
+        });
     }
+
+    /**
+     * Configures button visibility based on whether we're in edit or create mode.
+     * Edit mode shows the update + delete button combo, while create mode shows the create + cancel one.
+     */
+    private void setupCreateNavButtons() {
+        navStack.setScreenNavMenu(R.menu.create_event_menu, (item) -> {
+            if (item.getItemId() == R.id.cancel_nav_button) {
+                navStack.popScreen();
+            } else if (item.getItemId() == R.id.create_nav_button) {
+                createEvent();
+            }
+            return true;
+        });
+    }
+
 
     /**
      * Sets up click listeners for all interactive UI elements
@@ -220,12 +212,8 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
 
         // Poster delete button that will remove the poster
         deletePosterButton.setOnClickListener(v -> {
-            selectedImageUri = null;
-            posterBase64 = null;
-            posterDeleted = true;
+            event.setPosterUrl(null);
             posterPreview.setImageResource(R.drawable.image_placeholder);
-            deletePosterButton.setVisibility(View.GONE);
-            Toast.makeText(getContext(), "Poster removed", Toast.LENGTH_SHORT).show();
         });
 
         // Date and time picker buttons
@@ -269,16 +257,44 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
                 viewMapButton.setVisibility(View.GONE);
             }
         }
-
-        // Action buttons
-        // TODO: replace with nav stack
-//        createButton.setOnClickListener(v -> createEvent());
-//        updateButton.setOnClickListener(v -> updateEvent());
-//        cancelButton.setOnClickListener(v -> {
-//            if (navStack != null) navStack.popScreen();
-//        });
-//        deleteButton.setOnClickListener(v -> deleteEvent());
     }
+
+    /**
+     * Validates input fields and creates a new event. Shows a toast message and initiates the creation process.
+     */
+    private void createEvent() {
+        boolean isValid = updateLocalEventFromInputs();
+
+        if (isValid) {
+            Toast.makeText(getContext(), "Creating event...", Toast.LENGTH_SHORT).show();
+            eventController.createEvent(event)
+                    .addOnSuccessListener((eventId) -> {
+                        navStack.popScreen();
+                    })
+                    .addOnFailureListener((exception) -> {
+                        Log.e(TAG, "failed to create event", exception);
+                    });
+        }
+    }
+
+
+    /**
+     * Displays a confirmation dialog and deleted the event if the organizer confirms.
+     */
+    private void deleteEvent() {
+        new AlertDialog.Builder(requireContext())
+                .setTitle("Delete event")
+                .setMessage("Are you sure you want to permanently delete this event? This cannot be undone.")
+                .setPositiveButton("Confirm", (dialog, which) -> {
+                    eventController.deleteEvent(event.getEventID());
+                    navStack.popScreen();
+                })
+                .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
+                .show();
+
+        // TODO: remove the event from the organizer's list of owned events.
+    }
+
 
     /**
      * Displays a dialog showing a detailed list of entries with timestamps
@@ -502,7 +518,7 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
             }
         }
 
-        // Laumch the image picker intent
+        // Launch the image picker intent
         Intent intent = new Intent(Intent.ACTION_PICK);
         intent.setType("image/*");
         imagePickerLauncher.launch(intent);
@@ -543,14 +559,11 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 70, baos);
             byte[] imageBytes = baos.toByteArray();
-            posterBase64 = Base64.encodeToString(imageBytes, Base64.DEFAULT);
-
-            Log.d(TAG, "Image converted to Base64, size: " + posterBase64.length() + " characters");
+            event.setPosterUrl(Base64.encodeToString(imageBytes, Base64.DEFAULT));
 
             // Update the UI
             posterPreview.setImageBitmap(resizedBitmap);
             deletePosterButton.setVisibility(View.VISIBLE);
-            posterDeleted = false;
 
             Toast.makeText(getContext(), "Image loaded successfully", Toast.LENGTH_SHORT).show();
 
@@ -665,18 +678,6 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
     }
 
     /**
-     * Validates input fields and creates a new event. Shows a toast message and initiates the creation process.
-     */
-    private void createEvent() {
-        if (!validateInputs()) {
-            return;
-        }
-
-        Toast.makeText(getContext(), "Creating event...", Toast.LENGTH_SHORT).show();
-        createEventWithPoster(posterBase64);
-    }
-
-    /**
      * Creates a new event object with the provided poster data abd saves it to Firestore.
      * Navigates back to the OrganizerFragment on success, and shows an error message on failure.
      *
@@ -730,75 +731,86 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
                 });
     }
 
-    /**
-     * Validates inpit fields and updates the existing event. It determines whether to keep, update, or delete the poster based on user actions
-     */
-    private void updateEvent() {
-        if (event == null || TextUtils.isEmpty(event.getEventID())) return;
+    private boolean updateLocalEventFromInputs() {
+        boolean isValid = true;
 
-        if (!validateInputs()) {
-            return;
-        }
-
-        Toast.makeText(getContext(), "Updating event...", Toast.LENGTH_SHORT).show();
-
-        // Determine which poster data to save
-        String posterDataToSave;
-        if (posterDeleted) {
-            // User explicitly deleted the poster
-            posterDataToSave = null;
-        } else if (posterBase64 != null && !posterBase64.equals(event.getPosterUrl())) {
-            // User uploaded a new poster
-            posterDataToSave = posterBase64;
+        // validate title
+        if (titleInput.getText().toString().isEmpty()) {
+            titleInput.setError("Title is required");
+            isValid = false;
         } else {
-            // Keep the existing poster unchanged
-            posterDataToSave = event.getPosterUrl();
+            event.setName(titleInput.getText().toString());
         }
 
-        updateEventWithPoster(posterDataToSave);
-    }
+        event.setDescription(descriptionInput.getText().toString());
 
-    /**
-     * Updates the event in Firestore with the provided poster data and the form field vals.
-     * On success, will navigate back to the OrganizerFragment, and shows an error message on failure.
-     *
-     * @param posterData The BAse 64 encoded poster image, null if we're removing a poster
-     */
-    private void updateEventWithPoster(String posterData) {
-        // Builf a map of fields to update
-        Map<String, Object> updates = new HashMap<>();
-        updates.put("name", titleInput.getText().toString());
-        updates.put("description", descriptionInput.getText().toString());
-        updates.put("locationName", locationInput.getText().toString());
-        updates.put("maxAttendees", Integer.parseInt(entrantLimitInput.getText().toString()));
-        updates.put("registrationStart", startTime);
-        updates.put("registrationEnd", endTime);
-        updates.put("posterUrl", posterData);
-
-        // Max waiting list change
-        String maxWaitingListStr = maxWaitingListInput.getText().toString().trim();
-        if (!maxWaitingListStr.isEmpty()) {
-            updates.put("maxWaitingList", Integer.parseInt(maxWaitingListStr));
+        // validate location
+        if (locationInput.getText().toString().isEmpty()) {
+            locationInput.setError("Location is required");
+            isValid = false;
         } else {
-            // Null means unlimited
-            updates.put("maxWaitingList", null);
+            event.setLocationName(locationInput.getText().toString());
         }
 
-        // Perform the update in Firestore
-        eventController.updateEvent(event.getEventID(), updates).addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                Toast.makeText(getContext(), "Event updated!", Toast.LENGTH_SHORT).show();
-                // Update the local event object
-                event.setPosterUrl(posterData);
-                posterBase64 = posterData;
-
-                if (navStack != null) {
-                    navStack.popScreen();
+        // Validate entrant limit
+        if (entrantLimitInput.getText().toString().isEmpty()) {
+            entrantLimitInput.setError("Entrant limit is required");
+            isValid = false;
+        } else {
+            try {
+                int maxEntrants = Integer.parseInt(entrantLimitInput.getText().toString());
+                if (maxEntrants <= 0) {
+                    entrantLimitInput.setError("Must be greater than 0");
+                    isValid = false;
+                } else {
+                    event.setMaxAttendees(maxEntrants);
                 }
-            } else {
-                Toast.makeText(getContext(), "Failed to update: " + Objects.requireNonNull(task.getException()).getMessage(), Toast.LENGTH_LONG).show();
+            } catch (NumberFormatException e) {
+                entrantLimitInput.setError("Invalid number");
+                isValid = false;
             }
-        });
+        }
+
+        // Validate start date and time
+        if (startTime == null) {
+            Toast.makeText(getContext(), "Start date/time required", Toast.LENGTH_SHORT).show();
+            isValid = false;
+        }
+        // Validate end date and time
+        if (endTime == null) {
+            Toast.makeText(getContext(), "End date/time required", Toast.LENGTH_SHORT).show();
+            isValid = false;
+        }
+
+        // Validate that end time is AFTER the start time
+        if (startTime != null && endTime != null) {
+            if (endTime.toDate().before(startTime.toDate())) {
+                Toast.makeText(getContext(), "End date must be after start date", Toast.LENGTH_SHORT).show();
+                isValid = false;
+            }
+        }
+
+        event.setRegistrationStart(startTime);
+        event.setRegistrationEnd(endTime);
+
+        if (maxWaitingListInput.getText().toString().isEmpty()) {
+            event.setMaxWaitingList(null);
+        } else {
+            try {
+                int maxWaiting = Integer.parseInt(maxWaitingListInput.getText().toString());
+                if (maxWaiting <= 0) {
+                    maxWaitingListInput.setError("Must be greater than 0");
+                    isValid = false;
+                } else {
+                    event.setMaxWaitingList(maxWaiting);
+                }
+            } catch (NumberFormatException e) {
+                maxWaitingListInput.setError("Invalid number");
+                isValid = false;
+            }
+        }
+
+        return isValid;
     }
 
     /**
@@ -857,131 +869,6 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
         return new Timestamp(calendarDate.getTime());
     }
 
-    /**
-     * Validates all required input fields by checking for empty fields, valid numbers, and logical date/time constraints.
-     *
-     * @return true if all validations pass, false otherwise
-     */
-    private boolean validateInputs() {
-        boolean isValid = true;
-
-        // Validate title
-        if (TextUtils.isEmpty(titleInput.getText())) {
-            titleInput.setError("Title is required");
-            isValid = false;
-        }
-        // Validate location
-        if (TextUtils.isEmpty(locationInput.getText())) {
-            locationInput.setError("Location is required");
-            isValid = false;
-        }
-        // Validate entrant limit
-        if (TextUtils.isEmpty(entrantLimitInput.getText())) {
-            entrantLimitInput.setError("Entrant limit is required");
-            isValid = false;
-        } else {
-            try {
-                int maxEntrants = Integer.parseInt(entrantLimitInput.getText().toString().trim());
-                if (maxEntrants <= 0) {
-                    entrantLimitInput.setError("Must be greater than 0");
-                    isValid = false;
-                }
-            } catch (NumberFormatException e) {
-                entrantLimitInput.setError("Invalid number");
-                isValid = false;
-            }
-        }
-
-        // Validate start date and time
-        if (startTime == null) {
-            Toast.makeText(getContext(), "Start date/time required", Toast.LENGTH_SHORT).show();
-            isValid = false;
-        }
-        // Validate end date and time
-        if (endTime == null) {
-            Toast.makeText(getContext(), "End date/time required", Toast.LENGTH_SHORT).show();
-            isValid = false;
-        }
-
-        // Validate that end time is AFTER the start time
-        if (startTime != null && endTime != null) {
-            if (endTime.toDate().before(startTime.toDate())) {
-                Toast.makeText(getContext(), "End date must be after start date", Toast.LENGTH_SHORT).show();
-                isValid = false;
-            }
-        }
-
-        return isValid;
-    }
-
-    /**
-     * Displays a confirmation dialog and deleted the event if the organizer confirms. It also removes the event from the organizer's list of owned events.
-     */
-    private void deleteEvent() {
-        if (event == null || TextUtils.isEmpty(event.getEventID())) {
-            Toast.makeText(getContext(), "Error: Missing eventID", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        // Shows confirmation dialog
-        new AlertDialog.Builder(requireContext())
-                .setTitle("Delete Event?")
-                .setMessage("This action cannot be undone.")
-                .setPositiveButton("Delete", (dialog, which) -> {
-                    String eventID = event.getEventID();
-
-                    // Delete event from Firestore
-                    eventController.deleteEvent(eventID)
-                            .addOnSuccessListener(aVoid -> {
-                                Log.d(TAG, "Event deleted from Firestore");
-
-                                // Remove the event from the organizer's owned events
-                                if (organizerID != null) {
-                                    Organizer organizer = null;
-                                    try {
-                                        organizer = (Organizer) Tasks.await(UserController.getInstance().getUser(organizerID), 10, TimeUnit.SECONDS);
-                                    } catch (Exception error) {
-                                        Log.e(TAG, "Failed to delete event", error);
-                                    }
-                                    organizer.removeOwnedEventID(eventID)
-                                            .addOnSuccessListener(unused -> {
-                                                Log.d(TAG, "Event removed from organizer's list");
-                                                if (isAdded() && getContext() != null) {
-                                                    Toast.makeText(getContext(), "Event deleted", Toast.LENGTH_SHORT).show();
-                                                    if (navStack != null) {
-                                                        navStack.popScreen();
-                                                    }
-                                                }
-                                            })
-                                            .addOnFailureListener(e -> {
-                                                Log.e(TAG, "Failed to remove from organizer list", e);
-                                                if (isAdded() && getContext() != null) {
-                                                    Toast.makeText(getContext(), "Event deleted but failed to update organizer list", Toast.LENGTH_SHORT).show();
-                                                    if (navStack != null) {
-                                                        navStack.popScreen();
-                                                    }
-                                                }
-                                            });
-                                } else {
-                                    // No organizer object available, so just navigate back
-                                    if (isAdded() && getContext() != null) {
-                                        Toast.makeText(getContext(), "Event deleted", Toast.LENGTH_SHORT).show();
-                                        if (navStack != null) {
-                                            navStack.popScreen();
-                                        }
-                                    }
-                                }
-                            })
-                            .addOnFailureListener(error -> {
-                                Log.e(TAG, "Failed to delete event", error);
-                                if (isAdded() && getContext() != null) {
-                                    Toast.makeText(getContext(), "Failed to delete: " + error.getMessage(), Toast.LENGTH_LONG).show();
-                                }
-                            });
-                })
-                .setNegativeButton("Cancel", null)
-                .show();
-    }
-
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -994,7 +881,7 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
             }
         }
     }
-    
+
     /**
      * Callback interface for time selection from TimePickerDialog
      */
