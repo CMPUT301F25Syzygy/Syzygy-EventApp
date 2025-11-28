@@ -286,17 +286,25 @@ public class <span class="typeNameLabel"><a href=InvitationController.html>Invit
                                         <tr id="i4" class="altColor">
                                             <td class="colFirst"><code>ListenerRegistration</code>
                                             </td>
-                                            <th class="colSecond" scope="row"><code><a href=InvitationController.html#observeEventInvitations(java.lang.String,java.util.function.Consumer,java.util.function.Consumer)>observeEventInvitations</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> event, <a href=https://developer.android.com/reference/kotlin/java/util/function/Consumer.html>Consumer</a>&lt;<a href=https://developer.android.com/reference/kotlin/java/util/List.html>List</a>&lt;<a href=Invitation.html>Invitation</a>&gt;&gt; onChange, <a href=https://developer.android.com/reference/kotlin/java/util/function/Consumer.html>Consumer</a>&lt;<a href=https://developer.android.com/reference/kotlin/java/lang/Exception.html>Exception</a>&gt; onError) </code>
+                                            <th class="colSecond" scope="row"><code><a href=InvitationController.html#observeEventInvites(java.lang.String,java.util.function.Consumer)>observeEventInvites</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> eventId, <a href=https://developer.android.com/reference/kotlin/java/util/function/Consumer.html>Consumer</a>&lt;<a href=https://developer.android.com/reference/kotlin/java/util/List.html>List</a>&lt;<a href=Invitation.html>Invitation</a>&gt;&gt; onChange) </code>
                                             </th>
-                                            <td class="colLast">Observe all invitations for a given event in real time.</td>
+                                            <td class="colLast">Observe invitations to an event in real time.</td>
                                         </tr>
                                         
                                         <tr id="i5" class="rowColor">
                                             <td class="colFirst"><code>ListenerRegistration</code>
                                             </td>
-                                            <th class="colSecond" scope="row"><code><a href=InvitationController.html#observePending(java.lang.String,java.util.function.Consumer,java.util.function.Consumer)>observePending</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> recipientID, <a href=https://developer.android.com/reference/kotlin/java/util/function/Consumer.html>Consumer</a>&lt;<a href=https://developer.android.com/reference/kotlin/java/util/List.html>List</a>&lt;<a href=Invitation.html>Invitation</a>&gt;&gt; onChange, <a href=https://developer.android.com/reference/kotlin/java/util/function/Consumer.html>Consumer</a>&lt;<a href=https://developer.android.com/reference/kotlin/java/lang/Exception.html>Exception</a>&gt; onError) </code>
+                                            <th class="colSecond" scope="row"><code><a href=InvitationController.html#observeAllInvites(java.util.function.Consumer)>observeAllInvites</a>(<a href=https://developer.android.com/reference/kotlin/java/util/function/Consumer.html>Consumer</a>&lt;<a href=https://developer.android.com/reference/kotlin/java/util/List.html>List</a>&lt;<a href=Invitation.html>Invitation</a>&gt;&gt; onChange) </code>
                                             </th>
-                                            <td class="colLast">Observe all pending (accepted == null and not cancelled) invitations for a recipient in real time.</td>
+                                            <td class="colLast">Observe *all* invitations for a given event in real time.</td>
+                                        </tr>
+                                        
+                                        <tr id="i6" class="altColor">
+                                            <td class="colFirst"><code>ListenerRegistration</code>
+                                            </td>
+                                            <th class="colSecond" scope="row"><code><a href=InvitationController.html#observeInvites(Filter,java.util.function.Consumer)>observeInvites</a>(Filter filter, <a href=https://developer.android.com/reference/kotlin/java/util/function/Consumer.html>Consumer</a>&lt;<a href=https://developer.android.com/reference/kotlin/java/util/List.html>List</a>&lt;<a href=Invitation.html>Invitation</a>&gt;&gt; onChange) </code>
+                                            </th>
+                                            <td class="colLast">Observe invitations for a given event in real time.</td>
                                         </tr>
                                         
                                         </tbody>
@@ -505,16 +513,16 @@ public class <span class="typeNameLabel"><a href=InvitationController.html>Invit
                                     </li>
                                 </ul>
                                 
-                                <a id="observeEventInvitations(java.lang.String,java.util.function.Consumer,java.util.function.Consumer)">
+                                <a id="observeEventInvites(java.lang.String,java.util.function.Consumer)">
                                     <!--   -->
                                 </a>
                                 <ul class=
                                               "blockList"
                                           >
                                     <li class="blockList">
-                                        <h4>observeEventInvitations</h4>
-                                        <pre class="methodSignature"> ListenerRegistration <a href=InvitationController.html#observeEventInvitations(java.lang.String,java.util.function.Consumer,java.util.function.Consumer)>observeEventInvitations</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> event, <a href=https://developer.android.com/reference/kotlin/java/util/function/Consumer.html>Consumer</a>&lt;<a href=https://developer.android.com/reference/kotlin/java/util/List.html>List</a>&lt;<a href=Invitation.html>Invitation</a>&gt;&gt; onChange, <a href=https://developer.android.com/reference/kotlin/java/util/function/Consumer.html>Consumer</a>&lt;<a href=https://developer.android.com/reference/kotlin/java/lang/Exception.html>Exception</a>&gt; onError)</pre>
-                                        <div class="block"><p>Observe all invitations for a given event in real time. Caller must hold the returned ListenerRegistration and remove it appropriately.</p></div>
+                                        <h4>observeEventInvites</h4>
+                                        <pre class="methodSignature"> ListenerRegistration <a href=InvitationController.html#observeEventInvites(java.lang.String,java.util.function.Consumer)>observeEventInvites</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> eventId, <a href=https://developer.android.com/reference/kotlin/java/util/function/Consumer.html>Consumer</a>&lt;<a href=https://developer.android.com/reference/kotlin/java/util/List.html>List</a>&lt;<a href=Invitation.html>Invitation</a>&gt;&gt; onChange)</pre>
+                                        <div class="block"><p>Observe invitations to an event in real time. Caller must hold the returned ListenerRegistration and remove it appropriately.</p></div>
 
                                         <dl>
 
@@ -522,22 +530,13 @@ public class <span class="typeNameLabel"><a href=InvitationController.html>Invit
                                             <dt><span class="paramLabel">Parameters:</span></dt>
                                             
                                             
-                                            <dd><code>event</code> - Event document ID to observe</dd>
-                                            
                                             
                                             
                                             <dd><code>onChange</code> - Callback invoked with the latest list of Invitation objects</dd>
                                             
                                             
-                                            
-                                            <dd><code>onError</code> - Callback invoked on listener errors</dd>
-                                            
-                                            
                                         
 
-                                        
-                                            <dt><span class="returnLabel">Returns:</span></dt>
-                                            <dd><p>ListenerRegistration that must be removed when no longer needed</p></dd>
                                         
 
                                         
@@ -546,16 +545,16 @@ public class <span class="typeNameLabel"><a href=InvitationController.html>Invit
                                     </li>
                                 </ul>
                                 
-                                <a id="observePending(java.lang.String,java.util.function.Consumer,java.util.function.Consumer)">
+                                <a id="observeAllInvites(java.util.function.Consumer)">
                                     <!--   -->
                                 </a>
                                 <ul class=
-                                              "blockListLast"
+                                              "blockList"
                                           >
                                     <li class="blockList">
-                                        <h4>observePending</h4>
-                                        <pre class="methodSignature"> ListenerRegistration <a href=InvitationController.html#observePending(java.lang.String,java.util.function.Consumer,java.util.function.Consumer)>observePending</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> recipientID, <a href=https://developer.android.com/reference/kotlin/java/util/function/Consumer.html>Consumer</a>&lt;<a href=https://developer.android.com/reference/kotlin/java/util/List.html>List</a>&lt;<a href=Invitation.html>Invitation</a>&gt;&gt; onChange, <a href=https://developer.android.com/reference/kotlin/java/util/function/Consumer.html>Consumer</a>&lt;<a href=https://developer.android.com/reference/kotlin/java/lang/Exception.html>Exception</a>&gt; onError)</pre>
-                                        <div class="block"><p>Observe all pending (accepted == null and not cancelled) invitations for a recipient in real time.</p></div>
+                                        <h4>observeAllInvites</h4>
+                                        <pre class="methodSignature"> ListenerRegistration <a href=InvitationController.html#observeAllInvites(java.util.function.Consumer)>observeAllInvites</a>(<a href=https://developer.android.com/reference/kotlin/java/util/function/Consumer.html>Consumer</a>&lt;<a href=https://developer.android.com/reference/kotlin/java/util/List.html>List</a>&lt;<a href=Invitation.html>Invitation</a>&gt;&gt; onChange)</pre>
+                                        <div class="block"><p>Observe *all* invitations for a given event in real time. Caller must hold the returned ListenerRegistration and remove it appropriately.</p></div>
 
                                         <dl>
 
@@ -563,22 +562,45 @@ public class <span class="typeNameLabel"><a href=InvitationController.html>Invit
                                             <dt><span class="paramLabel">Parameters:</span></dt>
                                             
                                             
-                                            <dd><code>recipientID</code> - User ID of the invitation recipient.</dd>
-                                            
-                                            
-                                            
-                                            <dd><code>onChange</code> - Callback invoked with the latest list of pending invitations.</dd>
-                                            
-                                            
-                                            
-                                            <dd><code>onError</code> - Callback invoked on Firestore listener errors.</dd>
+                                            <dd><code>onChange</code> - Callback invoked with the latest list of Invitation objects</dd>
                                             
                                             
                                         
 
                                         
-                                            <dt><span class="returnLabel">Returns:</span></dt>
-                                            <dd><p>ListenerRegistration that must be removed when no longer needed.</p></dd>
+
+                                        
+
+                                        </dl>
+                                    </li>
+                                </ul>
+                                
+                                <a id="observeInvites(Filter,java.util.function.Consumer)">
+                                    <!--   -->
+                                </a>
+                                <ul class=
+                                              "blockListLast"
+                                          >
+                                    <li class="blockList">
+                                        <h4>observeInvites</h4>
+                                        <pre class="methodSignature"> ListenerRegistration <a href=InvitationController.html#observeInvites(Filter,java.util.function.Consumer)>observeInvites</a>(Filter filter, <a href=https://developer.android.com/reference/kotlin/java/util/function/Consumer.html>Consumer</a>&lt;<a href=https://developer.android.com/reference/kotlin/java/util/List.html>List</a>&lt;<a href=Invitation.html>Invitation</a>&gt;&gt; onChange)</pre>
+                                        <div class="block"><p>Observe invitations for a given event in real time. Caller must hold the returned ListenerRegistration and remove it appropriately.</p></div>
+
+                                        <dl>
+
+                                        
+                                            <dt><span class="paramLabel">Parameters:</span></dt>
+                                            
+                                            
+                                            <dd><code>filter</code> - Filter to select which invites to observe</dd>
+                                            
+                                            
+                                            
+                                            <dd><code>onChange</code> - Callback invoked with the latest list of Invitation objects</dd>
+                                            
+                                            
+                                        
+
                                         
 
                                         
