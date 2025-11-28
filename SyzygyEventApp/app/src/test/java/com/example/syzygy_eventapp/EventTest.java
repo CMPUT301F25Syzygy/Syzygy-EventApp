@@ -157,6 +157,7 @@ public class EventTest {
         boolean geolocationRequired = true;
         String posterUrl = "https://example.com/poster.jpg";
         ArrayList<String> waitingList = new ArrayList<>(Arrays.asList("user1"));
+        ArrayList<String> invites = new ArrayList<>(Arrays.asList("example-invite6346", "example-invite8561"));
         Integer maxWaitingList = 100;
         Timestamp now = new Timestamp(new Date());
         Integer maxAttendees = 50;
@@ -164,9 +165,9 @@ public class EventTest {
         String qrCodeData = "event://event123";
 
         Event fullEvent = new Event(
-                eventID, name, description, organizerID,
+                eventID, name, description, organizerID, now,
                 locationName, coords, geolocationRequired,
-                posterUrl, waitingList, maxWaitingList,
+                posterUrl, waitingList, invites, maxWaitingList,
                 now, now, maxAttendees, lotteryComplete,
                 qrCodeData, now, now
         );
@@ -177,12 +178,13 @@ public class EventTest {
         assertEquals(organizerID, fullEvent.getOrganizerID());
         assertEquals(locationName, fullEvent.getLocationName());
         assertEquals(coords, fullEvent.getLocationCoordinates());
-        assertTrue(fullEvent.isGeolocationRequired());
+        assertEquals(geolocationRequired, fullEvent.isGeolocationRequired());
         assertEquals(posterUrl, fullEvent.getPosterUrl());
         assertEquals(1, fullEvent.getWaitingList().size());
+        assertEquals(2, fullEvent.getInvites().size());
         assertEquals(maxWaitingList, fullEvent.getMaxWaitingList());
         assertEquals(maxAttendees, fullEvent.getMaxAttendees());
-        assertFalse(fullEvent.isLotteryComplete());
+        assertEquals(lotteryComplete, fullEvent.isLotteryComplete());
         assertEquals(qrCodeData, fullEvent.getQrCodeData());
     }
 }
