@@ -304,7 +304,39 @@ public class <span class="typeNameLabel"><a href=InvitationController.html>Invit
                                             </td>
                                             <th class="colSecond" scope="row"><code><a href=InvitationController.html#observeInvites(Filter,java.util.function.Consumer)>observeInvites</a>(Filter filter, <a href=https://developer.android.com/reference/kotlin/java/util/function/Consumer.html>Consumer</a>&lt;<a href=https://developer.android.com/reference/kotlin/java/util/List.html>List</a>&lt;<a href=Invitation.html>Invitation</a>&gt;&gt; onChange) </code>
                                             </th>
-                                            <td class="colLast">Observe invitations for a given event in real time.</td>
+                                            <td class="colLast">Observe invitations for any filter in real time.</td>
+                                        </tr>
+                                        
+                                        <tr id="i7" class="rowColor">
+                                            <td class="colFirst"><code>Task&lt;Invitation&gt;</code>
+                                            </td>
+                                            <th class="colSecond" scope="row"><code><a href=InvitationController.html#getInvite(java.lang.String)>getInvite</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> inviteID) </code>
+                                            </th>
+                                            <td class="colLast">Retrieves a invite from the database Results in a IllegalArgumentException if the userID isn't in the database</td>
+                                        </tr>
+                                        
+                                        <tr id="i8" class="altColor">
+                                            <td class="colFirst"><code>Task&lt;List&lt;Invitation&gt;&gt;</code>
+                                            </td>
+                                            <th class="colSecond" scope="row"><code><a href=InvitationController.html#getEventInvites(java.lang.String)>getEventInvites</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> eventId) </code>
+                                            </th>
+                                            <td class="colLast">Get invitations to an event.</td>
+                                        </tr>
+                                        
+                                        <tr id="i9" class="rowColor">
+                                            <td class="colFirst"><code>Task&lt;List&lt;Invitation&gt;&gt;</code>
+                                            </td>
+                                            <th class="colSecond" scope="row"><code><a href=InvitationController.html#getAllInvites()>getAllInvites</a>() </code>
+                                            </th>
+                                            <td class="colLast">Get *all* invitations for a given event.</td>
+                                        </tr>
+                                        
+                                        <tr id="i10" class="altColor">
+                                            <td class="colFirst"><code>Task&lt;List&lt;Invitation&gt;&gt;</code>
+                                            </td>
+                                            <th class="colSecond" scope="row"><code><a href=InvitationController.html#getInvites(Filter)>getInvites</a>(Filter filter) </code>
+                                            </th>
+                                            <td class="colLast">Get invitations for any filter in real time.</td>
                                         </tr>
                                         
                                         </tbody>
@@ -530,6 +562,8 @@ public class <span class="typeNameLabel"><a href=InvitationController.html>Invit
                                             <dt><span class="paramLabel">Parameters:</span></dt>
                                             
                                             
+                                            <dd><code>eventId</code> - eventID of the event to observe</dd>
+                                            
                                             
                                             
                                             <dd><code>onChange</code> - Callback invoked with the latest list of Invitation objects</dd>
@@ -579,12 +613,12 @@ public class <span class="typeNameLabel"><a href=InvitationController.html>Invit
                                     <!--   -->
                                 </a>
                                 <ul class=
-                                              "blockListLast"
+                                              "blockList"
                                           >
                                     <li class="blockList">
                                         <h4>observeInvites</h4>
                                         <pre class="methodSignature"> ListenerRegistration <a href=InvitationController.html#observeInvites(Filter,java.util.function.Consumer)>observeInvites</a>(Filter filter, <a href=https://developer.android.com/reference/kotlin/java/util/function/Consumer.html>Consumer</a>&lt;<a href=https://developer.android.com/reference/kotlin/java/util/List.html>List</a>&lt;<a href=Invitation.html>Invitation</a>&gt;&gt; onChange)</pre>
-                                        <div class="block"><p>Observe invitations for a given event in real time. Caller must hold the returned ListenerRegistration and remove it appropriately.</p></div>
+                                        <div class="block"><p>Observe invitations for any filter in real time. Caller must hold the returned ListenerRegistration and remove it appropriately.</p></div>
 
                                         <dl>
 
@@ -597,6 +631,122 @@ public class <span class="typeNameLabel"><a href=InvitationController.html>Invit
                                             
                                             
                                             <dd><code>onChange</code> - Callback invoked with the latest list of Invitation objects</dd>
+                                            
+                                            
+                                        
+
+                                        
+
+                                        
+
+                                        </dl>
+                                    </li>
+                                </ul>
+                                
+                                <a id="getInvite(java.lang.String)">
+                                    <!--   -->
+                                </a>
+                                <ul class=
+                                              "blockList"
+                                          >
+                                    <li class="blockList">
+                                        <h4>getInvite</h4>
+                                        <pre class="methodSignature"> Task&lt;Invitation&gt; <a href=InvitationController.html#getInvite(java.lang.String)>getInvite</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> inviteID)</pre>
+                                        <div class="block"><p>Retrieves a invite from the database Results in a IllegalArgumentException if the userID isn't in the database</p></div>
+
+                                        <dl>
+
+                                        
+                                            <dt><span class="paramLabel">Parameters:</span></dt>
+                                            
+                                            
+                                            <dd><code>inviteID</code> - the inviteID to get a <a href=Invitation.html>Invitation</a> for</dd>
+                                            
+                                            
+                                        
+
+                                        
+                                            <dt><span class="returnLabel">Returns:</span></dt>
+                                            <dd><p>the <a href=User.html>User</a> found in the database</p></dd>
+                                        
+
+                                        
+
+                                        </dl>
+                                    </li>
+                                </ul>
+                                
+                                <a id="getEventInvites(java.lang.String)">
+                                    <!--   -->
+                                </a>
+                                <ul class=
+                                              "blockList"
+                                          >
+                                    <li class="blockList">
+                                        <h4>getEventInvites</h4>
+                                        <pre class="methodSignature"> Task&lt;List&lt;Invitation&gt;&gt; <a href=InvitationController.html#getEventInvites(java.lang.String)>getEventInvites</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> eventId)</pre>
+                                        <div class="block"><p>Get invitations to an event.</p></div>
+
+                                        <dl>
+
+                                        
+                                            <dt><span class="paramLabel">Parameters:</span></dt>
+                                            
+                                            
+                                            <dd><code>eventId</code> - eventID of the event to get</dd>
+                                            
+                                            
+                                        
+
+                                        
+
+                                        
+
+                                        </dl>
+                                    </li>
+                                </ul>
+                                
+                                <a id="getAllInvites()">
+                                    <!--   -->
+                                </a>
+                                <ul class=
+                                              "blockList"
+                                          >
+                                    <li class="blockList">
+                                        <h4>getAllInvites</h4>
+                                        <pre class="methodSignature"> Task&lt;List&lt;Invitation&gt;&gt; <a href=InvitationController.html#getAllInvites()>getAllInvites</a>()</pre>
+                                        <div class="block"><p>Get *all* invitations for a given event.</p></div>
+
+                                        <dl>
+
+                                        
+
+                                        
+
+                                        
+
+                                        </dl>
+                                    </li>
+                                </ul>
+                                
+                                <a id="getInvites(Filter)">
+                                    <!--   -->
+                                </a>
+                                <ul class=
+                                              "blockListLast"
+                                          >
+                                    <li class="blockList">
+                                        <h4>getInvites</h4>
+                                        <pre class="methodSignature"> Task&lt;List&lt;Invitation&gt;&gt; <a href=InvitationController.html#getInvites(Filter)>getInvites</a>(Filter filter)</pre>
+                                        <div class="block"><p>Get invitations for any filter in real time.</p></div>
+
+                                        <dl>
+
+                                        
+                                            <dt><span class="paramLabel">Parameters:</span></dt>
+                                            
+                                            
+                                            <dd><code>filter</code> - Filter to select which invites to observe</dd>
                                             
                                             
                                         
