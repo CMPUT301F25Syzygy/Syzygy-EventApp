@@ -60,25 +60,37 @@
                 app:srcCompat="@drawable/ic_check" />
 
             <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Accepted: "
+                android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
+
+            <TextView
                 android:id="@+id/event_accepted_count"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Accepted: 27/30"
+                android:text="27/30"
                 android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
 
             <ImageView
                 android:layout_width="18dp"
                 android:layout_height="18dp"
-                android:layout_marginStart="16dp"
+                android:layout_marginStart="20dp"
                 android:layout_marginEnd="8dp"
                 app:tint="?attr/colorOnSurfaceVariant"
                 app:srcCompat="@drawable/ic_question_mark" />
 
             <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Interested: "
+                android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
+
+            <TextView
                 android:id="@+id/event_interested_count"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Interested: 34"
+                android:text="34"
                 android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
         </LinearLayout>
 
