@@ -13,7 +13,6 @@ import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.chip.Chip;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.Filter;
-import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -30,7 +29,6 @@ public class OrganizerEventSummaryFragment extends LinearLayout {
     private TextView titleText, timeText, locationText, dateText, acceptedCountText, interestedCountText;
     private MaterialCardView card;
     private Chip statusChip;
-    private FirebaseFirestore db;
 
     /**
      * Represents the status of an entrant for a given event.
@@ -86,8 +84,6 @@ public class OrganizerEventSummaryFragment extends LinearLayout {
         interestedCountText = findViewById(R.id.event_interested_count);
         card = findViewById(R.id.event_banner_card);
         statusChip = findViewById(R.id.chip_event_status);
-
-        db = FirebaseFirestore.getInstance();
     }
 
     /**
