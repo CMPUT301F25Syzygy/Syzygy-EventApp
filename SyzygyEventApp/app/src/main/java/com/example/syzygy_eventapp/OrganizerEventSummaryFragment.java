@@ -13,6 +13,7 @@ import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.chip.Chip;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.Filter;
+import com.google.firebase.firestore.ListenerRegistration;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -29,6 +30,7 @@ public class OrganizerEventSummaryFragment extends LinearLayout {
     private TextView titleText, timeText, locationText, dateText, acceptedCountText, interestedCountText;
     private MaterialCardView card;
     private Chip statusChip;
+    private ListenerRegistration inviteListener;
 
     /**
      * Represents the status of an entrant for a given event.
@@ -152,13 +154,18 @@ public class OrganizerEventSummaryFragment extends LinearLayout {
 
         // Get accepted count (accepted = true, cancelled = false)
 
-        Filter acceptedFilter = Filter
-                .equalTo("event", eventID)
-                .equalTo("accepted", true)
-                .equalTo("cancelled", false);
+        if (inviteListener != null) {
+            inviteListener.remove();
+        }
+
+        Filter acceptedFilter = Filter.and(
+                Filter.equalTo("event", eventID),
+                Filter.equalTo("accepted", true),
+                Filter.notEqualTo("responseTime", null),
+                Filter.equalTo("cancelled", false));
         
-        new InvitationController().observeInvites(acceptedFilter, (invitations) -> {
-            int acceptedCount = invitations.size();
+        inviteListener = new InvitationController().observeInvites(acceptedFilter, (invites) -> {
+            int acceptedCount = invites.size();
             acceptedCountText.setText(acceptedCount + "/" + maxAttendees);
         });
         // Get interested count (basically just get the waiting list size from the event)
