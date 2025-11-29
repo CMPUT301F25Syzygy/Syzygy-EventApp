@@ -2,6 +2,7 @@ package com.example.syzygy_eventapp;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -156,11 +157,12 @@ public class OrganizerEventSummaryFragment extends LinearLayout {
 
         // Get accepted count (accepted = true, cancelled = false)
 
-        Filter acceptedFilter = Filter
-                .equalTo("event", eventID)
-                .equalTo("accepted", true)
-                .equalTo("cancelled", false);
-        
+        Filter acceptedFilter = Filter.and(
+                Filter.equalTo("event", eventID),
+                Filter.equalTo("accepted", true),
+                Filter.equalTo("cancelled", false)
+        );
+
         new InvitationController().observeInvites(acceptedFilter, (invitations) -> {
             int acceptedCount = invitations.size();
             acceptedCountText.setText(acceptedCount + "/" + maxAttendees);
