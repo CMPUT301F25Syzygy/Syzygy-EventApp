@@ -58,6 +58,9 @@ public class AdminEventListFragment extends Fragment {
         this.upcomingEventList = root.findViewById(R.id.upcoming_event_list);
         this.pastEventList = root.findViewById(R.id.past_event_list);
 
+        this.upcomingEventList.setTitle("Upcoming Events");
+        this.pastEventList.setTitle("Past Events");
+
         return root;
     }
 
@@ -97,16 +100,51 @@ public class AdminEventListFragment extends Fragment {
             }
 
             // Populate the upcoming events list.
-            upcomingEventList.setItems(upcoming, true, this::eventClickedCallback);
+            upcomingEventList.setItems(
+                    upcoming,
+                    true,
+                    null,
+                    this::eventClickedCallback,
+                    this::eventRemoveBannerButtonClickedCallback,
+                    this::eventDeleteButtonClickedCallback
+            );
 
             // Populate the past event list.
-            pastEventList.setItems(past, true, this::eventClickedCallback);
+            pastEventList.setItems(
+                    past,
+                    true,
+                    null,
+                    this::eventClickedCallback,
+                    this::eventRemoveBannerButtonClickedCallback,
+                    this::eventDeleteButtonClickedCallback
+            );
         });
     }
 
     private void eventClickedCallback(View view) {
         Event event = (Event) view.getTag();
         navStack.pushScreen(new EventOrganizerDetailsView(event, navStack));
+    }
+
+    private void eventDeleteButtonClickedCallback(View view) {
+        Event event = (Event) view.getTag();
+
+        new AlertDialog.Builder(requireContext())
+                .setTitle("Delete Event")
+                .setMessage("Are you sure you want to delete this event?")
+                .setPositiveButton("Delete", (dialog, which) -> {
+                    // User confirmed
+                    EventController.getInstance().deleteEvent(event.getEventID());
+                })
+                .setNegativeButton("Cancel", (dialog, which) -> {
+                    // User cancelled (do nothing)
+                    dialog.dismiss();
+                })
+                .show();
+    }
+
+    private void eventRemoveBannerButtonClickedCallback(View view) {
+        Event event = (Event) view.getTag();
     }
 
     /**
