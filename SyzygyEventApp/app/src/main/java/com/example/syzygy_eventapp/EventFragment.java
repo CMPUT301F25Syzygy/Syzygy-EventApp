@@ -103,7 +103,7 @@ public class EventFragment extends Fragment {
         super.onStart();
 
         //start observing the event
-        eventListener = eventController.observeEvent(eventID, this::onEventUpdated);
+        eventListener = eventController.observeEvent(eventID, this::onEventUpdated, navStack::popScreen);
     }
 
     @Override
@@ -233,7 +233,6 @@ public class EventFragment extends Fragment {
                 if (bitmap != null) {
                     posterImage.setImageBitmap(bitmap);
                     posterImage.setVisibility(View.VISIBLE);
-                    Log.d(TAG, "Poster loaded successfully");
                 } else {
                     Log.e(TAG, "Failed to decode bitmap from Base64");
                     posterImage.setImageResource(R.drawable.image_placeholder);
@@ -431,36 +430,8 @@ public class EventFragment extends Fragment {
      * Open the event location in map software (Google Maps)
      */
     private void openLocationInMap() {
-        if (currentEvent == null || currentEvent.getLocationName() == null) {
-            Toast.makeText(requireContext(), "Location not available", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        // Create a URI for the location
-        Uri mapUri;
-        if (currentEvent.getLocationCoordinates() != null) {
-            // Use coordinates if available for more accurate location
-            double lat = currentEvent.getLocationCoordinates().getLatitude();
-            double lng = currentEvent.getLocationCoordinates().getLongitude();
-            mapUri = Uri.parse("geo:" + lat + "," + lng + "?q=" +
-                    Uri.encode(currentEvent.getLocationName()));
-        } else {
-            // Fall back to address search
-            mapUri = Uri.parse("geo:0,0?q=" + Uri.encode(currentEvent.getLocationName()));
-        }
-
-        Intent mapIntent = new Intent(Intent.ACTION_VIEW, mapUri);
-        mapIntent.setPackage("com.google.android.apps.maps");
-
-        // Check if Google Maps is installed
-        if (mapIntent.resolveActivity(requireActivity().getPackageManager()) != null) {
-            startActivity(mapIntent);
-        } else {
-            // Fall back to web browser
-            Intent webIntent = new Intent(Intent.ACTION_VIEW,
-                    Uri.parse("https://www.google.com/maps/search/?api=1&query=" +
-                            Uri.encode(currentEvent.getLocationName())));
-            startActivity(webIntent);
+        if (currentEvent != null) {
+            Maps.openInMaps(requireActivity(), currentEvent);
         }
     }
 }

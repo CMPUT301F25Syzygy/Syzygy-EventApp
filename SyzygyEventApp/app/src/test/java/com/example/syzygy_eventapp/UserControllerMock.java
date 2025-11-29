@@ -4,6 +4,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.ListenerRegistration;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.function.Consumer;
@@ -23,6 +24,10 @@ public class UserControllerMock implements UserControllerInterface {
 
     public Task<User> getUser(String userID) {
         return Tasks.forResult(new User());
+    }
+
+    public Task<List<User>> getUsers(List<String> userIDs) {
+        return Tasks.forResult(new ArrayList<User>());
     }
 
     public ListenerRegistration observeUser(String userID, Consumer<User> onUpdate, Runnable onDelete) {

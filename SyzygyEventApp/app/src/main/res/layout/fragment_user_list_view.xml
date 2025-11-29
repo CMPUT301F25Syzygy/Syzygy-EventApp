@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/user_list_root"
     android:layout_width="match_parent"
@@ -37,7 +38,8 @@
             android:id="@+id/expand_icon"
             android:layout_width="24dp"
             android:layout_height="24dp"
-            android:src="@drawable/ic_expand_more" />
+            android:src="@drawable/ic_expand_more"
+            app:tint="?android:attr/textColorPrimary" />
     </LinearLayout>
 
     <!-- RecyclerView for the list of users -->
