@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <!-- NewPage -->
 <html lang="en"><head>
-    <title>QRGenerateFragment </title>
+    <title>AdminProfileListFragment </title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta name="dc.created" content="2020-03-25">
     <link rel="stylesheet" type="text/css" href="../../../stylesheet.css" title="Style">
@@ -89,7 +89,7 @@ var pathtoroot = "../../../";
 <main role="main">
     <div class="header">
         <div class="subTitle"><span class="packageLabelInType">Package</span>&nbsp;<a href="package-summary.html">com.example.syzygy_eventapp</a></div>
-        <h2 title="Class QRGenerateFragment" class="title">Class QRGenerateFragment</h2>
+        <h2 title="Class AdminProfileListFragment" class="title">Class AdminProfileListFragment</h2>
     </div>
     <div class="contentContainer">
         <!-- <ul class="inheritance">
@@ -114,10 +114,10 @@ var pathtoroot = "../../../";
                     <hr>
                     <pre class="wrap-overflow">
 
-public class <span class="typeNameLabel"><a href=QRGenerateFragment.html>QRGenerateFragment</a></span>
+public class <span class="typeNameLabel"><a href=AdminProfileListFragment.html>AdminProfileListFragment</a></span>
 
                     </pre>
-                    <div class="block"><p>This fragment will generatr and display QR Codes for events. The scannable QR code made by this fragment will contain the event's ID in DEEP LINK FORMAT. When scanned, the code will navigate users directly to the event details page. Organizers can export the QR code image to their device (and then print/share it however they like).</p></div>
+                    <div class="block"><p>Fragment displaying a list of user profiles for the administrator to manage.</p></div>
 
                     <dl>
 
@@ -198,8 +198,8 @@ public class <span class="typeNameLabel"><a href=QRGenerateFragment.html>QRGener
                                         
                                             <tr class="altColor">
                                                 <th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a
-                                                        href="#QRGenerateFragment(com.example.syzygy_eventapp.Event,com.example.syzygy_eventapp.NavigationStackFragment)">QRGenerateFragment</a></span>(<a href=Event.html>Event</a> event, <a href=NavigationStackFragment.html>NavigationStackFragment</a> navStack)</code></th>
-                                                <td class="colLast">Constructor for QRGenerateFragment</td>
+                                                        href="#AdminProfileListFragment()">AdminProfileListFragment</a></span>()</code></th>
+                                                <td class="colLast"></td>
                                             </tr>
                                         
 
@@ -254,17 +254,25 @@ public class <span class="typeNameLabel"><a href=QRGenerateFragment.html>QRGener
                                         <tr id="i0" class="altColor">
                                             <td class="colFirst"><code>View</code>
                                             </td>
-                                            <th class="colSecond" scope="row"><code><a href=QRGenerateFragment.html#onCreateView(LayoutInflater,ViewGroup,Bundle)>onCreateView</a>(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) </code>
+                                            <th class="colSecond" scope="row"><code><a href=AdminProfileListFragment.html#onCreateView(LayoutInflater,ViewGroup,Bundle)>onCreateView</a>(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) </code>
                                             </th>
-                                            <td class="colLast">Inflates the layout and initializes all the UI components</td>
+                                            <td class="colLast">Inflates the fragment layout and binds views.</td>
                                         </tr>
                                         
                                         <tr id="i1" class="rowColor">
                                             <td class="colFirst"><code>void</code>
                                             </td>
-                                            <th class="colSecond" scope="row"><code><a href=QRGenerateFragment.html#onStart()>onStart</a>() </code>
+                                            <th class="colSecond" scope="row"><code><a href=AdminProfileListFragment.html#onStart()>onStart</a>() </code>
                                             </th>
-                                            <td class="colLast"></td>
+                                            <td class="colLast">Sets up the back button menu when the fragment starts</td>
+                                        </tr>
+                                        
+                                        <tr id="i2" class="altColor">
+                                            <td class="colFirst"><code>void</code>
+                                            </td>
+                                            <th class="colSecond" scope="row"><code><a href=AdminProfileListFragment.html#onDestroyView()>onDestroyView</a>() </code>
+                                            </th>
+                                            <td class="colLast">Cleans up Firestore listeners</td>
                                         </tr>
                                         
                                         </tbody>
@@ -298,25 +306,12 @@ public class <span class="typeNameLabel"><a href=QRGenerateFragment.html>QRGener
                             </a>
                                 <h3>Constructor Detail</h3>
                                 
-                                <a name="QRGenerateFragment(com.example.syzygy_eventapp.Event,com.example.syzygy_eventapp.NavigationStackFragment)"></a>
+                                <a name="AdminProfileListFragment()"></a>
                                 <ul class="blockList">
                                     <li class="blockList">
-                                        <h4>QRGenerateFragment</h4>
-                                        <pre>QRGenerateFragment(<a href=Event.html>Event</a> event, <a href=NavigationStackFragment.html>NavigationStackFragment</a> navStack)</pre>
-                                        <div class="block">Constructor for QRGenerateFragment</div>
-                                        
-                                        <dl>
-                                            <dt><span class="paramLabel">Parameters:</span></dt>
-                                            
-                                            
-                                            <dd><code>event</code> - The event that needs to have a QR generated</dd>
-                                            
-                                            
-                                            
-                                            <dd><code>navStack</code> - Navigation stack to manage screens</dd>
-                                            
-                                            
-                                        </dl>
+                                        <h4>AdminProfileListFragment</h4>
+                                        <pre>AdminProfileListFragment()</pre>
+                                        <div class="block"></div>
                                         
                                     </li>
                                 </ul>
@@ -342,31 +337,13 @@ public class <span class="typeNameLabel"><a href=QRGenerateFragment.html>QRGener
                                           >
                                     <li class="blockList">
                                         <h4>onCreateView</h4>
-                                        <pre class="methodSignature"> View <a href=QRGenerateFragment.html#onCreateView(LayoutInflater,ViewGroup,Bundle)>onCreateView</a>(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)</pre>
-                                        <div class="block"><p>Inflates the layout and initializes all the UI components</p></div>
+                                        <pre class="methodSignature"> View <a href=AdminProfileListFragment.html#onCreateView(LayoutInflater,ViewGroup,Bundle)>onCreateView</a>(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)</pre>
+                                        <div class="block"><p>Inflates the fragment layout and binds views.</p></div>
 
                                         <dl>
 
                                         
-                                            <dt><span class="paramLabel">Parameters:</span></dt>
-                                            
-                                            
-                                            <dd><code>inflater</code> - The LayoutInflater object that can be used to inflate any views in the fragment,</dd>
-                                            
-                                            
-                                            
-                                            <dd><code>container</code> - If non-null, this is the parent view that the fragment's UI should be attached to.</dd>
-                                            
-                                            
-                                            
-                                            <dd><code>savedInstanceState</code> - If non-null, this fragment is being re-constructed from a previous saved state as given here.</dd>
-                                            
-                                            
-                                        
 
-                                        
-                                            <dt><span class="returnLabel">Returns:</span></dt>
-                                            <dd><p>The root view for this frament's UI</p></dd>
                                         
 
                                         
@@ -379,12 +356,35 @@ public class <span class="typeNameLabel"><a href=QRGenerateFragment.html>QRGener
                                     <!--   -->
                                 </a>
                                 <ul class=
-                                              "blockListLast"
+                                              "blockList"
                                           >
                                     <li class="blockList">
                                         <h4>onStart</h4>
-                                        <pre class="methodSignature"> void <a href=QRGenerateFragment.html#onStart()>onStart</a>()</pre>
-                                        <div class="block"></div>
+                                        <pre class="methodSignature"> void <a href=AdminProfileListFragment.html#onStart()>onStart</a>()</pre>
+                                        <div class="block"><p>Sets up the back button menu when the fragment starts</p></div>
+
+                                        <dl>
+
+                                        
+
+                                        
+
+                                        
+
+                                        </dl>
+                                    </li>
+                                </ul>
+                                
+                                <a id="onDestroyView()">
+                                    <!--   -->
+                                </a>
+                                <ul class=
+                                              "blockListLast"
+                                          >
+                                    <li class="blockList">
+                                        <h4>onDestroyView</h4>
+                                        <pre class="methodSignature"> void <a href=AdminProfileListFragment.html#onDestroyView()>onDestroyView</a>()</pre>
+                                        <div class="block"><p>Cleans up Firestore listeners</p></div>
 
                                         <dl>
 
