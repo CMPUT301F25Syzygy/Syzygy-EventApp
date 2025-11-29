@@ -23,6 +23,8 @@ import java.util.List;
  */
 public class AdminProfileListFragment extends Fragment {
 
+    private String currentAdminID;
+
     /// User list view
     private UserListView userListView;
     /// Firestore listener for user data
@@ -60,6 +62,9 @@ public class AdminProfileListFragment extends Fragment {
         // Start listening to Firestore
         setupUserObservers();
 
+        // Get current admin's user ID
+        currentAdminID = AppInstallationId.get(requireContext());
+
         return root;
     }
 
@@ -83,7 +88,15 @@ public class AdminProfileListFragment extends Fragment {
     }
 
     private void onUsersChanged(List<User> users) {
-        userListView.setUsers(users);
+        // Filter out the current admin
+        List<User> filteredUsers = new ArrayList<>();
+        for (User user : users) {
+            if (!user.getUserID().equals(currentAdminID)) {
+                filteredUsers.add(user);
+            }
+        }
+
+        userListView.setUsers(filteredUsers);
     }
 
     /**

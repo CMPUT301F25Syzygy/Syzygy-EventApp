@@ -374,6 +374,10 @@ public class ProfileFragment extends Fragment {
                 });
     }
 
+    /**
+     * Opens the device's image picker to allow the user to select a poster image.
+     * It will request the needed permissions based on Android's version before opening.
+     */
     private void openImagePicker() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(requireContext(),
@@ -394,6 +398,12 @@ public class ProfileFragment extends Fragment {
         imagePickerLauncher.launch(intent);
     }
 
+    /**
+     * Loads an image from the given URI, resizes it, and converts it to Base64 format.
+     * Updates the poster preview and enables the delete button
+     *
+     * @param imageUri The URI of the selected image
+     */
     private void loadAndConvertProfileImage(Uri imageUri) {
         try {
             Bitmap bitmap;
@@ -409,7 +419,7 @@ public class ProfileFragment extends Fragment {
             }
 
             if (bitmap == null) {
-                Toast.makeText(getContext(), "Could not load image", Toast.LENGTH_SHORT).show();
+                showError("Failed to load image");
                 return;
             }
 
@@ -432,6 +442,12 @@ public class ProfileFragment extends Fragment {
         }
     }
 
+    /**
+     * Resizes a bitmap to fit within the specified max. dimensions while maintaining aspect ratio
+     *
+     * @param bitmap  The original bitmap to resize
+     * @return The resized bitmpa, or the original if already smaller than maxSize
+     */
     private Bitmap resizeBitmap(Bitmap bitmap) {
         int width = bitmap.getWidth();
         int height = bitmap.getHeight();
@@ -452,7 +468,7 @@ public class ProfileFragment extends Fragment {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 openImagePicker();
             } else {
-                Toast.makeText(getContext(), "Permission denied to read images", Toast.LENGTH_SHORT).show();
+                showError("Permission denied to read images");
             }
         }
     }
