@@ -12,6 +12,7 @@ public interface UserControllerInterface {
     public Task<Organizer> createOrganizer(String userID);
     public Task<Admin> createAdmin(String userID);
     public Task<User> getUser(String userID);
+    public Task<List<User>> getUsers(List<String> userIDs);
     public ListenerRegistration observeUser(String userID, Consumer<User> onUpdate, Runnable onDelete);
     public ListenerRegistration observeAllUsers(Consumer<List<User>> onChange);
     public Task<Void> updateFields(String userID, HashMap<String, Object> fields);

@@ -1,28 +1,34 @@
 package com.example.syzygy_eventapp;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.util.Base64;
+
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.GeoPoint;
 
+import java.sql.Time;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 /**
  * Event (model)
- *
+ * <p>
  * Responsibilities:
- *  - Store name, description, and organizer info
- *  - Store event location and whether geolocation is required
- *  - Store event poster (as URL)
- *  - Store waiting list entrants
- *  - Store registration period (start/end)
- *  - Store limits such as max waiting list size and max attendees
- *  - Store QR code data (used by QR generator and scanner)
- *  - Track timestamps for creation and update
- *
+ * - Store name, description, and organizer info
+ * - Store event location and whether geolocation is required
+ * - Store event poster (as URL)
+ * - Store waiting list entrants
+ * - Store registration period (start/end)
+ * - Store limits such as max waiting list size and max attendees
+ * - Store QR code data (used by QR generator and scanner)
+ * - Track timestamps for creation and update
+ * <p>
  * Collaborators:
- *  - Invitation (for invites to this event)
- *  - Entrant (for users on the waiting list)
- *  - Organizer
+ * - Invitation (for invites to this event)
+ * - Entrant (for users on the waiting list)
+ * - Organizer
  */
 public class Event {
 
@@ -31,6 +37,9 @@ public class Event {
     private String name;
     private String description;
     private String organizerID;
+
+    // --- Time ---
+    private Timestamp eventTime;
 
     // --- Location ---
     private String locationName;          // e.g., "10230 Jasper Ave, Edmonton, AB"
@@ -41,8 +50,11 @@ public class Event {
     private String posterUrl;             // Stored in Firebase Storage, referenced by URL
 
     // --- Waiting List ---
-    private List<String> waitingList;     // List of user IDs in waiting list
+    private List<String> waitingList = new ArrayList<>();     // List of user IDs in waiting list
     private Integer maxWaitingList;       // null or 0 = unlimited
+
+    // --- Invites list ---
+    private List<String> invites = new ArrayList<>();
 
     // --- Registration Period ---
     private Timestamp registrationStart;
@@ -52,67 +64,127 @@ public class Event {
     private Integer maxAttendees;         // Max entrants selected from lottery
     private boolean lotteryComplete;      // True when lottery is done
 
-    // --- QR Code ---
-    private String qrCodeData;            // Data embedded in generated QR code
-
     // --- Metadata ---
     private Timestamp createdAt;
     private Timestamp updatedAt;
 
     // --- Required empty constructor for Firestore ---
-    public Event() {}
+    public Event() {
+    }
 
     // --- Full constructor (optional, for easier testing / creation) ---
-    public Event(String eventID, String name, String description, String organizerID,
+    public Event(String eventID, String name, String description, String organizerID, Timestamp eventTime,
                  String locationName, GeoPoint locationCoordinates, boolean geolocationRequired,
-                 String posterUrl, List<String> waitingList, Integer maxWaitingList,
+                 String posterUrl, List<String> waitingList, List<String> invites, Integer maxWaitingList,
                  Timestamp registrationStart, Timestamp registrationEnd,
-                 Integer maxAttendees, boolean lotteryComplete, String qrCodeData,
+                 Integer maxAttendees, boolean lotteryComplete,
                  Timestamp createdAt, Timestamp updatedAt) {
         this.eventID = eventID;
         this.name = name;
         this.description = description;
         this.organizerID = organizerID;
+        this.eventTime = eventTime;
         this.locationName = locationName;
         this.locationCoordinates = locationCoordinates;
         this.geolocationRequired = geolocationRequired;
         this.posterUrl = posterUrl;
         this.waitingList = waitingList;
+        this.invites = invites;
         this.maxWaitingList = maxWaitingList;
         this.registrationStart = registrationStart;
         this.registrationEnd = registrationEnd;
         this.maxAttendees = maxAttendees;
         this.lotteryComplete = lotteryComplete;
-        this.qrCodeData = qrCodeData;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
 
     // --- Getters and Setters ---
 
-    public String getEventID() { return eventID; }
-    public void setEventID(String eventID) { this.eventID = eventID; }
+    public String getEventID() {
+        return eventID;
+    }
 
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
+    public void setEventID(String eventID) {
+        this.eventID = eventID;
+    }
 
-    public String getDescription() { return description; }
-    public void setDescription(String description) { this.description = description; }
+    public String getName() {
+        return name;
+    }
 
-    public String getOrganizerID() { return organizerID; }
-    public void setOrganizerID(String organizerID) { this.organizerID = organizerID; }
+    public void setName(String name) {
+        this.name = name;
+    }
 
-    public String getLocationName() { return locationName; }
-    public void setLocationName(String locationName) { this.locationName = locationName; }
+    public String getDescription() {
+        return description;
+    }
 
-    public GeoPoint getLocationCoordinates() { return locationCoordinates; }
-    public void setLocationCoordinates(GeoPoint locationCoordinates) { this.locationCoordinates = locationCoordinates; }
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
-    public boolean isGeolocationRequired() { return geolocationRequired; }
-    public void setGeolocationRequired(boolean geolocationRequired) { this.geolocationRequired = geolocationRequired; }
+    public String getOrganizerID() {
+        return organizerID;
+    }
 
-    public String getPosterUrl() { return posterUrl; }
-    public void setPosterUrl(String posterUrl) { this.posterUrl = posterUrl; }
+    public void setOrganizerID(String organizerID) {
+        this.organizerID = organizerID;
+    }
+
+    public Timestamp getEventTime() {
+        if (eventTime == null) {
+            return registrationEnd;
+        } else {
+            return eventTime;
+        }
+    }
+
+    public void setEventTime(Timestamp eventTime) {
+        this.eventTime = eventTime;
+    }
+
+    public String getLocationName() {
+        return locationName;
+    }
+
+    public void setLocationName(String locationName) {
+        this.locationName = locationName;
+    }
+
+    public GeoPoint getLocationCoordinates() {
+        return locationCoordinates;
+    }
+
+    public void setLocationCoordinates(GeoPoint locationCoordinates) {
+        this.locationCoordinates = locationCoordinates;
+    }
+
+    public boolean isGeolocationRequired() {
+        return geolocationRequired;
+    }
+
+    public void setGeolocationRequired(boolean geolocationRequired) {
+        this.geolocationRequired = geolocationRequired;
+    }
+
+    public String getPosterUrl() {
+        return posterUrl;
+    }
+
+    public void setPosterUrl(String posterUrl) {
+        this.posterUrl = posterUrl;
+    }
+
+    public Bitmap generatePosterBitmap() {
+        try {
+            byte[] decodedBytes = Base64.decode(posterUrl, Base64.DEFAULT);
+            return BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
+        } catch (Exception e) {
+            return null;
+        }
+    }
 
     public int getWaitingSize() {
         if (waitingList == null)
@@ -120,34 +192,82 @@ public class Event {
         return waitingList.size();
     }
 
-    public List<String> getWaitingList() { return waitingList; }
-    public void setWaitingList(List<String> waitingList) { this.waitingList = waitingList; }
+    public List<String> getWaitingList() {
+        return waitingList;
+    }
 
-    public Integer getMaxWaitingList() { return maxWaitingList; }
-    public void setMaxWaitingList(Integer maxWaitingList) { this.maxWaitingList = maxWaitingList; }
+    public void setWaitingList(List<String> waitingList) {
+        this.waitingList = waitingList;
+    }
 
-    public Timestamp getRegistrationStart() { return registrationStart; }
-    public void setRegistrationStart(Timestamp registrationStart) { this.registrationStart = registrationStart; }
+    public List<String> getInvites() {
+        return invites;
+    }
 
-    public Timestamp getRegistrationEnd() { return registrationEnd; }
-    public void setRegistrationEnd(Timestamp registrationEnd) { this.registrationEnd = registrationEnd; }
+    public void setInvites(List<String> invites) {
+        this.invites = invites;
+    }
 
-    public Integer getMaxAttendees() { return maxAttendees; }
-    public void setMaxAttendees(Integer maxAttendees) { this.maxAttendees = maxAttendees; }
+    public Integer getMaxWaitingList() {
+        return maxWaitingList;
+    }
 
-    public boolean isLotteryComplete() { return lotteryComplete; }
-    public void setLotteryComplete(boolean lotteryComplete) { this.lotteryComplete = lotteryComplete; }
+    public void setMaxWaitingList(Integer maxWaitingList) {
+        this.maxWaitingList = maxWaitingList;
+    }
+
+    public Timestamp getRegistrationStart() {
+        return registrationStart;
+    }
+
+    public void setRegistrationStart(Timestamp registrationStart) {
+        this.registrationStart = registrationStart;
+    }
+
+    public Timestamp getRegistrationEnd() {
+        return registrationEnd;
+    }
+
+    public void setRegistrationEnd(Timestamp registrationEnd) {
+        this.registrationEnd = registrationEnd;
+    }
+
+    public Integer getMaxAttendees() {
+        return maxAttendees;
+    }
+
+    public void setMaxAttendees(Integer maxAttendees) {
+        this.maxAttendees = maxAttendees;
+    }
+
+    public boolean isLotteryComplete() {
+        return lotteryComplete;
+    }
+
+    public void setLotteryComplete(boolean lotteryComplete) {
+        this.lotteryComplete = lotteryComplete;
+    }
 
     public boolean isOpen() {
+        if (registrationEnd == null) {
+            return false;
+        }
         return !lotteryComplete && registrationEnd.toDate().after(new Date());
     }
 
-    public String getQrCodeData() { return qrCodeData; }
-    public void setQrCodeData(String qrCodeData) { this.qrCodeData = qrCodeData; }
+    public Timestamp getCreatedAt() {
+        return createdAt;
+    }
 
-    public Timestamp getCreatedAt() { return createdAt; }
-    public void setCreatedAt(Timestamp createdAt) { this.createdAt = createdAt; }
+    public void setCreatedAt(Timestamp createdAt) {
+        this.createdAt = createdAt;
+    }
 
-    public Timestamp getUpdatedAt() { return updatedAt; }
-    public void setUpdatedAt(Timestamp updatedAt) { this.updatedAt = updatedAt; }
+    public Timestamp getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Timestamp updatedAt) {
+        this.updatedAt = updatedAt;
+    }
 }

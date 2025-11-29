@@ -81,7 +81,6 @@ public class EventControllerTest {
         event.setGeolocationRequired(true);
         event.setPosterUrl("http://example.com/poster.jpg");
         event.setMaxAttendees(100);
-        event.setQrCodeData("qr12345");
 
         String id = Tasks.await(controller.createEvent(event),
                 TIMEOUT_SEC, TimeUnit.SECONDS);

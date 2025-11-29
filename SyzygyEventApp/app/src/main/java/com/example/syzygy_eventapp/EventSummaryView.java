@@ -95,7 +95,7 @@ public class EventSummaryView extends LinearLayout {
         titleText.setText(event.getName());
         locationText.setText(event.getLocationName());
 
-        Date date = event.getRegistrationEnd().toDate();
+        Date date = event.getEventTime().toDate();
         DateFormat timeFormat = DateFormat.getTimeInstance(DateFormat.SHORT);
         DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.MEDIUM);
         timeText.setText(timeFormat.format(date));

@@ -73,7 +73,7 @@ export const lotteryDrawCallback =
     onRequest(async (req, res) => {
         if (debug) logger.debug("lotteryDrawCallback");
         try {
-            await LotteryManager.getInstance().drawLottery(req.body);
+            await LotteryManager.getInstance().drawLottery(req.body.eventId, false);
             res.status(200);
         } catch (err) {
             throw new HttpsError("internal", String(err));
@@ -86,10 +86,10 @@ export const lotteryDrawCallback =
  * @type CloudFunction
  */
 export const drawLotteryEarly =
-    onCall(async (req, res) => {
-        if (debug) logger.debug("earlyLotteryDraw");
+    onCall(async (req) => {
+        if (debug) logger.debug("drawLotteryEarly");
         try {
-            await LotteryManager.getInstance().drawLottery(req.data.lotteryID);
+            await LotteryManager.getInstance().drawLottery(req.data.lotteryID, true);
         } catch (err) {
             throw new HttpsError("internal", String(err));
         }
@@ -151,8 +151,8 @@ class LotteryManager {
             const timeAfter = data.after.get("registrationEnd") as Timestamp;
 
             if (timeBefore == null || timeAfter == null) {
-                logger.warn(`Ignoring ${data.after.id} since "registrationEnd" is null`)
-                return
+                logger.warn(`Ignoring ${data.after.id} since "registrationEnd" is null`);
+                return;
             }
 
             if (!timeBefore.isEqual(timeAfter)) {
@@ -215,7 +215,7 @@ class LotteryManager {
 
         if (millisUntilLottery <= 0) {
             // no need to schedule, draw it now
-            this.drawLottery(payload);
+            this.drawLottery(payload.eventId, false);
             return;
         }
 
@@ -274,34 +274,36 @@ class LotteryManager {
      * Updates everything in the database accordingly.
      *
      * @async
-     * @param {LotteryTaskPayload} payload A payload from when the Google Cloud Task was first made
+     * @param {LotteryTaskPayload} eventId A payload from when the Google Cloud Task was first made
+     * @param {LotteryTaskPayload} early If lottery is early it needs the Google Cloud Task deleted
      * @return {*}
      */
-    async drawLottery(payload: LotteryTaskPayload) {
-        if (debug) logger.debug("drawLottery A", payload.eventId);
+    async drawLottery(eventId: string, early: boolean) {
+        if (debug) logger.debug("drawLottery A", eventId);
         const eventsCollection = this.db.collection("events");
         const invitationsCollection = this.db.collection("invitations");
 
-        const eventRef = eventsCollection.doc(payload.eventId);
+        const eventRef = eventsCollection.doc(eventId);
         const eventSnap = await eventRef.get();
 
         // get event info
         const maxAttendees = eventSnap.get("maxAttendees") ?? Infinity as number;
         const waitingList = eventSnap.get("waitingList") as string[];
         const organizerId = eventSnap.get("organizerID") as string;
+        const invites = eventSnap.get("invites") ?? [] as string[];
         if (debug) logger.debug("drawLottery B", maxAttendees, waitingList, organizerId);
 
 
         if (waitingList == null) {
-            logger.warn(`Ignoring ${eventRef.id} since "waitingList" is null`)
-            return
+            logger.warn(`Ignoring ${eventRef.id} since "waitingList" is null`);
+            return;
         } else if (organizerId == null) {
-            logger.warn(`Ignoring ${eventRef.id} since "organizerId" is null`)
-            return
+            logger.warn(`Ignoring ${eventRef.id} since "organizerId" is null`);
+            return;
         }
 
         const invitesIds = [];
-        const inviteCount = Math.min(maxAttendees, waitingList.length);
+        const inviteCount = Math.min(maxAttendees - invites.length, waitingList.length);
 
         const tasks: Promise<unknown>[] = [];
 
@@ -337,6 +339,10 @@ class LotteryManager {
             merge: true,
         }));
         if (debug) logger.debug("drawLottery D", invitesIds, waitingList);
+
+        if (early) {
+            tasks.push(this.deleteLotteryTask(eventSnap));
+        }
 
         // wait for everything to finish
         await Promise.all(tasks);

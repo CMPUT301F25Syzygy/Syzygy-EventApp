@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/cancel_nav_button"
+        android:title="Cancel"
+        android:icon="@drawable/baseline_undo_24"/>
+    <item
+        android:id="@+id/create_nav_button"
+        android:title="Create"
+        android:icon="@drawable/ic_plus"/>
+</menu>
