@@ -103,7 +103,7 @@ public class EventFragment extends Fragment {
         super.onStart();
 
         //start observing the event
-        eventListener = eventController.observeEvent(eventID, this::onEventUpdated);
+        eventListener = eventController.observeEvent(eventID, this::onEventUpdated, navStack::popScreen);
     }
 
     @Override

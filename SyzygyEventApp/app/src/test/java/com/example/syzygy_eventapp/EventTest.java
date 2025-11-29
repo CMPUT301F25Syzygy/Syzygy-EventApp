@@ -140,13 +140,6 @@ public class EventTest {
     }
 
     @Test
-    public void testQRCodeData() {
-        String qrData = "event://event123";
-        event.setQrCodeData(qrData);
-        assertEquals(qrData, event.getQrCodeData());
-    }
-
-    @Test
     public void testFullConstructor() {
         String eventID = "event123";
         String name = "Test Event";
@@ -162,14 +155,13 @@ public class EventTest {
         Timestamp now = new Timestamp(new Date());
         Integer maxAttendees = 50;
         boolean lotteryComplete = false;
-        String qrCodeData = "event://event123";
 
         Event fullEvent = new Event(
                 eventID, name, description, organizerID, now,
                 locationName, coords, geolocationRequired,
                 posterUrl, waitingList, invites, maxWaitingList,
                 now, now, maxAttendees, lotteryComplete,
-                qrCodeData, now, now
+                 now, now
         );
 
         assertEquals(eventID, fullEvent.getEventID());
@@ -185,7 +177,6 @@ public class EventTest {
         assertEquals(maxWaitingList, fullEvent.getMaxWaitingList());
         assertEquals(maxAttendees, fullEvent.getMaxAttendees());
         assertEquals(lotteryComplete, fullEvent.isLotteryComplete());
-        assertEquals(qrCodeData, fullEvent.getQrCodeData());
     }
 }
 

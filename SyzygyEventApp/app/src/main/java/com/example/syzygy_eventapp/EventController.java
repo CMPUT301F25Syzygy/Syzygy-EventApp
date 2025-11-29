@@ -38,6 +38,7 @@ public class EventController {
 
     /**
      * Gets a single global instance of the EventController
+     *
      * @return a UserController singleton
      */
     public static EventController getInstance() {
@@ -50,8 +51,10 @@ public class EventController {
     //-----------------------
     // EVENT CREATION
     //-----------------------
+
     /**
      * Create a new event with provided details.
+     *
      * @param event Event object with the details filled in.
      * @return Task that completes when the document is created.
      * @throws IllegalArgumentException if any required fields are missing.
@@ -61,35 +64,15 @@ public class EventController {
             return Tasks.forException(new IllegalArgumentException("Event name and organizerID are required"));
         }
 
+        event.setCreatedAt(Timestamp.now());
+        event.setUpdatedAt(event.getCreatedAt());
+
         // Create a new document in the events collection
         DocumentReference doc = eventsRef.document();
         String eventID = doc.getId();
         event.setEventID(eventID);
 
-        // Set defaults if not provided
-        if (event.getWaitingList() == null) {
-            event.setWaitingList(new ArrayList<>());
-        }
-        Map<String, Object> data = new HashMap<>();
-        data.put("eventID", eventID);
-        data.put("name", event.getName());
-        data.put("description", event.getDescription());
-        data.put("organizerID", event.getOrganizerID());
-        data.put("locationName", event.getLocationName());
-        data.put("locationCoordinates", event.getLocationCoordinates());
-        data.put("geolocationRequired", event.isGeolocationRequired());
-        data.put("posterUrl", event.getPosterUrl());
-        data.put("waitingList", event.getWaitingList());
-        data.put("maxWaitingList", event.getMaxWaitingList());
-        data.put("registrationStart", event.getRegistrationStart());
-        data.put("registrationEnd", event.getRegistrationEnd());
-        data.put("maxAttendees", event.getMaxAttendees());
-        data.put("lotteryComplete", false); // Always start as false
-        data.put("qrCodeData", event.getQrCodeData());
-        data.put("createdAt", FieldValue.serverTimestamp());
-        data.put("updatedAt", FieldValue.serverTimestamp());
-
-        return doc.set(data).continueWith(task -> {
+        return doc.set(event).continueWith(task -> {
             if (!task.isSuccessful()) {
                 throw Objects.requireNonNull(task.getException());
             }
@@ -97,28 +80,49 @@ public class EventController {
         });
     }
 
+    /**
+     * Update event with provided details.
+     *
+     * @param event Event object with the details filled in.
+     * @return Task that completes when the document is created.
+     * @throws IllegalArgumentException if any required fields are missing.
+     */
+    public Task<Void> updateEvent(Event event) {
+        event.setUpdatedAt(Timestamp.now());
+
+        // Create a new document in the events collection
+        DocumentReference doc = eventsRef.document(event.getEventID());
+
+        return doc.set(event, SetOptions.merge());
+    }
+
     //-----------------------
     // EVENT OBSERVERS
     //-----------------------
+
     /**
      * Real time observers; observes a single event in real time
-     * @param eventID Event document ID to observe
+     *
+     * @param eventID       Event document ID to observe
      * @param onEventChange Callback invoked with the latest Event object
+     * @param onDelete      Callback invoked when event is deleted
      * @return ListenerRegistration that must be removed when no longer needed
      * @throws IllegalArgumentException if eventID is null/empty
      */
-    public ListenerRegistration observeEvent(String eventID, Consumer<Event> onEventChange) {
+    public ListenerRegistration observeEvent(String eventID, Consumer<Event> onEventChange, Runnable onDelete) {
         if (eventID == null || eventID.isEmpty()) {
             throw new IllegalArgumentException("eventID is required");
         }
         DocumentReference doc = eventsRef.document(eventID);
         return doc.addSnapshotListener((snap, error) -> {
-            // snap can't be null because none of it's implementations can return null
             if (error != null) {
-                System.err.println(error.toString());
+                System.err.println(error);
                 return;
             }
+
+            // snap can't be null because none of it's implementations can return null
             if (!snap.exists()) {
+                onDelete.run();
                 return;
             }
             // Convert to Event object
@@ -136,13 +140,14 @@ public class EventController {
 
     /**
      * Observe all events in real time.
+     *
      * @param onChange Callback invoked with the latest list of Event objects
      * @return ListenerRegistration that must be removed when no longer needed
      */
     public ListenerRegistration observeAllEvents(Consumer<List<Event>> onChange) {
         return eventsRef.addSnapshotListener((snap, error) -> {
             if (error != null) {
-                System.err.println(error.toString());
+                System.err.println(error);
                 return;
             }
 
@@ -162,8 +167,9 @@ public class EventController {
 
     /**
      * Observe all events owned by an organizer in real time.
+     *
      * @param organizerID Organizer document ID to observe
-     * @param onChange Callback invoked with the latest list of Event objects
+     * @param onChange    Callback invoked with the latest list of Event objects
      * @return ListenerRegistration that must be removed when no longer needed
      * @throws IllegalArgumentException if organizerID is null/empty
      */
@@ -175,7 +181,7 @@ public class EventController {
         return eventsRef.whereEqualTo("organizerID", organizerID)
                 .addSnapshotListener((snap, error) -> {
                     if (error != null) {
-                        System.err.println(error.toString());
+                        System.err.println(error);
                         return;
                     }
 
@@ -195,7 +201,8 @@ public class EventController {
 
     /**
      * Observe entrant locations for an event in real time.
-     * @param eventID Event document ID
+     *
+     * @param eventID  Event document ID
      * @param onChange Callback with list of location data maps
      * @return ListenerRegistration to remove when done
      */
@@ -208,7 +215,7 @@ public class EventController {
                 .collection("entrantLocations")
                 .addSnapshotListener((snap, error) -> {
                     if (error != null) {
-                        System.err.println(error.toString());
+                        System.err.println(error);
                         return;
                     }
 
@@ -225,8 +232,10 @@ public class EventController {
     //-----------------------
     // WAITING LIST OPERATIONS
     //-----------------------
+
     /**
      * Get the current number of Entrants on a waiting list for an event.
+     *
      * @param eventID Event document ID
      * @return Task that completes with the count of users on the waiting list
      * @throws IllegalArgumentException if eventID is null/empty
@@ -253,8 +262,9 @@ public class EventController {
 
     /**
      * Add a user to the waiting list for an event.
+     *
      * @param eventID Event document ID
-     * @param userID User document ID
+     * @param userID  User document ID
      * @return Task that completes when the user is added to the waiting list
      * @throws IllegalArgumentException if any parameter is null/empty
      */
@@ -321,8 +331,9 @@ public class EventController {
 
     /**
      * Remove a user from the waiting list for an event.
+     *
      * @param eventID Event document ID
-     * @param userID User document ID
+     * @param userID  User document ID
      * @return Task that completes when the user is removed from the waiting list
      * @throws IllegalArgumentException if any parameter is null/empty
      */
@@ -355,8 +366,10 @@ public class EventController {
     //-----------------------
     // EVENT UPDATES OR DELETE
     //-----------------------
+
     /**
      * Update event details.
+     *
      * @param eventID Event document ID
      * @param updates Map of field names to new values
      * @return Task that completes when the event is updated
@@ -376,6 +389,7 @@ public class EventController {
 
     /**
      * Gets an event object from the database
+     *
      * @param eventID event ID
      * @return Task that completes when the event found, null if the event does not exist
      */
@@ -407,7 +421,7 @@ public class EventController {
      * @return
      */
     public Task<HttpsCallableResult> drawLotteryEarly(String eventId) {
-        return drawLotteryEarly.call(new HashMap<>(){{
+        return drawLotteryEarly.call(new HashMap<>() {{
             put("lotteryID", eventId);
         }});
     }

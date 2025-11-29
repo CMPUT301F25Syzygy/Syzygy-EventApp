@@ -6,6 +6,6 @@
         android:icon="@drawable/baseline_undo_24"/>
     <item
         android:id="@+id/create_nav_button"
-        android:title="Save"
+        android:title="Create"
         android:icon="@drawable/ic_plus"/>
 </menu>

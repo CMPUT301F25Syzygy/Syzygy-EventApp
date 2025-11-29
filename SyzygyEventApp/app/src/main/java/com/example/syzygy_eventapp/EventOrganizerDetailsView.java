@@ -101,13 +101,11 @@ public class EventOrganizerDetailsView extends Fragment {
         userController = UserController.getInstance();
         invitationController = new InvitationController();
 
-        eventListener = eventController.observeEvent(event.getEventID(), (newEvent) -> {
-            event = newEvent;
-            refreshInterface();
-        });
-        inviteListener = invitationController.observeEventInvites(event.getEventID(), (newEvent) -> {
-            refreshInterface();
-        });
+        eventListener = eventController.observeEvent(event.getEventID(), this::setEvent, navStack::popScreen);
+        inviteListener = invitationController.observeEventInvites(event.getEventID(),
+                (newEvent) -> {
+                    refreshInterface();
+                });
 
         setupListeners();
         setupNavBar();
@@ -167,6 +165,11 @@ public class EventOrganizerDetailsView extends Fragment {
         });
     }
 
+    public void setEvent(Event event) {
+        this.event = event;
+        refreshInterface();
+    }
+
     /**
      * Fills in information about the event into the UI
      */
@@ -179,7 +182,7 @@ public class EventOrganizerDetailsView extends Fragment {
         String eventTime = DateFormat.format("MMM d, yyyy HH:mm", event.getEventTime().toDate()).toString();
         eventTimeText.setText(eventTime);
 
-        Bitmap bitmap = event.getPosterBitmap();
+        Bitmap bitmap = event.generatePosterBitmap();
         if (bitmap == null) {
             posterImage.setImageResource(R.drawable.image_placeholder);
         } else {
@@ -257,7 +260,7 @@ public class EventOrganizerDetailsView extends Fragment {
     private Task<Void> cancelInvites() {
         List<String> inviteIds = event.getInvites();
 
-        if(pendingListView.getUsers().size() == 0) {
+        if (pendingListView.getUsers().size() == 0) {
             Toast.makeText(getContext(), "There are pending invites", Toast.LENGTH_SHORT).show();
             return Tasks.forResult(null);
         }

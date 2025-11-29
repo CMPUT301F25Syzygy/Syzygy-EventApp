@@ -13,7 +13,6 @@ import android.graphics.ImageDecoder;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -27,10 +26,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.Timestamp;
 
 import java.io.ByteArrayOutputStream;
@@ -38,12 +34,7 @@ import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Fragment class that allows an organizer to create or edit an event's details.
@@ -65,15 +56,11 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
 
     // Controllers for Firebase operations
     private EventController eventController;
-    private InvitationController invitationController;
 
     // Current user and event data
-    private final String organizerID;
     private final Event event;
     private final boolean isEditMode;
     private Timestamp startTime, endTime;
-
-    private static final String TAG = "OrganizerEventEdit";
 
     // Activity result launcher for image selection
     private ActivityResultLauncher<Intent> imagePickerLauncher;
@@ -89,7 +76,6 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
         event.setOrganizerID(organizerID);
 
         this.isEditMode = false;
-        this.organizerID = organizerID;
         this.navStack = navStack;
     }
 
@@ -102,7 +88,6 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
     public OrganizerEventEditDetailsFragment(@NonNull Event event, @Nullable NavigationStackFragment navStack) {
         this.event = event;
         this.isEditMode = true;
-        this.organizerID = event.getOrganizerID();
         this.navStack = navStack;
     }
 
@@ -148,7 +133,6 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
 
         // Initialize controllers for Firebase operations
         eventController = EventController.getInstance();
-        invitationController = new InvitationController();
 
         setupListeners();
 
@@ -179,9 +163,9 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
             if (item.getItemId() == R.id.undo_nav_button) {
                 navStack.popScreen();
             } else if (item.getItemId() == R.id.delete_nav_button) {
-                deleteEvent();
+                deleteEvent(navStack::popScreen);
             } else if (item.getItemId() == R.id.save_nav_button) {
-                // TODO
+                updateEvent(navStack::popScreen);
             }
             return true;
         });
@@ -196,7 +180,7 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
             if (item.getItemId() == R.id.cancel_nav_button) {
                 navStack.popScreen();
             } else if (item.getItemId() == R.id.create_nav_button) {
-                createEvent();
+                createEvent(navStack::popScreen);
             }
             return true;
         });
@@ -238,61 +222,69 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
         }));
 
         // View map button
-        if (viewMapButton != null) {
-            viewMapButton.setOnClickListener(v -> {
-                if (event != null && event.isGeolocationRequired() && navStack != null) {
-                    WaitlistMapFragment mapFragment = new WaitlistMapFragment(event, navStack);
-                    navStack.pushScreen(mapFragment);
-                } else if (event != null && !event.isGeolocationRequired()) {
-                    Toast.makeText(getContext(),
-                            "Geolocation was not required for this event",
-                            Toast.LENGTH_SHORT).show();
-                }
-            });
+        viewMapButton.setOnClickListener(v -> {
+            WaitlistMapFragment mapFragment = new WaitlistMapFragment(event, navStack);
+            navStack.pushScreen(mapFragment);
+        });
 
-            // Show/hide based on geolocation requirement
-            if (isEditMode && event != null) {
-                viewMapButton.setVisibility(event.isGeolocationRequired() ? View.VISIBLE : View.GONE);
+        geolocationToggle.setOnClickListener((view) -> {
+            if (geolocationToggle.isChecked()) {
+                viewMapButton.setVisibility(View.VISIBLE);
             } else {
                 viewMapButton.setVisibility(View.GONE);
             }
-        }
+        });
     }
 
     /**
      * Validates input fields and creates a new event. Shows a toast message and initiates the creation process.
      */
-    private void createEvent() {
+    private void createEvent(Runnable callback) {
         boolean isValid = updateLocalEventFromInputs();
 
         if (isValid) {
             Toast.makeText(getContext(), "Creating event...", Toast.LENGTH_SHORT).show();
             eventController.createEvent(event)
                     .addOnSuccessListener((eventId) -> {
-                        navStack.popScreen();
+                        callback.run();
                     })
                     .addOnFailureListener((exception) -> {
-                        Log.e(TAG, "failed to create event", exception);
+                        Toast.makeText(getContext(), "Failed to create event", Toast.LENGTH_SHORT).show();
                     });
         }
     }
 
+    private void updateEvent(Runnable callback) {
+        boolean isValid = updateLocalEventFromInputs();
+
+        if (isValid) {
+            Toast.makeText(getContext(), "Updating event...", Toast.LENGTH_SHORT).show();
+            eventController.updateEvent(event)
+                    .addOnSuccessListener((eventId) -> {
+                        callback.run();
+                    })
+                    .addOnFailureListener((exception) -> {
+                        Toast.makeText(getContext(), "Failed to update event", Toast.LENGTH_SHORT).show();
+                    });
+        }
+    }
 
     /**
      * Displays a confirmation dialog and deleted the event if the organizer confirms.
      */
-    private void deleteEvent() {
+    private void deleteEvent(Runnable callback) {
         new AlertDialog.Builder(requireContext())
                 .setTitle("Delete event")
                 .setMessage("Are you sure you want to permanently delete this event? This cannot be undone.")
                 .setPositiveButton("Confirm", (dialog, which) -> {
                     eventController.deleteEvent(event.getEventID());
-                    navStack.popScreen();
+                    callback.run();
                 })
                 .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
                 .show();
 
         // TODO: remove the event from the organizer's list of owned events.
+        // JUST NOT HERE, THAT IS A JOB FOR THE EVENT CONTROLLER
     }
 
     /**
@@ -359,12 +351,7 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
 
             // Update the UI
             posterPreview.setImageBitmap(resizedBitmap);
-            deletePosterButton.setVisibility(View.VISIBLE);
-
-            Toast.makeText(getContext(), "Image loaded successfully", Toast.LENGTH_SHORT).show();
-
         } catch (Exception error) {
-            Log.e(TAG, "Error loading image", error);
             Toast.makeText(getContext(), "Failed to load image: " + error.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
@@ -453,7 +440,7 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
         updateTimeButtonText(endTimeButton, endTime);
 
         // Load the poster is available
-        Bitmap bitmap = event.getPosterBitmap();
+        Bitmap bitmap = event.generatePosterBitmap();
 
         if (bitmap == null) {
             posterPreview.setImageResource(R.drawable.image_placeholder);
@@ -469,62 +456,6 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
             geolocationToggle.setEnabled(false);
             geolocationToggle.setAlpha(0.6f);
         }
-
-
-    }
-
-    /**
-     * Creates a new event object with the provided poster data abd saves it to Firestore.
-     * Navigates back to the OrganizerFragment on success, and shows an error message on failure.
-     *
-     * @param posterData The Base64 encoded poster image, which is null is there is no poster
-     */
-    private void createEventWithPoster(String posterData) {
-        // Builf a new event object from input fields
-        Event newEvent = new Event();
-        newEvent.setName(titleInput.getText().toString());
-        newEvent.setDescription(descriptionInput.getText().toString());
-        newEvent.setLocationName(locationInput.getText().toString());
-        newEvent.setOrganizerID(organizerID);
-        newEvent.setMaxAttendees(Integer.parseInt(entrantLimitInput.getText().toString()));
-        newEvent.setRegistrationStart(startTime);
-        newEvent.setRegistrationEnd(endTime);
-        newEvent.setLotteryComplete(false);
-        newEvent.setPosterUrl(posterData);
-
-        // Max waiting list
-        String maxWaitingListStr = maxWaitingListInput.getText().toString().trim();
-        if (!maxWaitingListStr.isEmpty()) {
-            newEvent.setMaxWaitingList(Integer.parseInt(maxWaitingListStr));
-        } else {
-            // Keep as null, which means unlimited people can enter the waiting list
-            newEvent.setMaxWaitingList(null);
-        }
-
-        // Set geolocation requirement from toggle
-        newEvent.setGeolocationRequired(geolocationToggle.isChecked());
-
-        // Set default values for optional fields
-        // TODO: Change these if/when they are implemented based on the organizer's choices.
-        newEvent.setLocationCoordinates(null);
-        newEvent.setQrCodeData(null);
-        newEvent.setWaitingList(new ArrayList<>());
-        newEvent.setCreatedAt(Timestamp.now());
-        newEvent.setUpdatedAt(Timestamp.now());
-
-        // Save to Firestore
-        eventController.createEvent(newEvent)
-                .addOnSuccessListener(eventID -> {
-                    Log.d(TAG, "SUCCESS! Event created with ID: " + eventID);
-                    Toast.makeText(getContext(), "Event created!", Toast.LENGTH_SHORT).show();
-                    if (navStack != null) {
-                        navStack.popScreen();
-                    }
-                })
-                .addOnFailureListener(error -> {
-                    Log.e(TAG, "FAILED to create event", error);
-                    Toast.makeText(getContext(), "Failed to create event: " + error.getMessage(), Toast.LENGTH_LONG).show();
-                });
     }
 
     private boolean updateLocalEventFromInputs() {
@@ -605,6 +536,8 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
                 isValid = false;
             }
         }
+
+        event.setGeolocationRequired(geolocationToggle.isChecked());
 
         return isValid;
     }
