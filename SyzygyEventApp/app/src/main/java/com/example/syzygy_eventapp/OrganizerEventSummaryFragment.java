@@ -13,7 +13,6 @@ import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.chip.Chip;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.Filter;
-import com.google.firebase.firestore.ListenerRegistration;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -163,7 +162,7 @@ public class OrganizerEventSummaryFragment extends LinearLayout {
                 Filter.equalTo("accepted", true),
                 Filter.notEqualTo("responseTime", null),
                 Filter.equalTo("cancelled", false));
-        
+
         inviteListener = new InvitationController().observeInvites(acceptedFilter, (invites) -> {
             int acceptedCount = invites.size();
             acceptedCountText.setText(acceptedCount + "/" + maxAttendees);
@@ -228,10 +227,10 @@ public class OrganizerEventSummaryFragment extends LinearLayout {
         int color;
         String label;
 
-        if (lotteryComplete) {
+        if (registrationEnd.before(new Date())) {
             label = "Finished";
             color = R.color.grey;
-        } else if (registrationEnd.before(new Date())) {
+        } else if (lotteryComplete) {
             label = "Lottery Done";
             color = R.color.purple;
         } else {

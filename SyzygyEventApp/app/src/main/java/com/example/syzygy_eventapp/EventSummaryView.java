@@ -95,11 +95,13 @@ public class EventSummaryView extends LinearLayout {
         titleText.setText(event.getName());
         locationText.setText(event.getLocationName());
 
-        Date date = event.getEventTime().toDate();
-        DateFormat timeFormat = DateFormat.getTimeInstance(DateFormat.SHORT);
-        DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.MEDIUM);
-        timeText.setText(timeFormat.format(date));
-        dateText.setText(dateFormat.format(date));
+        if (event.getEventTime() != null) {
+            Date date = event.getEventTime().toDate();
+            DateFormat timeFormat = DateFormat.getTimeInstance(DateFormat.SHORT);
+            DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.MEDIUM);
+            timeText.setText(timeFormat.format(date));
+            dateText.setText(dateFormat.format(date));
+        }
 
         if (attendeeStatus != null) {
             setAttendeeChipColor(attendeeStatus);
