@@ -102,6 +102,15 @@ public class EventFragment extends Fragment {
     public void onStart() {
         super.onStart();
 
+        // set a back button nav bar
+        navStack.setScreenNavMenu(R.menu.back_nav_menu, item -> {
+            if (item.getItemId() == R.id.back_nav_button) {
+                navStack.popScreen();
+                return true;
+            }
+            return false;
+        });
+
         //start observing the event
         eventListener = eventController.observeEvent(eventID, this::onEventUpdated, navStack::popScreen);
     }
