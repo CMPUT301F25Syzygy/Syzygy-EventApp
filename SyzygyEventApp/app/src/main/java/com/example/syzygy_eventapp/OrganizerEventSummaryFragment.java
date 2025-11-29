@@ -161,7 +161,6 @@ public class OrganizerEventSummaryFragment extends LinearLayout {
         Filter acceptedFilter = Filter.and(
                 Filter.equalTo("event", eventID),
                 Filter.equalTo("accepted", true),
-                Filter.notEqualTo("responseTime", null),
                 Filter.equalTo("cancelled", false));
 
         inviteListener = new InvitationController().observeInvites(acceptedFilter, (invites) -> {
