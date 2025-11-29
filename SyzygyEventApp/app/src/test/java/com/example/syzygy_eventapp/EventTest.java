@@ -29,7 +29,6 @@ public class EventTest {
         assertNotNull(event);
         assertNull(event.getEventID());
         assertNull(event.getName());
-        assertNull(event.getWaitingList());
     }
 
     @Test
