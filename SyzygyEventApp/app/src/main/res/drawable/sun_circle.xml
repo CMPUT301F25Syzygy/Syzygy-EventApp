@@ -9,13 +9,14 @@
     <gradient
         android:type="radial"
         android:centerX="50%"
-        android:centerY="60%"
-        android:gradientRadius="260dp"
-        android:startColor="#FFFFD54F"
-        android:centerColor="#FFFFA000"
-        android:endColor="#FFF57F17" />
+        android:centerY="48%"
+        android:gradientRadius="320dp"
+        android:startColor="#FFFDE68A"
+        android:centerColor="#FFFFA726"
+        android:endColor="#FFE65100" />
 
     <stroke
-        android:width="2dp"
-        android:color="#55FFFFFF" />
+        android:width="4dp"
+        android:color="#33FF9800" />
+
 </shape>

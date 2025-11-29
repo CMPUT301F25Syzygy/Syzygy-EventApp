@@ -1,8 +1,17 @@
 package com.example.syzygy_eventapp;
 
+import android.Manifest;
+import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.ImageDecoder;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.InputType;
+import android.util.Base64;
 import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,8 +22,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.content.Intent;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.material.chip.Chip;
@@ -22,6 +34,8 @@ import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.google.firebase.firestore.ListenerRegistration;
 
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.function.Consumer;
 
@@ -35,6 +49,9 @@ import java.util.function.Consumer;
 public class ProfileFragment extends Fragment {
 
     // Profile section
+    private static final int MAX_IMAGE_SIZE = 200;
+    private static final int PERMISSION_REQUEST_IMAGE = 100;
+    private ActivityResultLauncher<Intent> imagePickerLauncher;
     private ShapeableImageView profileImageView;
     private LinearLayout profileNamePanel;
     private TextView profileNameText;
@@ -113,6 +130,18 @@ public class ProfileFragment extends Fragment {
                 newValue -> updateUserField("name", newValue)
         ));
 
+        imagePickerLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+                        Uri selectedImageUri = result.getData().getData();
+                        if (selectedImageUri != null) {
+                            loadAndConvertProfileImage(selectedImageUri);
+                        }
+                    }
+                }
+        );
+
         profileEmailPanel.setOnClickListener(v -> showEditDialog(
                 "Edit Email",
                 profileEmailText.getText().toString(),
@@ -179,6 +208,14 @@ public class ProfileFragment extends Fragment {
                     .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
                     .show();
         });
+
+        profileImageView.setOnClickListener(v -> {
+            if (currentUser == null) {
+                Toast.makeText(getContext(), "User not loaded yet", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            openImagePicker();
+        });
     }
 
     /**
@@ -238,7 +275,22 @@ public class ProfileFragment extends Fragment {
             profileEmailText.setText(user.getEmail() != null ? user.getEmail() : "(No email)");
             profilePhoneNumberText.setText(user.getPhone() != null ? user.getPhone() : "(No phone)");
             profileRoleBadge.setText(user.getRole() != null ? user.getRole().name() : "Unassigned");
+
+            if (user.getPhotoURL() != null && !user.getPhotoURL().isEmpty()) {
+                byte[] decodedBytes = Base64.decode(user.getPhotoURL(), Base64.DEFAULT);
+                Bitmap decodedBitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
+                if (decodedBitmap != null) {
+                    profileImageView.setImageBitmap(decodedBitmap);
+                } else {
+                    profileImageView.setImageResource(R.drawable.profile_placeholder);
+                }
+            } else {
+                profileImageView.setImageResource(R.drawable.profile_placeholder);
+            }
+
         });
+
+
     }
 
     /**
@@ -321,4 +373,92 @@ public class ProfileFragment extends Fragment {
                             (err.getMessage() == null ? "unknown error" : err.getMessage()));
                 });
     }
+
+    private void openImagePicker() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(requireContext(),
+                    Manifest.permission.READ_MEDIA_IMAGES) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{Manifest.permission.READ_MEDIA_IMAGES}, PERMISSION_REQUEST_IMAGE);
+                return;
+            }
+        } else {
+            if (ContextCompat.checkSelfPermission(requireContext(),
+                    Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSION_REQUEST_IMAGE);
+                return;
+            }
+        }
+
+        Intent intent = new Intent(Intent.ACTION_PICK);
+        intent.setType("image/*");
+        imagePickerLauncher.launch(intent);
+    }
+
+    private void loadAndConvertProfileImage(Uri imageUri) {
+        try {
+            Bitmap bitmap;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                ImageDecoder.Source source = ImageDecoder.createSource(
+                        requireContext().getContentResolver(), imageUri);
+                bitmap = ImageDecoder.decodeBitmap(source);
+            } else {
+                InputStream inputStream = requireContext().getContentResolver()
+                        .openInputStream(imageUri);
+                bitmap = BitmapFactory.decodeStream(inputStream);
+                if (inputStream != null) inputStream.close();
+            }
+
+            if (bitmap == null) {
+                Toast.makeText(getContext(), "Could not load image", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            Bitmap resized = resizeBitmap(bitmap);
+
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            resized.compress(Bitmap.CompressFormat.JPEG, 70, baos);
+            byte[] imageBytes = baos.toByteArray();
+
+            String encoded = Base64.encodeToString(imageBytes, Base64.DEFAULT);
+
+            currentUser.setPhotoURL(encoded);
+            updateUserField("photoURL", encoded);
+
+            profileImageView.setImageBitmap(resized);
+            Toast.makeText(getContext(), "Profile image updated", Toast.LENGTH_SHORT).show();
+
+        } catch (Exception e) {
+            Toast.makeText(getContext(), "Image error: " + e.getMessage(), Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private Bitmap resizeBitmap(Bitmap bitmap) {
+        int width = bitmap.getWidth();
+        int height = bitmap.getHeight();
+
+        if (width <= ProfileFragment.MAX_IMAGE_SIZE && height <= ProfileFragment.MAX_IMAGE_SIZE) return bitmap;
+
+        float ratio = Math.min((float) ProfileFragment.MAX_IMAGE_SIZE / width, (float) ProfileFragment.MAX_IMAGE_SIZE / height);
+        int newW = Math.round(width * ratio);
+        int newH = Math.round(height * ratio);
+
+        return Bitmap.createScaledBitmap(bitmap, newW, newH, true);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == PERMISSION_REQUEST_IMAGE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                openImagePicker();
+            } else {
+                Toast.makeText(getContext(), "Permission denied to read images", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+
+
+
+
 }
