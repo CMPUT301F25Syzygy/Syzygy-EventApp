@@ -289,6 +289,14 @@ public class <span class="typeNameLabel"><a href=UserController.html>UserControl
                                         </tr>
                                         
                                         <tr id="i5" class="rowColor">
+                                            <td class="colFirst"><code>Task&lt;List&lt;User&gt;&gt;</code>
+                                            </td>
+                                            <th class="colSecond" scope="row"><code><a href=UserController.html#getUsers(java.util.List)>getUsers</a>(<a href=https://developer.android.com/reference/kotlin/java/util/List.html>List</a>&lt;<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a>&gt; userIDs) </code>
+                                            </th>
+                                            <td class="colLast">Retrieves a list of users from the database Results in a IllegalArgumentException if the userID isn't in the database</td>
+                                        </tr>
+                                        
+                                        <tr id="i6" class="altColor">
                                             <td class="colFirst"><code>ListenerRegistration</code>
                                             </td>
                                             <th class="colSecond" scope="row"><code><a href=UserController.html#observeUser(java.lang.String,java.util.function.Consumer,java.lang.Runnable)>observeUser</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> userID, <a href=https://developer.android.com/reference/kotlin/java/util/function/Consumer.html>Consumer</a>&lt;<a href=User.html>User</a>&gt; onUpdate, <a href=https://developer.android.com/reference/kotlin/java/lang/Runnable.html>Runnable</a> onDelete) </code>
@@ -296,7 +304,15 @@ public class <span class="typeNameLabel"><a href=UserController.html>UserControl
                                             <td class="colLast">Observes userID and pushes the current <a href=User.html>User</a> on each change.</td>
                                         </tr>
                                         
-                                        <tr id="i6" class="altColor">
+                                        <tr id="i7" class="rowColor">
+                                            <td class="colFirst"><code>ListenerRegistration</code>
+                                            </td>
+                                            <th class="colSecond" scope="row"><code><a href=UserController.html#observeAllUsers(java.util.function.Consumer)>observeAllUsers</a>(<a href=https://developer.android.com/reference/kotlin/java/util/function/Consumer.html>Consumer</a>&lt;<a href=https://developer.android.com/reference/kotlin/java/util/List.html>List</a>&lt;<a href=User.html>User</a>&gt;&gt; onChange) </code>
+                                            </th>
+                                            <td class="colLast">Observe all users in real time.</td>
+                                        </tr>
+                                        
+                                        <tr id="i8" class="altColor">
                                             <td class="colFirst"><code>Task&lt;Void&gt;</code>
                                             </td>
                                             <th class="colSecond" scope="row"><code><a href=UserController.html#updateFields(java.lang.String,java.util.HashMap)>updateFields</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> userID, <a href=https://developer.android.com/reference/kotlin/java/util/HashMap.html>HashMap</a>&lt;<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a>, <a href=https://developer.android.com/reference/kotlin/java/lang/Object.html>Object</a>&gt; fields) </code>
@@ -304,7 +320,7 @@ public class <span class="typeNameLabel"><a href=UserController.html>UserControl
                                             <td class="colLast">Partially update a user's fields.</td>
                                         </tr>
                                         
-                                        <tr id="i7" class="rowColor">
+                                        <tr id="i9" class="rowColor">
                                             <td class="colFirst"><code>Task&lt;User&gt;</code>
                                             </td>
                                             <th class="colSecond" scope="row"><code><a href=UserController.html#setUserRole(java.lang.String,com.example.syzygy_eventapp.Role)>setUserRole</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> userID, <a href=Role.html>Role</a> role) </code>
@@ -312,7 +328,7 @@ public class <span class="typeNameLabel"><a href=UserController.html>UserControl
                                             <td class="colLast"></td>
                                         </tr>
                                         
-                                        <tr id="i8" class="altColor">
+                                        <tr id="i10" class="altColor">
                                             <td class="colFirst"><code>Task&lt;Void&gt;</code>
                                             </td>
                                             <th class="colSecond" scope="row"><code><a href=UserController.html#deleteUser(java.lang.String)>deleteUser</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> userID) </code>
@@ -501,6 +517,39 @@ public class <span class="typeNameLabel"><a href=UserController.html>UserControl
                                     </li>
                                 </ul>
                                 
+                                <a id="getUsers(java.util.List)">
+                                    <!--   -->
+                                </a>
+                                <ul class=
+                                              "blockList"
+                                          >
+                                    <li class="blockList">
+                                        <h4>getUsers</h4>
+                                        <pre class="methodSignature"> Task&lt;List&lt;User&gt;&gt; <a href=UserController.html#getUsers(java.util.List)>getUsers</a>(<a href=https://developer.android.com/reference/kotlin/java/util/List.html>List</a>&lt;<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a>&gt; userIDs)</pre>
+                                        <div class="block"><p>Retrieves a list of users from the database Results in a IllegalArgumentException if the userID isn't in the database</p></div>
+
+                                        <dl>
+
+                                        
+                                            <dt><span class="paramLabel">Parameters:</span></dt>
+                                            
+                                            
+                                            <dd><code>userIDs</code> - the userID to get a <a href=User.html>User</a> for</dd>
+                                            
+                                            
+                                        
+
+                                        
+                                            <dt><span class="returnLabel">Returns:</span></dt>
+                                            <dd><p>the list of <a href=User.html>User</a> found in the database</p></dd>
+                                        
+
+                                        
+
+                                        </dl>
+                                    </li>
+                                </ul>
+                                
                                 <a id="observeUser(java.lang.String,java.util.function.Consumer,java.lang.Runnable)">
                                     <!--   -->
                                 </a>
@@ -534,6 +583,39 @@ public class <span class="typeNameLabel"><a href=UserController.html>UserControl
                                         
                                             <dt><span class="returnLabel">Returns:</span></dt>
                                             <dd><p>ListenerRegistration for stopping the observation</p></dd>
+                                        
+
+                                        
+
+                                        </dl>
+                                    </li>
+                                </ul>
+                                
+                                <a id="observeAllUsers(java.util.function.Consumer)">
+                                    <!--   -->
+                                </a>
+                                <ul class=
+                                              "blockList"
+                                          >
+                                    <li class="blockList">
+                                        <h4>observeAllUsers</h4>
+                                        <pre class="methodSignature"> ListenerRegistration <a href=UserController.html#observeAllUsers(java.util.function.Consumer)>observeAllUsers</a>(<a href=https://developer.android.com/reference/kotlin/java/util/function/Consumer.html>Consumer</a>&lt;<a href=https://developer.android.com/reference/kotlin/java/util/List.html>List</a>&lt;<a href=User.html>User</a>&gt;&gt; onChange)</pre>
+                                        <div class="block"><p>Observe all users in real time.</p></div>
+
+                                        <dl>
+
+                                        
+                                            <dt><span class="paramLabel">Parameters:</span></dt>
+                                            
+                                            
+                                            <dd><code>onChange</code> - Callback invoked with the latest list of User objects</dd>
+                                            
+                                            
+                                        
+
+                                        
+                                            <dt><span class="returnLabel">Returns:</span></dt>
+                                            <dd><p>ListenerRegistration that must be removed when no longer needed</p></dd>
                                         
 
                                         
