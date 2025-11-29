@@ -31,6 +31,7 @@ public class AdminEventListFragment extends Fragment {
     /// Navigation stack fragment
     private NavigationStackFragment navStack;
 
+    /// Event list views
     private EventSummaryListView upcomingEventList;
     private EventSummaryListView pastEventList;
 
@@ -80,6 +81,9 @@ public class AdminEventListFragment extends Fragment {
         startEventObserver();
     }
 
+    /**
+     * Starts observing all events from the EventController and updates the UI accordingly.
+     */
     private void startEventObserver() {
         EventController.getInstance().observeAllEvents(events -> {
             List<Event> upcoming = new ArrayList<>();
@@ -121,11 +125,17 @@ public class AdminEventListFragment extends Fragment {
         });
     }
 
+    /**
+     * Callback when an event is clicked. Navigates to the EventFragment for the selected event.
+     */
     private void eventClickedCallback(View view) {
         Event event = (Event) view.getTag();
-        navStack.pushScreen(new EventOrganizerDetailsView(event, navStack));
+        navStack.pushScreen(new EventFragment(navStack, event.getEventID()));
     }
 
+    /**
+     * Callback when the delete event button is clicked. Prompts for confirmation before deleting the event.
+     */
     private void eventDeleteButtonClickedCallback(View view) {
         Event event = (Event) view.getTag();
 
@@ -143,8 +153,25 @@ public class AdminEventListFragment extends Fragment {
                 .show();
     }
 
+    /**
+     * Callback when the remove banner button is clicked. Prompts for confirmation before removing the event poster image.
+     */
     private void eventRemoveBannerButtonClickedCallback(View view) {
         Event event = (Event) view.getTag();
+
+        new AlertDialog.Builder(requireContext())
+                .setTitle("Remove Event Poster Image")
+                .setMessage("Are you sure you want to remove this event's poster image?")
+                .setPositiveButton("Remove", (dialog, which) -> {
+                    // User confirmed
+                    event.setPosterUrl(null);
+                    EventController.getInstance().updateEvent(event);
+                })
+                .setNegativeButton("Cancel", (dialog, which) -> {
+                    // User cancelled (do nothing)
+                    dialog.dismiss();
+                })
+                .show();
     }
 
     /**
