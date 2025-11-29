@@ -227,10 +227,10 @@ public class OrganizerEventSummaryFragment extends LinearLayout {
         int color;
         String label;
 
-        if (lotteryComplete) {
+        if (registrationEnd.before(new Date())) {
             label = "Finished";
             color = R.color.grey;
-        } else if (registrationEnd.before(new Date())) {
+        } else if (lotteryComplete) {
             label = "Lottery Done";
             color = R.color.purple;
         } else {
