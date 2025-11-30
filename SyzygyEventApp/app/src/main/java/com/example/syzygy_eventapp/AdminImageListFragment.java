@@ -2,6 +2,9 @@ package com.example.syzygy_eventapp;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.media.Image;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -9,6 +12,7 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
+import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,24 +20,32 @@ import android.view.ViewGroup;
 import com.google.firebase.firestore.ListenerRegistration;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Fragment displaying a list of user profiles for the administrator to manage.
  */
 public class AdminImageListFragment extends Fragment {
 
-    private String currentAdminID;
+    private ImageListView imageListView;
 
-    /// User list view
-    private ImageListView userListView;
+
+
     /// Firestore listener for user data
     private ListenerRegistration userListener;
+    private ListenerRegistration eventListener;
+
+
+
+
     /// Navigation stack fragment
     private NavigationStackFragment navStack;
 
     List<User> users = new ArrayList<>();
     List<Event> events = new ArrayList<>();
+
 
 
     /// Required empty constructor
@@ -58,16 +70,14 @@ public class AdminImageListFragment extends Fragment {
         View root = inflater.inflate(R.layout.fragment_admin_image_list, container, false);
 
         // Bind list view
-        userListView = root.findViewById(R.id.image_list_view);
+        imageListView = root.findViewById(R.id.image_list_view);
 
         // Click listener for each user
-//        userListView.setOnUserClickListener(this::showUserActionDialog);
+        imageListView.setOnImageClickListener(this::showActionDialog);
 
         // Start listening to Firestore
         setupUserObservers();
-
-        // Get current admin's user ID
-        currentAdminID = AppInstallationId.get(requireContext());
+        setupEventObservers();
 
         return root;
     }
@@ -91,18 +101,83 @@ public class AdminImageListFragment extends Fragment {
                 .observeAllUsers(this::onUsersChanged);
     }
 
-    private void onUsersChanged(List<User> users) {
-        // Filter out the current admin
-        List<User> filteredUsers = new ArrayList<>();
-        for (User user : users) {
-//            if (!user.getUserID().equals(currentAdminID)) {
-//                filteredUsers.add(user);
-//            }
+    private void setupEventObservers() {
+        eventListener = EventController.getInstance()
+                .observeAllEvents(this::onEventsChanged);
+    }
 
-            filteredUsers.add(user);
+    private void onUsersChanged(List<User> updatedUsers) {
+        users = new ArrayList<>();
+        for (User user : updatedUsers) {
+            if (user.getPhotoURL() != null) {
+                users.add(user);
+            }
         }
 
-        userListView.setUsers(filteredUsers);
+        this.updateImages();
+    }
+
+    private void onEventsChanged(List<Event> updatedEvents) {
+        events = new ArrayList<>();
+        for (Event event : updatedEvents) {
+            if (event.getPosterUrl() != null) {
+                events.add(event);
+            }
+        }
+
+        this.updateImages();
+    }
+
+    private void updateImages() {
+        List<ImageWrapper> images = new ArrayList<>();
+
+        for (User user : users) {
+            images.add(new ImageWrapper(user));
+        }
+
+        for (Event event : events) {
+            images.add(new ImageWrapper(event));
+        }
+
+        imageListView.setImages(images);
+    }
+
+    private void showActionDialog(ImageWrapper image) {
+        switch (image.getImageSourceType()) {
+            case USER:
+                new AlertDialog.Builder(requireContext())
+                        .setTitle("Delete user profile image?")
+                        .setMessage("This will permanently remove the user's profile picture.")
+                        .setPositiveButton("Delete", (dialog, which) -> {
+                            // Delete the image
+                            HashMap<String, Object> updates = new HashMap<>();
+                            updates.put("photoURL", null);
+                            UserController.getInstance().updateFields(
+                                    image.getUserID(),
+                                    updates
+                            );
+                        })
+                        .setNegativeButton("Cancel", null)
+                        .show();
+                break;
+
+            case EVENT:
+                new AlertDialog.Builder(requireContext())
+                        .setTitle("Delete event image?")
+                        .setMessage("This will permanently remove this event's image.")
+                        .setPositiveButton("Delete", (dialog, which) -> {
+                            // Delete the image
+                            HashMap<String, Object> updates = new HashMap<>();
+                            updates.put("posterUrl", null);
+                            EventController.getInstance().updateEvent(
+                                    image.getEventID(),
+                                    updates
+                            );
+                        })
+                        .setNegativeButton("Cancel", null)
+                        .show();
+                break;
+        }
     }
 
     /**

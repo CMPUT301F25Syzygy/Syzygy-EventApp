@@ -49,6 +49,6 @@
         android:layout_height="wrap_content"
         android:visibility="visible"
         app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-        app:spanCount="2"
+        app:spanCount="1"
         tools:listitem="@layout/image_grid_item"/>
 </LinearLayout>

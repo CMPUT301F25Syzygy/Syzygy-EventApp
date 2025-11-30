@@ -10,7 +10,9 @@
     android:layout_margin="8dp"
     app:cardBackgroundColor="?attr/colorSurfaceContainerHigh"
     app:cardCornerRadius="12dp"
-    app:cardElevation="2dp">
+    app:cardElevation="2dp"
+    app:strokeColor="?attr/colorOutline"
+    app:strokeWidth="2dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -22,9 +24,9 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical"
+            android:gravity="fill_vertical"
             android:orientation="vertical"
-            android:padding="6dp">
+            android:padding="8dp">
 
             <!-- Image -->
             <com.google.android.material.imageview.ShapeableImageView
@@ -32,15 +34,19 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_person_placeholder"
-                app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full"
                 app:strokeColor="?attr/colorOutline"
-                app:strokeWidth="1dp" />
+                app:strokeWidth="0dp" />
 
             <TextView
                 android:id="@+id/meta_text"
                 android:layout_width="match_parent"
-                android:layout_height="20dp"
-                tools:text="Test" />
+                android:layout_height="wrap_content"
+                android:textAlignment="center"
+                android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:typeface="normal"
+                tools:text="Placeholder" />
 
         </LinearLayout>
 

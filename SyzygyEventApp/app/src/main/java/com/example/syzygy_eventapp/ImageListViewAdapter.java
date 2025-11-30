@@ -2,6 +2,7 @@ package com.example.syzygy_eventapp;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.Image;
 import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,17 +22,17 @@ import java.util.List;
  */
 public class ImageListViewAdapter extends RecyclerView.Adapter<ImageListViewAdapter.ImageViewHolder> {
 
-    /// The list of users to display.
-    private final List<User> users;
+
+    private final List<ImageWrapper> images;
 
     /// The listener for user item clicks.
-    private OnUserClickListener listener;
+    private OnImageClickListener listener;
 
     /**
      * Interface for handling user item clicks.
      */
-    public interface OnUserClickListener {
-        void onUserClick(User user);
+    public interface OnImageClickListener {
+        void onImageClick(ImageWrapper image);
     }
 
     /**
@@ -39,8 +40,8 @@ public class ImageListViewAdapter extends RecyclerView.Adapter<ImageListViewAdap
      *
      * @param users The list of users to display.
      */
-    public ImageListViewAdapter(List<User> users) {
-        this.users = users;
+    public ImageListViewAdapter(List<ImageWrapper> images) {
+        this.images = images;
     }
 
     /**
@@ -64,18 +65,56 @@ public class ImageListViewAdapter extends RecyclerView.Adapter<ImageListViewAdap
      */
     @Override
     public void onBindViewHolder(@NonNull ImageViewHolder holder, int position) {
-        User user = users.get(position);
+        ImageWrapper image = images.get(position);
 
-        if (user.getPhotoURL() != null) {
-            byte[] decoded = Base64.decode(user.getPhotoURL(), Base64.DEFAULT);
-            Bitmap bm = BitmapFactory.decodeByteArray(decoded, 0, decoded.length);
-            holder.imageView.setImageBitmap(bm);
+        // Show a temporary placeholder so recycled cells don’t show old images
+        holder.imageView.setImageBitmap(null);
+        holder.metaText.setText("Loading...");
+
+        switch (image.getImageSourceType()) {
+            case USER:
+                UserController.getInstance()
+                        .getUser(image.getUserID())
+                        .addOnSuccessListener(user -> {
+                            if (user != null && user.getPhotoURL() != null) {
+                                byte[] decoded = Base64.decode(user.getPhotoURL(), Base64.DEFAULT);
+                                Bitmap bm = BitmapFactory.decodeByteArray(decoded, 0, decoded.length);
+                                holder.imageView.setImageBitmap(bm);
+                            }
+
+                            holder.metaText.setText(user != null ?
+                                    "From User: " + user.getName() :
+                                    "From User: (Unknown)");
+                        })
+                        .addOnFailureListener(error -> {
+                            holder.metaText.setText("From User: (Error)");
+                        });
+                break;
+
+            case EVENT:
+                EventController.getInstance()
+                        .getEvent(image.getEventID())
+                        .addOnSuccessListener(event -> {
+                            if (event != null && event.getPosterUrl() != null) {
+                                byte[] decoded = Base64.decode(event.getPosterUrl(), Base64.DEFAULT);
+                                Bitmap bm = BitmapFactory.decodeByteArray(decoded, 0, decoded.length);
+                                holder.imageView.setImageBitmap(bm);
+                            }
+
+                            holder.metaText.setText(event != null ?
+                                    "From Event: " + event.getName() :
+                                    "From Event: (Unknown)");
+                        })
+                        .addOnFailureListener(error -> {
+                            holder.metaText.setText("From Event: (Error)");
+                        });
+                break;
         }
 
-        holder.metaText.setText(user.getName());
+
 
         holder.itemView.setOnClickListener(v -> {
-            if (listener != null) listener.onUserClick(user);
+            if (listener != null) listener.onImageClick(image);
         });
     }
 
@@ -85,32 +124,32 @@ public class ImageListViewAdapter extends RecyclerView.Adapter<ImageListViewAdap
      */
     @Override
     public int getItemCount() {
-        return users.size();
+        return images.size();
     }
 
     /**
      * Sets the listener for user item clicks.
      * @param listener The OnUserClickListener to set.
      */
-    public void setOnUserClickListener(OnUserClickListener listener) {
+    public void setOnImageClickListener(OnImageClickListener listener) {
         this.listener = listener;
     }
 
     /**
      * Adds a user at the end of the list and updates the RecyclerView
      */
-    public void addUser(User user) {
-        users.add(user);
-        notifyItemInserted(users.size() - 1);
+    public void addImage(ImageWrapper image) {
+        images.add(image);
+        notifyItemInserted(images.size() - 1);
     }
 
     /**
      * Removes a user by object and updates the RecyclerView
      */
-    public void removeUser(User user) {
-        int index = users.indexOf(user);
+    public void removeImage(ImageWrapper image) {
+        int index = images.indexOf(image);
         if (index != -1) {
-            users.remove(index);
+            images.remove(index);
             notifyItemRemoved(index);
         }
     }
@@ -118,9 +157,9 @@ public class ImageListViewAdapter extends RecyclerView.Adapter<ImageListViewAdap
     /**
      * Removes a user by index
      */
-    public void removeUserAt(int index) {
-        if (index >= 0 && index < users.size()) {
-            users.remove(index);
+    public void removeImageAt(int index) {
+        if (index >= 0 && index < images.size()) {
+            images.remove(index);
             notifyItemRemoved(index);
         }
     }

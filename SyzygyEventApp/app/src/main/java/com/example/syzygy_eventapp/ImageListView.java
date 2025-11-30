@@ -24,8 +24,8 @@ import java.util.List;
  * A view representing a list of {@link User} objects.
  */
 public class ImageListView extends LinearLayout {
-    /// The list of users to display.
-    private List<User> users = new ArrayList<>();
+    /// The list of images (and their metadata) to display
+    private List<ImageWrapper> images = new ArrayList<>();
 
     /// The RecyclerView for displaying the user list.
     private RecyclerView recyclerView;
@@ -79,46 +79,15 @@ public class ImageListView extends LinearLayout {
         LayoutInflater.from(context).inflate(R.layout.fragment_image_list, this, true);
 
         titleText = findViewById(R.id.list_title);
-        countText = findViewById(R.id.user_count);
+        countText = findViewById(R.id.count_text);
         expandIcon = findViewById(R.id.expand_icon);
         recyclerView = findViewById(R.id.image_recycler_view);
 
         View header = findViewById(R.id.header_layout);
         header.setOnClickListener(v -> toggleListVisibility());
 
-        adapter = new ImageListViewAdapter(users);
+        adapter = new ImageListViewAdapter(images);
         recyclerView.setAdapter(adapter);
-    }
-
-    /**
-     * Adds a user at the end of the list and updates RecyclerView.
-     * @param user The user to add.
-     */
-    public void addUser(User user) {
-        if (users != null) {
-            users.add(user);
-            if (adapter != null) {
-                adapter.notifyItemInserted(users.size() - 1);
-            }
-            updateCountText();
-        }
-    }
-
-    /**
-     * Removes a user from the list and updates RecyclerView.
-     * @param user The user to remove.
-     */
-    public void removeUser(User user) {
-        if (users != null) {
-            int index = users.indexOf(user);
-            if (index != -1) {
-                users.remove(index);
-                if (adapter != null) {
-                    adapter.notifyItemRemoved(index);
-                }
-                updateCountText();
-            }
-        }
     }
 
     /**
@@ -126,19 +95,11 @@ public class ImageListView extends LinearLayout {
      * @param newUsers The new list of users.
      */
     @SuppressLint("NotifyDataSetChanged")
-    public void setUsers(List<User> newUsers) {
-        users.clear();
-        users.addAll(newUsers);
+    public void setImages(List<ImageWrapper> newImages) {
+        images.clear();
+        images.addAll(newImages);
         adapter.notifyDataSetChanged();
         updateCountText();
-    }
-
-    /**
-     * Gets the entire user list
-     * @return The list of users.
-     */
-    public List<User> getUsers() {
-        return users;
     }
 
     /**
@@ -150,34 +111,21 @@ public class ImageListView extends LinearLayout {
         titleText.setText(title);
     }
 
-    /**
-     * Removes a user by index and updates RecyclerView.
-     * @param index The index of the user to remove.
-     */
-    public void removeUserAt(int index) {
-        if (users != null && index >= 0 && index < users.size()) {
-            users.remove(index);
-            if (adapter != null) {
-                adapter.notifyItemRemoved(index);
-            }
-            updateCountText();
-        }
-    }
 
     /**
      * Sets the listener for user item clicks.
      * @param listener The listener to set.
      */
-    public void setOnUserClickListener(ImageListViewAdapter.OnUserClickListener listener) {
-        adapter.setOnUserClickListener(listener);
+    public void setOnImageClickListener(ImageListViewAdapter.OnImageClickListener listener) {
+        adapter.setOnImageClickListener(listener);
     }
 
     /**
      * Updates the user count TextView.
      */
     public void updateCountText() {
-        if (countText != null && users != null) {
-            countText.setText(String.valueOf(users.size()));
+        if (countText != null && images != null) {
+            countText.setText(String.valueOf(images.size()));
         }
     }
 
