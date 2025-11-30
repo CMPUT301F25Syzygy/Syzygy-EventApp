@@ -172,12 +172,6 @@ public class <span class="typeNameLabel"><a href=ImageListView.html>ImageListVie
                                             <th class="colLast" scope="col">Description</th>
                                         </tr>
                                         
-                                        <tr class="altColor">
-                                            <td class="colFirst"><code>public  <a href=https://developer.android.com/reference/kotlin/java/util/List.html>List</a>&lt;<a href=User.html>User</a>&gt;</code></td>
-                                            <th class="colSecond" scope="row"><code><a href=ImageListView.html#users>users</a></code></th>
-                                            <td class="colLast"></td>
-                                        </tr>
-                                        
                                     </table>
                                 </div>
                             </li>
@@ -270,38 +264,6 @@ public class <span class="typeNameLabel"><a href=ImageListView.html>ImageListVie
                                         </tr>
                                         
                                         <tr id="i0" class="altColor">
-                                            <td class="colFirst"><code><a href=https://developer.android.com/reference/kotlin/java/util/List.html>List</a>&lt;<a href=User.html>User</a>&gt;</code>
-                                            </td>
-                                            <th class="colSecond" scope="row"><code><a href=ImageListView.html#getUsers()>getUsers</a>() </code>
-                                            </th>
-                                            <td class="colLast">Gets the entire user list</td>
-                                        </tr>
-                                        
-                                        <tr id="i1" class="rowColor">
-                                            <td class="colFirst"><code>void</code>
-                                            </td>
-                                            <th class="colSecond" scope="row"><code><a href=ImageListView.html#setUsers(java.util.List)>setUsers</a>(<a href=https://developer.android.com/reference/kotlin/java/util/List.html>List</a>&lt;<a href=User.html>User</a>&gt; newUsers) </code>
-                                            </th>
-                                            <td class="colLast">Sets the entire user list and updates RecyclerView.</td>
-                                        </tr>
-                                        
-                                        <tr id="i2" class="altColor">
-                                            <td class="colFirst"><code>void</code>
-                                            </td>
-                                            <th class="colSecond" scope="row"><code><a href=ImageListView.html#addUser(com.example.syzygy_eventapp.User)>addUser</a>(<a href=User.html>User</a> user) </code>
-                                            </th>
-                                            <td class="colLast">Adds a user at the end of the list and updates RecyclerView.</td>
-                                        </tr>
-                                        
-                                        <tr id="i3" class="rowColor">
-                                            <td class="colFirst"><code>void</code>
-                                            </td>
-                                            <th class="colSecond" scope="row"><code><a href=ImageListView.html#removeUser(com.example.syzygy_eventapp.User)>removeUser</a>(<a href=User.html>User</a> user) </code>
-                                            </th>
-                                            <td class="colLast">Removes a user from the list and updates RecyclerView.</td>
-                                        </tr>
-                                        
-                                        <tr id="i4" class="altColor">
                                             <td class="colFirst"><code>void</code>
                                             </td>
                                             <th class="colSecond" scope="row"><code><a href=ImageListView.html#setTitle(java.lang.String)>setTitle</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> title) </code>
@@ -309,23 +271,15 @@ public class <span class="typeNameLabel"><a href=ImageListView.html>ImageListVie
                                             <td class="colLast">Sets the title shown in the header (e.g., &quot;Events&quot;, &quot;Upcoming&quot;, &quot;History&quot;).</td>
                                         </tr>
                                         
-                                        <tr id="i5" class="rowColor">
+                                        <tr id="i1" class="rowColor">
                                             <td class="colFirst"><code>void</code>
                                             </td>
-                                            <th class="colSecond" scope="row"><code><a href=ImageListView.html#removeUserAt(int)>removeUserAt</a>(int index) </code>
-                                            </th>
-                                            <td class="colLast">Removes a user by index and updates RecyclerView.</td>
-                                        </tr>
-                                        
-                                        <tr id="i6" class="altColor">
-                                            <td class="colFirst"><code>void</code>
-                                            </td>
-                                            <th class="colSecond" scope="row"><code><a href=ImageListView.html#setOnUserClickListener(com.example.syzygy_eventapp.ImageListViewAdapter.OnUserClickListener)>setOnUserClickListener</a>(<a href=ImageListViewAdapter.OnUserClickListener.html>ImageListViewAdapter.OnUserClickListener</a> listener) </code>
+                                            <th class="colSecond" scope="row"><code><a href=ImageListView.html#setOnImageClickListener(com.example.syzygy_eventapp.ImageListViewAdapter.OnImageClickListener)>setOnImageClickListener</a>(<a href=ImageListViewAdapter.OnImageClickListener.html>ImageListViewAdapter.OnImageClickListener</a> listener) </code>
                                             </th>
                                             <td class="colLast">Sets the listener for user item clicks.</td>
                                         </tr>
                                         
-                                        <tr id="i7" class="rowColor">
+                                        <tr id="i2" class="altColor">
                                             <td class="colFirst"><code>void</code>
                                             </td>
                                             <th class="colSecond" scope="row"><code><a href=ImageListView.html#updateCountText()>updateCountText</a>() </code>
@@ -333,7 +287,7 @@ public class <span class="typeNameLabel"><a href=ImageListView.html>ImageListVie
                                             <td class="colLast">Updates the user count TextView.</td>
                                         </tr>
                                         
-                                        <tr id="i8" class="altColor">
+                                        <tr id="i3" class="rowColor">
                                             <td class="colFirst"><code>void</code>
                                             </td>
                                             <th class="colSecond" scope="row"><code><a href=ImageListView.html#toggleListVisibility()>toggleListVisibility</a>() </code>
@@ -341,12 +295,20 @@ public class <span class="typeNameLabel"><a href=ImageListView.html>ImageListVie
                                             <td class="colLast">Toggles the visibility of the user list.</td>
                                         </tr>
                                         
-                                        <tr id="i9" class="rowColor">
+                                        <tr id="i4" class="altColor">
                                             <td class="colFirst"><code>void</code>
                                             </td>
                                             <th class="colSecond" scope="row"><code><a href=ImageListView.html#setListVisibility(boolean)>setListVisibility</a>(boolean isExpanded) </code>
                                             </th>
                                             <td class="colLast">Sets the visibility of the user list.</td>
+                                        </tr>
+                                        
+                                        <tr id="i5" class="rowColor">
+                                            <td class="colFirst"><code>void</code>
+                                            </td>
+                                            <th class="colSecond" scope="row"><code><a href=ImageListView.html#setImages(java.util.List)>setImages</a>(<a href=https://developer.android.com/reference/kotlin/java/util/List.html>List</a>&lt;<a href=ImageWrapper.html>ImageWrapper</a>&gt; newImages) </code>
+                                            </th>
+                                            <td class="colLast">Sets the entire user list and updates RecyclerView.</td>
                                         </tr>
                                         
                                         </tbody>
@@ -462,122 +424,6 @@ public class <span class="typeNameLabel"><a href=ImageListView.html>ImageListVie
                             </a>
                                 <h3>Method Detail</h3>
                                 
-                                <a id="getUsers()">
-                                    <!--   -->
-                                </a>
-                                <ul class=
-                                              "blockList"
-                                          >
-                                    <li class="blockList">
-                                        <h4>getUsers</h4>
-                                        <pre class="methodSignature"> <a href=https://developer.android.com/reference/kotlin/java/util/List.html>List</a>&lt;<a href=User.html>User</a>&gt; <a href=ImageListView.html#getUsers()>getUsers</a>()</pre>
-                                        <div class="block"><p>Gets the entire user list</p></div>
-
-                                        <dl>
-
-                                        
-
-                                        
-                                            <dt><span class="returnLabel">Returns:</span></dt>
-                                            <dd><p>The list of users.</p></dd>
-                                        
-
-                                        
-
-                                        </dl>
-                                    </li>
-                                </ul>
-                                
-                                <a id="setUsers(java.util.List)">
-                                    <!--   -->
-                                </a>
-                                <ul class=
-                                              "blockList"
-                                          >
-                                    <li class="blockList">
-                                        <h4>setUsers</h4>
-                                        <pre class="methodSignature"> void <a href=ImageListView.html#setUsers(java.util.List)>setUsers</a>(<a href=https://developer.android.com/reference/kotlin/java/util/List.html>List</a>&lt;<a href=User.html>User</a>&gt; newUsers)</pre>
-                                        <div class="block"><p>Sets the entire user list and updates RecyclerView.</p></div>
-
-                                        <dl>
-
-                                        
-                                            <dt><span class="paramLabel">Parameters:</span></dt>
-                                            
-                                            
-                                            <dd><code>newUsers</code> - The new list of users.</dd>
-                                            
-                                            
-                                        
-
-                                        
-
-                                        
-
-                                        </dl>
-                                    </li>
-                                </ul>
-                                
-                                <a id="addUser(com.example.syzygy_eventapp.User)">
-                                    <!--   -->
-                                </a>
-                                <ul class=
-                                              "blockList"
-                                          >
-                                    <li class="blockList">
-                                        <h4>addUser</h4>
-                                        <pre class="methodSignature"> void <a href=ImageListView.html#addUser(com.example.syzygy_eventapp.User)>addUser</a>(<a href=User.html>User</a> user)</pre>
-                                        <div class="block"><p>Adds a user at the end of the list and updates RecyclerView.</p></div>
-
-                                        <dl>
-
-                                        
-                                            <dt><span class="paramLabel">Parameters:</span></dt>
-                                            
-                                            
-                                            <dd><code>user</code> - The user to add.</dd>
-                                            
-                                            
-                                        
-
-                                        
-
-                                        
-
-                                        </dl>
-                                    </li>
-                                </ul>
-                                
-                                <a id="removeUser(com.example.syzygy_eventapp.User)">
-                                    <!--   -->
-                                </a>
-                                <ul class=
-                                              "blockList"
-                                          >
-                                    <li class="blockList">
-                                        <h4>removeUser</h4>
-                                        <pre class="methodSignature"> void <a href=ImageListView.html#removeUser(com.example.syzygy_eventapp.User)>removeUser</a>(<a href=User.html>User</a> user)</pre>
-                                        <div class="block"><p>Removes a user from the list and updates RecyclerView.</p></div>
-
-                                        <dl>
-
-                                        
-                                            <dt><span class="paramLabel">Parameters:</span></dt>
-                                            
-                                            
-                                            <dd><code>user</code> - The user to remove.</dd>
-                                            
-                                            
-                                        
-
-                                        
-
-                                        
-
-                                        </dl>
-                                    </li>
-                                </ul>
-                                
                                 <a id="setTitle(java.lang.String)">
                                     <!--   -->
                                 </a>
@@ -608,45 +454,15 @@ public class <span class="typeNameLabel"><a href=ImageListView.html>ImageListVie
                                     </li>
                                 </ul>
                                 
-                                <a id="removeUserAt(int)">
+                                <a id="setOnImageClickListener(com.example.syzygy_eventapp.ImageListViewAdapter.OnImageClickListener)">
                                     <!--   -->
                                 </a>
                                 <ul class=
                                               "blockList"
                                           >
                                     <li class="blockList">
-                                        <h4>removeUserAt</h4>
-                                        <pre class="methodSignature"> void <a href=ImageListView.html#removeUserAt(int)>removeUserAt</a>(int index)</pre>
-                                        <div class="block"><p>Removes a user by index and updates RecyclerView.</p></div>
-
-                                        <dl>
-
-                                        
-                                            <dt><span class="paramLabel">Parameters:</span></dt>
-                                            
-                                            
-                                            <dd><code>index</code> - The index of the user to remove.</dd>
-                                            
-                                            
-                                        
-
-                                        
-
-                                        
-
-                                        </dl>
-                                    </li>
-                                </ul>
-                                
-                                <a id="setOnUserClickListener(com.example.syzygy_eventapp.ImageListViewAdapter.OnUserClickListener)">
-                                    <!--   -->
-                                </a>
-                                <ul class=
-                                              "blockList"
-                                          >
-                                    <li class="blockList">
-                                        <h4>setOnUserClickListener</h4>
-                                        <pre class="methodSignature"> void <a href=ImageListView.html#setOnUserClickListener(com.example.syzygy_eventapp.ImageListViewAdapter.OnUserClickListener)>setOnUserClickListener</a>(<a href=ImageListViewAdapter.OnUserClickListener.html>ImageListViewAdapter.OnUserClickListener</a> listener)</pre>
+                                        <h4>setOnImageClickListener</h4>
+                                        <pre class="methodSignature"> void <a href=ImageListView.html#setOnImageClickListener(com.example.syzygy_eventapp.ImageListViewAdapter.OnImageClickListener)>setOnImageClickListener</a>(<a href=ImageListViewAdapter.OnImageClickListener.html>ImageListViewAdapter.OnImageClickListener</a> listener)</pre>
                                         <div class="block"><p>Sets the listener for user item clicks.</p></div>
 
                                         <dl>
@@ -718,12 +534,35 @@ public class <span class="typeNameLabel"><a href=ImageListView.html>ImageListVie
                                     <!--   -->
                                 </a>
                                 <ul class=
-                                              "blockListLast"
+                                              "blockList"
                                           >
                                     <li class="blockList">
                                         <h4>setListVisibility</h4>
                                         <pre class="methodSignature"> void <a href=ImageListView.html#setListVisibility(boolean)>setListVisibility</a>(boolean isExpanded)</pre>
                                         <div class="block"><p>Sets the visibility of the user list.</p></div>
+
+                                        <dl>
+
+                                        
+
+                                        
+
+                                        
+
+                                        </dl>
+                                    </li>
+                                </ul>
+                                
+                                <a id="setImages(java.util.List)">
+                                    <!--   -->
+                                </a>
+                                <ul class=
+                                              "blockListLast"
+                                          >
+                                    <li class="blockList">
+                                        <h4>setImages</h4>
+                                        <pre class="methodSignature"> void <a href=ImageListView.html#setImages(java.util.List)>setImages</a>(<a href=https://developer.android.com/reference/kotlin/java/util/List.html>List</a>&lt;<a href=ImageWrapper.html>ImageWrapper</a>&gt; newImages)</pre>
+                                        <div class="block"><p>Sets the entire user list and updates RecyclerView.</p></div>
 
                                         <dl>
 
