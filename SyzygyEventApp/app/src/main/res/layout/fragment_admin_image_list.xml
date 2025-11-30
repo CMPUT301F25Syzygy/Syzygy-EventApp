@@ -38,7 +38,10 @@
                 android:layout_marginTop="4dp"/>
         </LinearLayout>
 
-
+        <com.example.syzygy_eventapp.ImageListView
+            android:id="@+id/image_list_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
 
     </LinearLayout>
 </LinearLayout>

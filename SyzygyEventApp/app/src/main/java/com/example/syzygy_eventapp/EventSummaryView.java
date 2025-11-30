@@ -106,7 +106,11 @@ public class EventSummaryView extends LinearLayout {
         if (attendeeStatus != null) {
             setAttendeeChipColor(attendeeStatus);
         } else {
-            setAdminChipColor(event.isLotteryComplete(), event.getRegistrationEnd().toDate());
+            // Guard against events with null dates to prevent app crashes
+            if (event.getRegistrationEnd() != null)
+            {
+                setAdminChipColor(event.isLotteryComplete(), event.getRegistrationEnd().toDate());
+            }
         }
 
         adminButtons.setVisibility(isAdmin ? VISIBLE : GONE);

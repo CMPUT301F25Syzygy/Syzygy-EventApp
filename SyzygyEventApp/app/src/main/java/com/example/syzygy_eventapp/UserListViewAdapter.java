@@ -1,5 +1,8 @@
 package com.example.syzygy_eventapp;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -66,7 +69,17 @@ public class UserListViewAdapter extends RecyclerView.Adapter<UserListViewAdapte
         holder.emailText.setText(user.getEmail());
         holder.phoneText.setText(user.getPhone());
         holder.roleChip.setText(user.getRole().toString());
-        // TODO: set profile image if available
+
+        // Make sure to always default a UserView's image, otherwise it wont
+        // be recycled properly.
+        holder.profileImage.setImageResource(R.drawable.ic_person_placeholder);
+
+        // Set the user's profile image
+        if (user.getPhotoURL() != null) {
+            byte[] decoded = Base64.decode(user.getPhotoURL(), Base64.DEFAULT);
+            Bitmap bm = BitmapFactory.decodeByteArray(decoded, 0, decoded.length);
+            holder.profileImage.setImageBitmap(bm);
+        }
 
         holder.itemView.setOnClickListener(v -> {
             if (listener != null) listener.onUserClick(user);
