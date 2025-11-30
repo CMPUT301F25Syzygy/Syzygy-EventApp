@@ -2,7 +2,6 @@ package com.example.syzygy_eventapp;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -14,7 +13,7 @@ import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.chip.Chip;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.Filter;
-import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.ListenerRegistration;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -31,7 +30,7 @@ public class OrganizerEventSummaryFragment extends LinearLayout {
     private TextView titleText, timeText, locationText, dateText, acceptedCountText, interestedCountText;
     private MaterialCardView card;
     private Chip statusChip;
-    private FirebaseFirestore db;
+    private ListenerRegistration inviteListener;
 
     /**
      * Represents the status of an entrant for a given event.
@@ -87,8 +86,6 @@ public class OrganizerEventSummaryFragment extends LinearLayout {
         interestedCountText = findViewById(R.id.event_interested_count);
         card = findViewById(R.id.event_banner_card);
         statusChip = findViewById(R.id.chip_event_status);
-
-        db = FirebaseFirestore.getInstance();
     }
 
     /**
@@ -157,14 +154,17 @@ public class OrganizerEventSummaryFragment extends LinearLayout {
 
         // Get accepted count (accepted = true, cancelled = false)
 
+        if (inviteListener != null) {
+            inviteListener.remove();
+        }
+
         Filter acceptedFilter = Filter.and(
                 Filter.equalTo("event", eventID),
                 Filter.equalTo("accepted", true),
-                Filter.equalTo("cancelled", false)
-        );
+                Filter.equalTo("cancelled", false));
 
-        new InvitationController().observeInvites(acceptedFilter, (invitations) -> {
-            int acceptedCount = invitations.size();
+        inviteListener = new InvitationController().observeInvites(acceptedFilter, (invites) -> {
+            int acceptedCount = invites.size();
             acceptedCountText.setText(acceptedCount + "/" + maxAttendees);
         });
         // Get interested count (basically just get the waiting list size from the event)

@@ -18,7 +18,6 @@ import android.widget.Toast;
 
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
 
 import java.text.SimpleDateFormat;
@@ -112,8 +111,6 @@ public class FindEventsFragment extends Fragment {
             public void afterTextChanged(android.text.Editable s) {}
         });
 
-        // Load events from Firestore
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
         String currentUserID = AppInstallationId.get(requireContext());
 
         EventController.getInstance().observeAllEvents((events) -> {
