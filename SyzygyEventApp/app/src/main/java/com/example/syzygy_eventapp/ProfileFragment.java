@@ -33,6 +33,7 @@ import com.google.android.material.chip.Chip;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.Filter;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -119,7 +120,6 @@ public class ProfileFragment extends Fragment {
         deleteProfileButton = view.findViewById(R.id.deleteProfileButton);
 
         // Retrieve the userID for this device or authenticated user
-        userID = AppInstallationId.get(requireContext());
         userController = UserController.getInstance();
 
         // Setup editable panels for name, email, and phone
@@ -226,10 +226,7 @@ public class ProfileFragment extends Fragment {
     public void onStart() {
         super.onStart();
 
-        // Ensure user exists before observing
-        userController.getUser(userID)
-                .addOnSuccessListener(user -> startUserListener(userID))
-                .addOnFailureListener(err -> showError("Failed to find user: " + err.getMessage()));
+        startUserListener();
     }
 
     /**
@@ -247,12 +244,11 @@ public class ProfileFragment extends Fragment {
     /**
      * Begins observing the UserController for real-time updates.
      * If a previous listener exists, it is removed first.
-     *
-     * @param userID The ID of the user to observe.
      */
-    private void startUserListener(String userID) {
+    private void startUserListener() {
         if (userListener != null) userListener.remove();
 
+        userID = AppInstallationId.get(requireContext());
         userListener = userController.observeUser(
                 userID,
                 this::updateUIFromUser,
@@ -472,9 +468,4 @@ public class ProfileFragment extends Fragment {
             }
         }
     }
-
-
-
-
-
 }
