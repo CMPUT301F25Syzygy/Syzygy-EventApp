@@ -172,7 +172,7 @@ public class OrganizerEventSummaryFragment extends LinearLayout {
                 .addOnSuccessListener(event -> {
                     interestedCountText.setText(String.valueOf(event.getWaitingSize()));
                 })
-                .addOnFailureListener(e -> {
+                .addOnFailureListener(error -> {
                     interestedCountText.setText("0");
                 });
     }

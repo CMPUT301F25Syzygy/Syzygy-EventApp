@@ -394,7 +394,8 @@ public class EventController {
      * Gets an event object from the database
      *
      * @param eventID event ID
-     * @return Task that completes when the event found, null if the event does not exist
+     * @throws IllegalStateException if the event does not exist, or can not be parsed
+     * @return Task that completes to the Event when it is found
      */
     public Task<Event> getEvent(String eventID) {
         if (eventID == null || eventID.isEmpty()) {
