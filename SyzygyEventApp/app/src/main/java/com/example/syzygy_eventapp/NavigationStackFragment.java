@@ -1,5 +1,8 @@
 package com.example.syzygy_eventapp;
 
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
+
 import android.os.Bundle;
 
 import androidx.activity.OnBackPressedCallback;
@@ -28,6 +31,7 @@ public class NavigationStackFragment extends Fragment implements OnItemSelectedL
         public OnItemSelectedListener listener = null;
         public Integer menuResId = null;
         public Integer menuSelectedItemId = null;
+        public boolean backEnabled = true;
         public UUID uuid = UUID.randomUUID();
 
         Screen(Fragment fragment) {
@@ -40,7 +44,7 @@ public class NavigationStackFragment extends Fragment implements OnItemSelectedL
     private BottomNavigationView navBar;
     private UUID displayedScreenUUID = null;
 
-    NavigationStackFragment() {
+    public NavigationStackFragment() {
         screenStack = new Stack<Screen>();
         // one empty screen in the stack to hold the main menu
         screenStack.push(new Screen(null));
@@ -95,15 +99,18 @@ public class NavigationStackFragment extends Fragment implements OnItemSelectedL
                 .replace(R.id.fragment_frame, fragment)
                 .commit();
 
+        Screen screen;
         if (isEmpty()) {
             // there is always at least one screen with a null fragment to hold the main menu
             // this will give the screen a fragment
-            screenStack.get(0).fragment = fragment;
+            screen = screenStack.get(0);
+            screen.fragment = fragment;
         } else {
-            screenStack.push(new Screen(fragment));
+            screen = new Screen(fragment);
+            screenStack.push(screen);
         }
 
-        backCallback.setEnabled(screenStack.size() > 1);
+        backCallback.setEnabled(screenStack.size() > 1 && screen.backEnabled);
 
         refreshNavBar();
     }
@@ -121,7 +128,7 @@ public class NavigationStackFragment extends Fragment implements OnItemSelectedL
         screenStack.pop();
         Screen screen = screenStack.peek();
 
-        backCallback.setEnabled(screenStack.size() > 1);
+        backCallback.setEnabled(screenStack.size() > 1 && screen.backEnabled);
 
         FragmentManager manager = getParentFragmentManager();
         manager.beginTransaction()
@@ -163,6 +170,17 @@ public class NavigationStackFragment extends Fragment implements OnItemSelectedL
      */
     public void setMainNavMenu(int menuResId, OnItemSelectedListener listener) {
         setScreenNavMenu(0, menuResId, listener);
+    }
+    /**
+     * Sets if the screen should allow the user to click the OS back button to got to the last screen
+     * Disabling this will keep the user on this current screen.
+     *
+     * @param enabled if the back button should be allowed
+     */
+    public void setScreenBackEnabled(boolean enabled) {
+        Screen screen = screenStack.peek();
+        screen.backEnabled = enabled;
+        backCallback.setEnabled(enabled);
     }
 
     /**
@@ -213,6 +231,12 @@ public class NavigationStackFragment extends Fragment implements OnItemSelectedL
                 clearNavBar();
             } else if (displayedScreenUUID == null || displayedScreenUUID != menuScreen.uuid) {
                 inflateIntoNavBar(menuScreen);
+            }
+
+            if (navBar.getMenu().size() == 0) {
+                navBar.setVisibility(GONE);
+            } else {
+                navBar.setVisibility(VISIBLE);
             }
         }
     }
