@@ -76,17 +76,16 @@ public class ImageListView extends LinearLayout {
      * @param context The context to use.
      */
     private void init(Context context) {
-        LayoutInflater.from(context).inflate(R.layout.fragment_user_list_view, this, true);
+        LayoutInflater.from(context).inflate(R.layout.fragment_image_list, this, true);
 
         titleText = findViewById(R.id.list_title);
         countText = findViewById(R.id.user_count);
         expandIcon = findViewById(R.id.expand_icon);
-        recyclerView = findViewById(R.id.user_recycler_view);
+        recyclerView = findViewById(R.id.image_recycler_view);
 
         View header = findViewById(R.id.header_layout);
         header.setOnClickListener(v -> toggleListVisibility());
 
-        recyclerView.setLayoutManager(new LinearLayoutManager(context));
         adapter = new ImageListViewAdapter(users);
         recyclerView.setAdapter(adapter);
     }
