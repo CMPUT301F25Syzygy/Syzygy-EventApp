@@ -1,8 +1,12 @@
 package com.example.syzygy_eventapp;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.format.DateFormat;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -13,25 +17,23 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 
 /**
  * Invite screen shown to entrants who have won the lottery.
  * The user must accept or decline. "More Details" shows the entrant event page
  * without changing the invitation state.
  */
-public class InvitationFragment extends AppCompatActivity {
-
-    public static final String EXTRA_INVITATION_ID = "extra_invitation_id";
+public class InvitationFragment extends Fragment {
+    private NavigationStackFragment navStack;
 
     private InvitationController invitationController;
     private EventController eventController;
     private UserControllerInterface userController;
 
     private String invitationId;
-    private Invitation invitation;
     private Event event;
 
-    private TextView invitedTextView;
     private TextView eventTitleTextView;
     private ImageView eventImageView;
     private ImageView organizerImageView;
@@ -39,42 +41,56 @@ public class InvitationFragment extends AppCompatActivity {
     private TextView locationTextView;
     private TextView eventTimeTextView;
     private Button moreDetailsButton;
-    private Button declineButton;
-    private Button acceptButton;
+
+    InvitationFragment(String invitationId, NavigationStackFragment navStack) {
+        super();
+        this.navStack = navStack;
+        this.invitationId = invitationId;
+    }
 
     /**
      * Initializes the screen, loads the invitation, and binds event/organizer data.
-     * The Activity must be started with {@link #EXTRA_INVITATION_ID}.
      */
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.fragment_event_invite);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        // Inflate this fragment's layout
+        View view = inflater.inflate(R.layout.fragment_event_invite, container, false);
 
         invitationController = new InvitationController();
         eventController = EventController.getInstance();
         userController = UserController.getInstance();
 
-        invitationId = getIntent().getStringExtra(EXTRA_INVITATION_ID);
+        eventTitleTextView = view.findViewById(R.id.event_title);
+        eventImageView = view.findViewById(R.id.event_image);
+        organizerImageView = view.findViewById(R.id.organizer_image);
+        organizerNameTextView = view.findViewById(R.id.organizer_name);
+        locationTextView = view.findViewById(R.id.location_text);
+        eventTimeTextView = view.findViewById(R.id.event_time);
 
-        invitedTextView = findViewById(R.id.invited_text);
-        eventTitleTextView = findViewById(R.id.event_title);
-        eventImageView = findViewById(R.id.event_image);
-        organizerImageView = findViewById(R.id.organizer_image);
-        organizerNameTextView = findViewById(R.id.organizer_name);
-        locationTextView = findViewById(R.id.location_text);
-        eventTimeTextView = findViewById(R.id.event_time);
-        moreDetailsButton = findViewById(R.id.btn_more_details);
-        declineButton = findViewById(R.id.btn_decline);
-        acceptButton = findViewById(R.id.btn_accept);
-
+        moreDetailsButton = view.findViewById(R.id.btn_more_details);
         moreDetailsButton.setEnabled(false);
+        moreDetailsButton.setOnClickListener(v -> openEventDetails(false));
+
+
+        Button acceptButton = view.findViewById(R.id.btn_accept);
+        acceptButton.setOnClickListener(v -> handleAccept());
+
+        Button declineButton = view.findViewById(R.id.btn_decline);
+        declineButton.setOnClickListener(v -> handleDecline());
 
         loadInvitation();
 
-        moreDetailsButton.setOnClickListener(v -> openEventDetails(false));
-        acceptButton.setOnClickListener(v -> handleAccept());
-        declineButton.setOnClickListener(v -> handleDecline());
+        return view;
+    }
+
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        // set a back button nav bar
+        navStack.setScreenNavMenu(R.menu.empty_nav_menu, null);
+        navStack.setScreenBackEnabled(false);
     }
 
     /**
@@ -83,11 +99,10 @@ public class InvitationFragment extends AppCompatActivity {
     private void loadInvitation() {
         invitationController.getInvite(invitationId)
                 .addOnSuccessListener(invite -> {
-                    invitation = invite;
                     loadEventAndOrganizer(invite.getEvent(), invite.getOrganizerID());
                 })
                 .addOnFailureListener(e -> {
-                    finish();
+                    navStack.popScreen();
                 });
     }
 
@@ -110,7 +125,7 @@ public class InvitationFragment extends AppCompatActivity {
                 })
                 .addOnFailureListener(e -> {
                     invitationController.deleteInvite(invitationId);
-                    finish();
+                    navStack.popScreen();
                 });
     }
 
@@ -162,12 +177,10 @@ public class InvitationFragment extends AppCompatActivity {
      */
     private void handleAccept() {
         invitationController.acceptInvite(invitationId)
-                .addOnSuccessListener(updated -> {
-                    openEventDetails(true);
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(this,
-                            "Failed to accept invitation: " + e.getMessage(),
+                .addOnSuccessListener(updated -> openEventDetails(true))
+                .addOnFailureListener(error -> {
+                    Toast.makeText(requireContext(),
+                            "Failed to accept invitation: " + error.getMessage(),
                             Toast.LENGTH_LONG).show();
                 });
     }
@@ -177,9 +190,9 @@ public class InvitationFragment extends AppCompatActivity {
      */
     private void handleDecline() {
         invitationController.declineInvite(invitationId)
-                .addOnSuccessListener(updated -> finish())
+                .addOnSuccessListener(updated -> navStack.popScreen())
                 .addOnFailureListener(e -> {
-                    Toast.makeText(this,
+                    Toast.makeText(requireContext(),
                             "Failed to decline invitation: " + e.getMessage(),
                             Toast.LENGTH_LONG).show();
                 });
@@ -192,19 +205,19 @@ public class InvitationFragment extends AppCompatActivity {
      */
     private void openEventDetails(boolean fromAccept) {
         if (event == null || event.getEventID() == null) {
-            Toast.makeText(this,
+            Toast.makeText(getContext(),
                     "Event details are still loading. Please try again.",
                     Toast.LENGTH_SHORT
             ).show();
             return;
         }
 
-        String eventId = event.getEventID();
+        EventFragment eventFragment = new EventFragment(navStack, event.getEventID());
 
-        Intent intent = new Intent(this, MainActivity.class);
-        intent.putExtra(MainActivity.EXTRA_OPEN_EVENT_ID, eventId);
-        startActivity(intent);
-
-        finish();
+        if (fromAccept) {
+            navStack.replaceScreen(eventFragment);
+        } else {
+            navStack.pushScreen(eventFragment);
+        }
     }
 }

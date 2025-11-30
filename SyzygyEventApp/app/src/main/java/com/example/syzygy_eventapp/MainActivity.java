@@ -149,12 +149,8 @@ public class MainActivity extends AppCompatActivity implements OnItemSelectedLis
                             continue;
                         }
 
-                        Intent intent = new Intent(this, InvitationFragment.class);
-                        intent.putExtra(
-                                InvitationFragment.EXTRA_INVITATION_ID,
-                                invite.getInvitation()
-                        );
-                        startActivity(intent);
+                        InvitationFragment inviteFragment = new InvitationFragment(invite.getInvitation(), navStack);
+                        navStack.pushScreen(inviteFragment);
                         break;
                     }
                 });
