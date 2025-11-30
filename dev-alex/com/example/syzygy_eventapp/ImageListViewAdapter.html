@@ -117,7 +117,7 @@ var pathtoroot = "../../../";
 public class <span class="typeNameLabel"><a href=ImageListViewAdapter.html>ImageListViewAdapter</a></span>
 
                     </pre>
-                    <div class="block"><p>RecyclerView Adapter for displaying a list of Users.</p></div>
+                    <div class="block"><p>RecyclerView Adapter for displaying a list of ImageWrappers.</p></div>
 
                     <dl>
 
@@ -153,14 +153,14 @@ public class <span class="typeNameLabel"><a href=ImageListViewAdapter.html>Image
                                             <td class="colFirst"><code>public interface</code></td>
                                             <th class="colSecond" scope="row"><code><a href="ImageListViewAdapter.OnImageClickListener.html">ImageListViewAdapter.OnImageClickListener</a></span></code>
                                             </th>
-                                            <td class="colLast"><p>Interface for handling user item clicks.</p></td>
+                                            <td class="colLast"><p>Interface for handling image item clicks.</p></td>
                                         </tr>
                                         
                                         <tr class="rowColor">
                                             <td class="colFirst"><code>public class</code></td>
                                             <th class="colSecond" scope="row"><code><a href="ImageListViewAdapter.ImageViewHolder.html">ImageListViewAdapter.ImageViewHolder</a></span></code>
                                             </th>
-                                            <td class="colLast"><p>ViewHolder class for user items.</p></td>
+                                            <td class="colLast"><p>ViewHolder class for image items.</p></td>
                                         </tr>
                                         
                                     </table>
@@ -213,7 +213,7 @@ public class <span class="typeNameLabel"><a href=ImageListViewAdapter.html>Image
                                             <tr class="altColor">
                                                 <th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a
                                                         href="#ImageListViewAdapter(java.util.List)">ImageListViewAdapter</a></span>(<a href=https://developer.android.com/reference/kotlin/java/util/List.html>List</a>&lt;<a href=ImageWrapper.html>ImageWrapper</a>&gt; images)</code></th>
-                                                <td class="colLast">Constructor for UserListViewAdapter.</td>
+                                                <td class="colLast">Constructor for ImageListViewAdapter.</td>
                                             </tr>
                                         
 
@@ -270,7 +270,7 @@ public class <span class="typeNameLabel"><a href=ImageListViewAdapter.html>Image
                                             </td>
                                             <th class="colSecond" scope="row"><code><a href=ImageListViewAdapter.html#onCreateViewHolder(ViewGroup,int)>onCreateViewHolder</a>(ViewGroup parent, int viewType) </code>
                                             </th>
-                                            <td class="colLast">Creates a new ViewHolder for a user item.</td>
+                                            <td class="colLast">Creates a new ViewHolder for an image item.</td>
                                         </tr>
                                         
                                         <tr id="i1" class="rowColor">
@@ -278,7 +278,7 @@ public class <span class="typeNameLabel"><a href=ImageListViewAdapter.html>Image
                                             </td>
                                             <th class="colSecond" scope="row"><code><a href=ImageListViewAdapter.html#onBindViewHolder(com.example.syzygy_eventapp.ImageListViewAdapter.ImageViewHolder,int)>onBindViewHolder</a>(<a href=ImageListViewAdapter.ImageViewHolder.html>ImageListViewAdapter.ImageViewHolder</a> holder, int position) </code>
                                             </th>
-                                            <td class="colLast">Binds user data to the ViewHolder.</td>
+                                            <td class="colLast">Binds image data to the ViewHolder.</td>
                                         </tr>
                                         
                                         <tr id="i2" class="altColor">
@@ -286,7 +286,7 @@ public class <span class="typeNameLabel"><a href=ImageListViewAdapter.html>Image
                                             </td>
                                             <th class="colSecond" scope="row"><code><a href=ImageListViewAdapter.html#getItemCount()>getItemCount</a>() </code>
                                             </th>
-                                            <td class="colLast">Returns the total number of users in the list.</td>
+                                            <td class="colLast">Returns the total number of images in the list.</td>
                                         </tr>
                                         
                                         <tr id="i3" class="rowColor">
@@ -294,7 +294,7 @@ public class <span class="typeNameLabel"><a href=ImageListViewAdapter.html>Image
                                             </td>
                                             <th class="colSecond" scope="row"><code><a href=ImageListViewAdapter.html#setOnImageClickListener(com.example.syzygy_eventapp.ImageListViewAdapter.OnImageClickListener)>setOnImageClickListener</a>(<a href=ImageListViewAdapter.OnImageClickListener.html>ImageListViewAdapter.OnImageClickListener</a> listener) </code>
                                             </th>
-                                            <td class="colLast">Sets the listener for user item clicks.</td>
+                                            <td class="colLast">Sets the listener for image item clicks.</td>
                                         </tr>
                                         
                                         <tr id="i4" class="altColor">
@@ -302,7 +302,7 @@ public class <span class="typeNameLabel"><a href=ImageListViewAdapter.html>Image
                                             </td>
                                             <th class="colSecond" scope="row"><code><a href=ImageListViewAdapter.html#addImage(com.example.syzygy_eventapp.ImageWrapper)>addImage</a>(<a href=ImageWrapper.html>ImageWrapper</a> image) </code>
                                             </th>
-                                            <td class="colLast">Adds a user at the end of the list and updates the RecyclerView</td>
+                                            <td class="colLast">Adds an image at the end of the list and updates the RecyclerView</td>
                                         </tr>
                                         
                                         <tr id="i5" class="rowColor">
@@ -310,7 +310,7 @@ public class <span class="typeNameLabel"><a href=ImageListViewAdapter.html>Image
                                             </td>
                                             <th class="colSecond" scope="row"><code><a href=ImageListViewAdapter.html#removeImage(com.example.syzygy_eventapp.ImageWrapper)>removeImage</a>(<a href=ImageWrapper.html>ImageWrapper</a> image) </code>
                                             </th>
-                                            <td class="colLast">Removes a user by object and updates the RecyclerView</td>
+                                            <td class="colLast">Removes an image by object and updates the RecyclerView</td>
                                         </tr>
                                         
                                         <tr id="i6" class="altColor">
@@ -318,7 +318,7 @@ public class <span class="typeNameLabel"><a href=ImageListViewAdapter.html>Image
                                             </td>
                                             <th class="colSecond" scope="row"><code><a href=ImageListViewAdapter.html#removeImageAt(int)>removeImageAt</a>(int index) </code>
                                             </th>
-                                            <td class="colLast">Removes a user by index</td>
+                                            <td class="colLast">Removes an image by index</td>
                                         </tr>
                                         
                                         </tbody>
@@ -357,7 +357,16 @@ public class <span class="typeNameLabel"><a href=ImageListViewAdapter.html>Image
                                     <li class="blockList">
                                         <h4>ImageListViewAdapter</h4>
                                         <pre>ImageListViewAdapter(<a href=https://developer.android.com/reference/kotlin/java/util/List.html>List</a>&lt;<a href=ImageWrapper.html>ImageWrapper</a>&gt; images)</pre>
-                                        <div class="block">Constructor for UserListViewAdapter.</div>
+                                        <div class="block">Constructor for ImageListViewAdapter.</div>
+                                        
+                                        <dl>
+                                            <dt><span class="paramLabel">Parameters:</span></dt>
+                                            
+                                            
+                                            <dd><code>images</code> - The list of images to display.</dd>
+                                            
+                                            
+                                        </dl>
                                         
                                     </li>
                                 </ul>
@@ -384,7 +393,7 @@ public class <span class="typeNameLabel"><a href=ImageListViewAdapter.html>Image
                                     <li class="blockList">
                                         <h4>onCreateViewHolder</h4>
                                         <pre class="methodSignature"> <a href=ImageListViewAdapter.ImageViewHolder.html>ImageListViewAdapter.ImageViewHolder</a> <a href=ImageListViewAdapter.html#onCreateViewHolder(ViewGroup,int)>onCreateViewHolder</a>(ViewGroup parent, int viewType)</pre>
-                                        <div class="block"><p>Creates a new ViewHolder for a user item.</p></div>
+                                        <div class="block"><p>Creates a new ViewHolder for an image item.</p></div>
 
                                         <dl>
 
@@ -403,7 +412,7 @@ public class <span class="typeNameLabel"><a href=ImageListViewAdapter.html>Image
 
                                         
                                             <dt><span class="returnLabel">Returns:</span></dt>
-                                            <dd><p>A new UserViewHolder instance.</p></dd>
+                                            <dd><p>A new ImageViewHolder instance.</p></dd>
                                         
 
                                         
@@ -421,7 +430,7 @@ public class <span class="typeNameLabel"><a href=ImageListViewAdapter.html>Image
                                     <li class="blockList">
                                         <h4>onBindViewHolder</h4>
                                         <pre class="methodSignature"> void <a href=ImageListViewAdapter.html#onBindViewHolder(com.example.syzygy_eventapp.ImageListViewAdapter.ImageViewHolder,int)>onBindViewHolder</a>(<a href=ImageListViewAdapter.ImageViewHolder.html>ImageListViewAdapter.ImageViewHolder</a> holder, int position)</pre>
-                                        <div class="block"><p>Binds user data to the ViewHolder.</p></div>
+                                        <div class="block"><p>Binds image data to the ViewHolder.</p></div>
 
                                         <dl>
 
@@ -429,11 +438,11 @@ public class <span class="typeNameLabel"><a href=ImageListViewAdapter.html>Image
                                             <dt><span class="paramLabel">Parameters:</span></dt>
                                             
                                             
-                                            <dd><code>holder</code> - The UserViewHolder to bind data to.</dd>
+                                            <dd><code>holder</code> - The ImageViewHolder to bind data to.</dd>
                                             
                                             
                                             
-                                            <dd><code>position</code> - The position of the user in the list.</dd>
+                                            <dd><code>position</code> - The position of the image in the list</dd>
                                             
                                             
                                         
@@ -455,7 +464,7 @@ public class <span class="typeNameLabel"><a href=ImageListViewAdapter.html>Image
                                     <li class="blockList">
                                         <h4>getItemCount</h4>
                                         <pre class="methodSignature"> int <a href=ImageListViewAdapter.html#getItemCount()>getItemCount</a>()</pre>
-                                        <div class="block"><p>Returns the total number of users in the list.</p></div>
+                                        <div class="block"><p>Returns the total number of images in the list.</p></div>
 
                                         <dl>
 
@@ -463,7 +472,7 @@ public class <span class="typeNameLabel"><a href=ImageListViewAdapter.html>Image
 
                                         
                                             <dt><span class="returnLabel">Returns:</span></dt>
-                                            <dd><p>The number of users.</p></dd>
+                                            <dd><p>The number of images.</p></dd>
                                         
 
                                         
@@ -481,7 +490,7 @@ public class <span class="typeNameLabel"><a href=ImageListViewAdapter.html>Image
                                     <li class="blockList">
                                         <h4>setOnImageClickListener</h4>
                                         <pre class="methodSignature"> void <a href=ImageListViewAdapter.html#setOnImageClickListener(com.example.syzygy_eventapp.ImageListViewAdapter.OnImageClickListener)>setOnImageClickListener</a>(<a href=ImageListViewAdapter.OnImageClickListener.html>ImageListViewAdapter.OnImageClickListener</a> listener)</pre>
-                                        <div class="block"><p>Sets the listener for user item clicks.</p></div>
+                                        <div class="block"><p>Sets the listener for image item clicks.</p></div>
 
                                         <dl>
 
@@ -489,7 +498,7 @@ public class <span class="typeNameLabel"><a href=ImageListViewAdapter.html>Image
                                             <dt><span class="paramLabel">Parameters:</span></dt>
                                             
                                             
-                                            <dd><code>listener</code> - The OnUserClickListener to set.</dd>
+                                            <dd><code>listener</code> - The OnImageClickListener to set.</dd>
                                             
                                             
                                         
@@ -511,7 +520,7 @@ public class <span class="typeNameLabel"><a href=ImageListViewAdapter.html>Image
                                     <li class="blockList">
                                         <h4>addImage</h4>
                                         <pre class="methodSignature"> void <a href=ImageListViewAdapter.html#addImage(com.example.syzygy_eventapp.ImageWrapper)>addImage</a>(<a href=ImageWrapper.html>ImageWrapper</a> image)</pre>
-                                        <div class="block"><p>Adds a user at the end of the list and updates the RecyclerView</p></div>
+                                        <div class="block"><p>Adds an image at the end of the list and updates the RecyclerView</p></div>
 
                                         <dl>
 
@@ -534,7 +543,7 @@ public class <span class="typeNameLabel"><a href=ImageListViewAdapter.html>Image
                                     <li class="blockList">
                                         <h4>removeImage</h4>
                                         <pre class="methodSignature"> void <a href=ImageListViewAdapter.html#removeImage(com.example.syzygy_eventapp.ImageWrapper)>removeImage</a>(<a href=ImageWrapper.html>ImageWrapper</a> image)</pre>
-                                        <div class="block"><p>Removes a user by object and updates the RecyclerView</p></div>
+                                        <div class="block"><p>Removes an image by object and updates the RecyclerView</p></div>
 
                                         <dl>
 
@@ -557,7 +566,7 @@ public class <span class="typeNameLabel"><a href=ImageListViewAdapter.html>Image
                                     <li class="blockList">
                                         <h4>removeImageAt</h4>
                                         <pre class="methodSignature"> void <a href=ImageListViewAdapter.html#removeImageAt(int)>removeImageAt</a>(int index)</pre>
-                                        <div class="block"><p>Removes a user by index</p></div>
+                                        <div class="block"><p>Removes an image by index</p></div>
 
                                         <dl>
 
