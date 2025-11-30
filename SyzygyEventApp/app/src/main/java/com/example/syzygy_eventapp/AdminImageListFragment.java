@@ -205,5 +205,9 @@ public class AdminImageListFragment extends Fragment {
             userListener.remove();
             userListener = null;
         }
+        if (eventListener != null) {
+            eventListener.remove();
+            eventListener = null;
+        }
     }
 }
