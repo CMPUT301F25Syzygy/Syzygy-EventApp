@@ -19,7 +19,7 @@ import androidx.appcompat.app.AppCompatActivity;
  * The user must accept or decline. "More Details" shows the entrant event page
  * without changing the invitation state.
  */
-public class InvitationActivity extends AppCompatActivity {
+public class InvitationFragment extends AppCompatActivity {
 
     public static final String EXTRA_INVITATION_ID = "extra_invitation_id";
 

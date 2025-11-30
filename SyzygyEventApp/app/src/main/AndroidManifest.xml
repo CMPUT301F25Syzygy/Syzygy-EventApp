@@ -26,7 +26,7 @@
             android:exported="true" />
 
         <activity
-            android:name=".InvitationActivity"
+            android:name=".InvitationFragment"
             android:exported="false" />
 
     </application>

@@ -4,21 +4,14 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
-import android.widget.Toast;
-import android.content.Intent;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
-import com.google.android.gms.tasks.Tasks;
 import com.google.android.material.navigation.NavigationBarView.OnItemSelectedListener;
 import com.google.firebase.firestore.Filter;
-
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 public class MainActivity extends AppCompatActivity implements OnItemSelectedListener {
     public static final String EXTRA_OPEN_EVENT_ID = "extra_open_event_id";
@@ -156,9 +149,9 @@ public class MainActivity extends AppCompatActivity implements OnItemSelectedLis
                             continue;
                         }
 
-                        Intent intent = new Intent(this, InvitationActivity.class);
+                        Intent intent = new Intent(this, InvitationFragment.class);
                         intent.putExtra(
-                                InvitationActivity.EXTRA_INVITATION_ID,
+                                InvitationFragment.EXTRA_INVITATION_ID,
                                 invite.getInvitation()
                         );
                         startActivity(intent);
