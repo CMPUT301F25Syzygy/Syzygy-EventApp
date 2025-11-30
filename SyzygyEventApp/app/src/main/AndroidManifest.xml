@@ -25,10 +25,6 @@
             android:name=".MainActivity"
             android:exported="true" />
 
-        <activity
-            android:name=".InvitationFragment"
-            android:exported="false" />
-
     </application>
 
     <uses-permission android:name="android.permission.CAMERA" />
