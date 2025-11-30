@@ -77,9 +77,6 @@ public class ProfileFragment extends Fragment {
     // Delete Profile Button
     private View deleteProfileButton;
 
-    // Invitation handling
-    private InvitationController invitationController;
-
     /**
      * Default constructor.
      */
@@ -123,10 +120,7 @@ public class ProfileFragment extends Fragment {
         deleteProfileButton = view.findViewById(R.id.deleteProfileButton);
 
         // Retrieve the userID for this device or authenticated user
-        userID = AppInstallationId.get(requireContext());
         userController = UserController.getInstance();
-
-        invitationController = new InvitationController();
 
         // Setup editable panels for name, email, and phone
         profileNamePanel.setOnClickListener(v -> showEditDialog(
@@ -232,13 +226,7 @@ public class ProfileFragment extends Fragment {
     public void onStart() {
         super.onStart();
 
-        // Ensure user exists before observing
-        userController.getUser(userID)
-                .addOnSuccessListener(user -> {
-                        startUserListener(userID);
-                        checkPendingInvites();
-                })
-                .addOnFailureListener(err -> showError("Failed to find user: " + err.getMessage()));
+        startUserListener();
     }
 
     /**
@@ -256,12 +244,11 @@ public class ProfileFragment extends Fragment {
     /**
      * Begins observing the UserController for real-time updates.
      * If a previous listener exists, it is removed first.
-     *
-     * @param userID The ID of the user to observe.
      */
-    private void startUserListener(String userID) {
+    private void startUserListener() {
         if (userListener != null) userListener.remove();
 
+        userID = AppInstallationId.get(requireContext());
         userListener = userController.observeUser(
                 userID,
                 this::updateUIFromUser,
@@ -481,48 +468,4 @@ public class ProfileFragment extends Fragment {
             }
         }
     }
-
-
-    /**
-     * Checks Firestore for any pending invitations for this user and, if found,
-     * opens InvitationActivity for the first pending invite.
-     */
-    private void checkPendingInvites() {
-        com.google.firebase.firestore.Filter filter =
-                com.google.firebase.firestore.Filter.equalTo("recipientID", userID);
-
-        invitationController.getInvites(filter)
-                .addOnSuccessListener(invitations -> {
-                    if (!isAdded()) {
-                        return;
-                    }
-
-                    for (Invitation invite : invitations) {
-                        if (Boolean.TRUE.equals(invite.getCancelled())) {
-                            continue;
-                        }
-
-                        if (invite.getResponseTime() != null) {
-                            continue;
-                        }
-
-                        Boolean accepted = invite.getAccepted();
-                        boolean isPending = (accepted == null) || !accepted;
-
-                        if (isPending) {
-                            Intent intent = new Intent(requireContext(), InvitationActivity.class);
-                            intent.putExtra(
-                                    InvitationActivity.EXTRA_INVITATION_ID,
-                                    invite.getInvitation()
-                            );
-                            startActivity(intent);
-                            break;
-                        }
-                    }
-                });
-    }
-
-
-
-
 }

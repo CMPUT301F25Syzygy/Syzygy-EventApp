@@ -14,6 +14,7 @@ import androidx.fragment.app.FragmentManager;
 
 import com.google.android.gms.tasks.Tasks;
 import com.google.android.material.navigation.NavigationBarView.OnItemSelectedListener;
+import com.google.firebase.firestore.Filter;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -28,8 +29,10 @@ public class MainActivity extends AppCompatActivity implements OnItemSelectedLis
     private Fragment joinedFragment;
     private Fragment organizerFragment;
     private Fragment adminFragment;
+
+    // controllers
     private UserControllerInterface userController;
-    private String pendingEventIdFromIntent;
+    private InvitationController inviteController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,7 +40,7 @@ public class MainActivity extends AppCompatActivity implements OnItemSelectedLis
         setContentView(R.layout.activity_main);
 
         Intent launchIntent = getIntent();
-        pendingEventIdFromIntent = launchIntent.getStringExtra(EXTRA_OPEN_EVENT_ID);
+        final String pendingEventIdFromIntent = launchIntent.getStringExtra(EXTRA_OPEN_EVENT_ID);
 
         // Log the current AppInstallationId each time
         // the app starts.
@@ -60,11 +63,22 @@ public class MainActivity extends AppCompatActivity implements OnItemSelectedLis
 
         String userID = AppInstallationId.get(this);
         userController = UserController.getInstance();
+        inviteController = new InvitationController();
 
-// Ensure user exists before proceeding.
-// If user is missing, go back to WelcomeActivity.
+        // Ensure user exists before proceeding.
+        // If user is missing, go back to WelcomeActivity.
         userController.getUser(userID)
-                .addOnSuccessListener(this::setupMainNavBar)
+                .addOnSuccessListener((user) -> {
+                    this.setupUser(user);
+
+                    if (pendingEventIdFromIntent != null) {
+                        EventFragment entrantEventFragment =
+                                new EventFragment(navStack, pendingEventIdFromIntent);
+                        navStack.pushScreen(entrantEventFragment);
+                    } else {
+                        navStack.selectNavItem(R.id.profile_nav_button);
+                    }
+                })
                 .addOnFailureListener(e -> {
                     // No user found: redirect to welcome / onboarding
                     Intent intent = new Intent(this, WelcomeActivity.class);
@@ -74,9 +88,11 @@ public class MainActivity extends AppCompatActivity implements OnItemSelectedLis
                 });
     }
 
-    private void setupMainNavBar(User user) {
+    private void setupUser(User user) {
         this.updateMainNavBar(user);
-        navStack.selectNavItem(R.id.profile_nav_button);
+        updateMainNavBar(user);
+        setupInviteListener(user);
+
 
         userController.observeUser(user.getUserID(),
                 this::updateMainNavBar,
@@ -88,13 +104,6 @@ public class MainActivity extends AppCompatActivity implements OnItemSelectedLis
                     startActivity(intent);
                     finish();
                 });
-
-        if (pendingEventIdFromIntent != null) {
-            EventFragment entrantEventFragment =
-                    new EventFragment(navStack, pendingEventIdFromIntent);
-            navStack.pushScreen(entrantEventFragment);
-            pendingEventIdFromIntent = null;
-        }
     }
 
     private void updateMainNavBar(User user) {
@@ -128,5 +137,33 @@ public class MainActivity extends AppCompatActivity implements OnItemSelectedLis
         }
 
         return true;
+    }
+
+    /**
+     * Checks Firestore for any pending invitations for this user and, if found,
+     * opens InvitationActivity for the first pending invite.
+     */
+    private void setupInviteListener(User user) {
+        Filter filter = Filter.equalTo("recipientID", user.getUserID());
+
+        inviteController.observeInvites(filter, (invitations) -> {
+                    for (Invitation invite : invitations) {
+                        if (Boolean.TRUE.equals(invite.getCancelled())) {
+                            continue;
+                        }
+
+                        if (invite.getResponseTime() != null) {
+                            continue;
+                        }
+
+                        Intent intent = new Intent(this, InvitationActivity.class);
+                        intent.putExtra(
+                                InvitationActivity.EXTRA_INVITATION_ID,
+                                invite.getInvitation()
+                        );
+                        startActivity(intent);
+                        break;
+                    }
+                });
     }
 }
