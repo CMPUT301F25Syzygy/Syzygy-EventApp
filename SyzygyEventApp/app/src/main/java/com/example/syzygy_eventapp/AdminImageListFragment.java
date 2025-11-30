@@ -25,27 +25,24 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Fragment displaying a list of user profiles for the administrator to manage.
+ * Fragment displaying a list of images in the app for the administrator to manage.
  */
 public class AdminImageListFragment extends Fragment {
 
+    /// Image list view
     private ImageListView imageListView;
 
 
-
-    /// Firestore listener for user data
+    /// Firestore listeners for user and event data
     private ListenerRegistration userListener;
     private ListenerRegistration eventListener;
-
-
-
 
     /// Navigation stack fragment
     private NavigationStackFragment navStack;
 
+    /// Data lists for users and events
     List<User> users = new ArrayList<>();
     List<Event> events = new ArrayList<>();
-
 
 
     /// Required empty constructor
@@ -72,7 +69,7 @@ public class AdminImageListFragment extends Fragment {
         // Bind list view
         imageListView = root.findViewById(R.id.image_list_view);
 
-        // Click listener for each user
+        // Click listener for each image
         imageListView.setOnImageClickListener(this::showActionDialog);
 
         // Start listening to Firestore
@@ -96,16 +93,25 @@ public class AdminImageListFragment extends Fragment {
         });
     }
 
+    /**
+     * Sets up Firestore observers for users 
+     */
     private void setupUserObservers() {
         userListener = UserController.getInstance()
                 .observeAllUsers(this::onUsersChanged);
     }
 
+    /**
+     * Sets up Firestore observers for events
+     */
     private void setupEventObservers() {
         eventListener = EventController.getInstance()
                 .observeAllEvents(this::onEventsChanged);
     }
 
+    /**
+     * Callback for when user data changes
+     */
     private void onUsersChanged(List<User> updatedUsers) {
         users = new ArrayList<>();
         for (User user : updatedUsers) {
@@ -117,6 +123,9 @@ public class AdminImageListFragment extends Fragment {
         this.updateImages();
     }
 
+    /**
+     * Callback for when event data changes
+     */
     private void onEventsChanged(List<Event> updatedEvents) {
         events = new ArrayList<>();
         for (Event event : updatedEvents) {
@@ -128,6 +137,9 @@ public class AdminImageListFragment extends Fragment {
         this.updateImages();
     }
 
+    /**
+     * Updates the image list view with current users and events
+     */
     private void updateImages() {
         List<ImageWrapper> images = new ArrayList<>();
 
@@ -142,6 +154,9 @@ public class AdminImageListFragment extends Fragment {
         imageListView.setImages(images);
     }
 
+    /**
+     * Shows a dialog with actions for the selected image
+     */
     private void showActionDialog(ImageWrapper image) {
         switch (image.getImageSourceType()) {
             case USER:

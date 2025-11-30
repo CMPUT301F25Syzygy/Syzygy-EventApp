@@ -21,17 +21,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A view representing a list of {@link User} objects.
+ * A view representing a list of {@link ImageWrapper} objects.
  */
 public class ImageListView extends LinearLayout {
     /// The list of images (and their metadata) to display
     private List<ImageWrapper> images = new ArrayList<>();
 
-    /// The RecyclerView for displaying the user list.
+    /// The RecyclerView for displaying the image list.
     private RecyclerView recyclerView;
     /// The TextView for displaying the title.
     private TextView titleText;
-    /// The TextView for displaying the user count.
+    /// The TextView for displaying the image count.
     private TextView countText;
     /// The ImageView for the expand/collapse icon.
     private ImageView expandIcon;
@@ -72,7 +72,7 @@ public class ImageListView extends LinearLayout {
     }
 
     /**
-     * Initializes the UserListView.
+     * Initializes the ImageListView.
      * @param context The context to use.
      */
     private void init(Context context) {
@@ -91,8 +91,8 @@ public class ImageListView extends LinearLayout {
     }
 
     /**
-     * Sets the entire user list and updates RecyclerView.
-     * @param newUsers The new list of users.
+     * Sets the entire image list and updates RecyclerView.
+     * @param newImages The new list of images to display.
      */
     @SuppressLint("NotifyDataSetChanged")
     public void setImages(List<ImageWrapper> newImages) {
@@ -113,7 +113,7 @@ public class ImageListView extends LinearLayout {
 
 
     /**
-     * Sets the listener for user item clicks.
+     * Sets the listener for image item clicks.
      * @param listener The listener to set.
      */
     public void setOnImageClickListener(ImageListViewAdapter.OnImageClickListener listener) {
@@ -121,7 +121,7 @@ public class ImageListView extends LinearLayout {
     }
 
     /**
-     * Updates the user count TextView.
+     * Updates the image count TextView.
      */
     public void updateCountText() {
         if (countText != null && images != null) {
@@ -130,14 +130,14 @@ public class ImageListView extends LinearLayout {
     }
 
     /**
-     * Toggles the visibility of the user list.
+     * Toggles the visibility of the image list.
      */
     public void toggleListVisibility() {
         setListVisibility(!isExpanded);
     }
 
     /**
-     * Sets the visibility of the user list.
+     * Sets the visibility of the image list.
      */
     public void setListVisibility(boolean isExpanded) {
         if (isExpanded == this.isExpanded) return;

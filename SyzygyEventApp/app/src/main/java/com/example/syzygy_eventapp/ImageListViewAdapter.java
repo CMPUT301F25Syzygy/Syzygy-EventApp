@@ -18,37 +18,37 @@ import com.google.android.material.imageview.ShapeableImageView;
 import java.util.List;
 
 /**
- * RecyclerView Adapter for displaying a list of Users.
+ * RecyclerView Adapter for displaying a list of ImageWrappers.
  */
 public class ImageListViewAdapter extends RecyclerView.Adapter<ImageListViewAdapter.ImageViewHolder> {
 
-
+    /// The list of images to display.
     private final List<ImageWrapper> images;
 
-    /// The listener for user item clicks.
+    /// The listener for image item clicks.
     private OnImageClickListener listener;
 
     /**
-     * Interface for handling user item clicks.
+     * Interface for handling image item clicks.
      */
     public interface OnImageClickListener {
         void onImageClick(ImageWrapper image);
     }
 
     /**
-     * Constructor for UserListViewAdapter.
+     * Constructor for ImageListViewAdapter.
      *
-     * @param users The list of users to display.
+     * @param images The list of images to display.
      */
     public ImageListViewAdapter(List<ImageWrapper> images) {
         this.images = images;
     }
 
     /**
-     * Creates a new ViewHolder for a user item.
+     * Creates a new ViewHolder for an image item.
      * @param parent The parent ViewGroup.
      * @param viewType The view type of the new View.
-     * @return A new UserViewHolder instance.
+     * @return A new ImageViewHolder instance.
      */
     @NonNull
     @Override
@@ -59,9 +59,9 @@ public class ImageListViewAdapter extends RecyclerView.Adapter<ImageListViewAdap
     }
 
     /**
-     * Binds user data to the ViewHolder.
-     * @param holder The UserViewHolder to bind data to.
-     * @param position The position of the user in the list.
+     * Binds image data to the ViewHolder.
+     * @param holder The ImageViewHolder to bind data to.
+     * @param position The position of the image in the list
      */
     @Override
     public void onBindViewHolder(@NonNull ImageViewHolder holder, int position) {
@@ -111,16 +111,14 @@ public class ImageListViewAdapter extends RecyclerView.Adapter<ImageListViewAdap
                 break;
         }
 
-
-
         holder.itemView.setOnClickListener(v -> {
             if (listener != null) listener.onImageClick(image);
         });
     }
 
     /**
-     * Returns the total number of users in the list.
-     * @return The number of users.
+     * Returns the total number of images in the list.
+     * @return The number of images.
      */
     @Override
     public int getItemCount() {
@@ -128,15 +126,15 @@ public class ImageListViewAdapter extends RecyclerView.Adapter<ImageListViewAdap
     }
 
     /**
-     * Sets the listener for user item clicks.
-     * @param listener The OnUserClickListener to set.
+     * Sets the listener for image item clicks.
+     * @param listener The OnImageClickListener to set.
      */
     public void setOnImageClickListener(OnImageClickListener listener) {
         this.listener = listener;
     }
 
     /**
-     * Adds a user at the end of the list and updates the RecyclerView
+     * Adds an image at the end of the list and updates the RecyclerView
      */
     public void addImage(ImageWrapper image) {
         images.add(image);
@@ -144,7 +142,7 @@ public class ImageListViewAdapter extends RecyclerView.Adapter<ImageListViewAdap
     }
 
     /**
-     * Removes a user by object and updates the RecyclerView
+     * Removes an image by object and updates the RecyclerView
      */
     public void removeImage(ImageWrapper image) {
         int index = images.indexOf(image);
@@ -155,7 +153,7 @@ public class ImageListViewAdapter extends RecyclerView.Adapter<ImageListViewAdap
     }
 
     /**
-     * Removes a user by index
+     * Removes an image by index
      */
     public void removeImageAt(int index) {
         if (index >= 0 && index < images.size()) {
@@ -165,7 +163,7 @@ public class ImageListViewAdapter extends RecyclerView.Adapter<ImageListViewAdap
     }
 
     /**
-     * ViewHolder class for user items.
+     * ViewHolder class for image items.
      */
     public static class ImageViewHolder extends RecyclerView.ViewHolder {
         ShapeableImageView imageView;
