@@ -4,14 +4,20 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationBarView.OnItemSelectedListener;
 import com.google.firebase.firestore.Filter;
+import com.google.firebase.messaging.FirebaseMessaging;
+
+import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity implements OnItemSelectedListener {
     public static final String EXTRA_OPEN_EVENT_ID = "extra_open_event_id";
@@ -86,7 +92,6 @@ public class MainActivity extends AppCompatActivity implements OnItemSelectedLis
         updateMainNavBar(user);
         setupInviteListener(user);
 
-
         userController.observeUser(user.getUserID(),
                 this::updateMainNavBar,
                 () -> {
@@ -97,6 +102,27 @@ public class MainActivity extends AppCompatActivity implements OnItemSelectedLis
                     startActivity(intent);
                     finish();
                 });
+
+        FirebaseMessaging.getInstance().getToken()
+                .addOnCompleteListener(task -> {
+                    if (!task.isSuccessful()) {
+                        Log.w("MainActivity", "Fetching FCM registration token failed", task.getException());
+                        return;
+                    }
+
+                    // Get new FCM registration token
+                    String token = task.getResult();
+
+                    userController.updateFields(user.getUserID(), new HashMap<>(){{
+                        put("fcmToken", token);
+                    }});
+                });
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
     }
 
     private void updateMainNavBar(User user) {
@@ -140,19 +166,19 @@ public class MainActivity extends AppCompatActivity implements OnItemSelectedLis
         Filter filter = Filter.equalTo("recipientID", user.getUserID());
 
         inviteController.observeInvites(filter, (invitations) -> {
-                    for (Invitation invite : invitations) {
-                        if (Boolean.TRUE.equals(invite.getCancelled())) {
-                            continue;
-                        }
+            for (Invitation invite : invitations) {
+                if (Boolean.TRUE.equals(invite.getCancelled())) {
+                    continue;
+                }
 
-                        if (invite.getResponseTime() != null) {
-                            continue;
-                        }
+                if (invite.getResponseTime() != null) {
+                    continue;
+                }
 
-                        InvitationFragment inviteFragment = new InvitationFragment(invite.getInvitation(), navStack);
-                        navStack.pushScreen(inviteFragment);
-                        break;
-                    }
-                });
+                InvitationFragment inviteFragment = new InvitationFragment(invite.getInvitation(), navStack);
+                navStack.pushScreen(inviteFragment);
+                break;
+            }
+        });
     }
 }
