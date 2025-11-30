@@ -15,16 +15,26 @@ import android.view.ViewGroup;
 
 import com.google.firebase.firestore.ListenerRegistration;
 
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * Fragment displaying a list of images for the administrator to manage.
+ * Fragment displaying a list of user profiles for the administrator to manage.
  */
 public class AdminImageListFragment extends Fragment {
 
+    private String currentAdminID;
+
+    /// User list view
+    private ImageListView userListView;
     /// Firestore listener for user data
     private ListenerRegistration userListener;
     /// Navigation stack fragment
     private NavigationStackFragment navStack;
+
+    List<User> users = new ArrayList<>();
+    List<Event> events = new ArrayList<>();
+
 
     /// Required empty constructor
     public AdminImageListFragment() {
@@ -47,6 +57,18 @@ public class AdminImageListFragment extends Fragment {
 
         View root = inflater.inflate(R.layout.fragment_admin_image_list, container, false);
 
+        // Bind list view
+        userListView = root.findViewById(R.id.image_list_view);
+
+        // Click listener for each user
+//        userListView.setOnUserClickListener(this::showUserActionDialog);
+
+        // Start listening to Firestore
+        setupUserObservers();
+
+        // Get current admin's user ID
+        currentAdminID = AppInstallationId.get(requireContext());
+
         return root;
     }
 
@@ -62,5 +84,36 @@ public class AdminImageListFragment extends Fragment {
             navStack.popScreen();
             return true;
         });
+    }
+
+    private void setupUserObservers() {
+        userListener = UserController.getInstance()
+                .observeAllUsers(this::onUsersChanged);
+    }
+
+    private void onUsersChanged(List<User> users) {
+        // Filter out the current admin
+        List<User> filteredUsers = new ArrayList<>();
+        for (User user : users) {
+//            if (!user.getUserID().equals(currentAdminID)) {
+//                filteredUsers.add(user);
+//            }
+
+            filteredUsers.add(user);
+        }
+
+        userListView.setUsers(filteredUsers);
+    }
+
+    /**
+     * Cleans up Firestore listeners
+     */
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (userListener != null) {
+            userListener.remove();
+            userListener = null;
+        }
     }
 }
