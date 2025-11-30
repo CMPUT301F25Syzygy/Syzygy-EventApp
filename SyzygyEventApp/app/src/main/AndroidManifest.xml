@@ -25,6 +25,10 @@
             android:name=".MainActivity"
             android:exported="true" />
 
+        <activity
+            android:name=".InvitationActivity"
+            android:exported="false" />
+
     </application>
 
     <uses-permission android:name="android.permission.CAMERA" />

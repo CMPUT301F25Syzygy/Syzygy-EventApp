@@ -27,6 +27,7 @@ public class EventController {
 
     private final CollectionReference eventsRef;
     private final HttpsCallableReference drawLotteryEarly;
+    private final InvitationController invitationController;
 
     private EventController() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -34,6 +35,8 @@ public class EventController {
 
         FirebaseFunctions fbFunctions = FirebaseFunctions.getInstance();
         drawLotteryEarly = fbFunctions.getHttpsCallable("drawLotteryEarly");
+
+        invitationController = new InvitationController();
     }
 
     /**
@@ -394,16 +397,33 @@ public class EventController {
      * @return Task that completes when the event found, null if the event does not exist
      */
     public Task<Event> getEvent(String eventID) {
-        return eventsRef.document(eventID).get().continueWith(task -> {
+        if (eventID == null || eventID.isEmpty()) {
+            return Tasks.forException(new IllegalArgumentException("eventID is required"));
+        }
+
+        return eventsRef.document(eventID).get().continueWithTask(task -> {
             if (!task.isSuccessful()) {
-                return null;
-            }
-            DocumentSnapshot snap = task.getResult();
-            if (!snap.exists()) {
-                return null;
+                return Tasks.forException(Objects.requireNonNull(task.getException()));
             }
 
-            return snap.toObject(Event.class);
+            DocumentSnapshot snap = task.getResult();
+
+            if (!snap.exists()) {
+                return Tasks.forException(
+                        new IllegalStateException("Event " + eventID + " not found")
+                );
+            }
+
+            Event event = snap.toObject(Event.class);
+            if (event == null) {
+                return Tasks.forException(
+                        new IllegalStateException("Failed to parse Event " + eventID)
+                );
+            }
+
+            event.setEventID(snap.getId());
+
+            return Tasks.forResult(event);
         });
     }
 
@@ -411,7 +431,27 @@ public class EventController {
         if (eventID == null || eventID.isEmpty()) {
             return Tasks.forException(new IllegalArgumentException("eventID is required"));
         }
-        return eventsRef.document(eventID).delete();
+        return invitationController.getEventInvites(eventID)
+                .continueWithTask(task -> {
+                    if (!task.isSuccessful()) {
+                        return Tasks.forException(task.getException());
+                    }
+
+                    List<Invitation> invites = task.getResult();
+                    List<Task<Void>> deleteInviteTasks = new ArrayList<>();
+
+                    for (Invitation invite : invites) {
+                        deleteInviteTasks.add(
+                                invitationController.deleteInvite(invite.getInvitation())
+                        );
+                    }
+
+                    // Wait for all invite deletions, then delete the event itself
+                    return Tasks.whenAllComplete(deleteInviteTasks)
+                            .continueWithTask(allDone ->
+                                    eventsRef.document(eventID).delete()
+                            );
+                });
     }
 
     /**

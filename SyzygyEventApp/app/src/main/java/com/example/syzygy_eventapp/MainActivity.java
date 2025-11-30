@@ -20,6 +20,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 public class MainActivity extends AppCompatActivity implements OnItemSelectedListener {
+    public static final String EXTRA_OPEN_EVENT_ID = "extra_open_event_id";
+
     private NavigationStackFragment navStack;
     private Fragment profileFragment;
     private Fragment findFragment;
@@ -27,11 +29,15 @@ public class MainActivity extends AppCompatActivity implements OnItemSelectedLis
     private Fragment organizerFragment;
     private Fragment adminFragment;
     private UserControllerInterface userController;
+    private String pendingEventIdFromIntent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        Intent launchIntent = getIntent();
+        pendingEventIdFromIntent = launchIntent.getStringExtra(EXTRA_OPEN_EVENT_ID);
 
         // Log the current AppInstallationId each time
         // the app starts.
@@ -77,11 +83,18 @@ public class MainActivity extends AppCompatActivity implements OnItemSelectedLis
                 () -> {
                     // User was deleted
                     Intent intent = new Intent(MainActivity.this, WelcomeActivity.class);
-                    intent.putExtra("profile_deleted", true); // 👈 same flag
+                    intent.putExtra("profile_deleted", true);
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
                     finish();
                 });
+
+        if (pendingEventIdFromIntent != null) {
+            EventFragment entrantEventFragment =
+                    new EventFragment(navStack, pendingEventIdFromIntent);
+            navStack.pushScreen(entrantEventFragment);
+            pendingEventIdFromIntent = null;
+        }
     }
 
     private void updateMainNavBar(User user) {

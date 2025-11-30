@@ -40,7 +40,7 @@ public class NavigationStackFragment extends Fragment implements OnItemSelectedL
     private BottomNavigationView navBar;
     private UUID displayedScreenUUID = null;
 
-    NavigationStackFragment() {
+    public NavigationStackFragment() {
         screenStack = new Stack<Screen>();
         // one empty screen in the stack to hold the main menu
         screenStack.push(new Screen(null));

@@ -33,6 +33,7 @@ import com.google.android.material.chip.Chip;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.Filter;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -75,6 +76,9 @@ public class ProfileFragment extends Fragment {
 
     // Delete Profile Button
     private View deleteProfileButton;
+
+    // Invitation handling
+    private InvitationController invitationController;
 
     /**
      * Default constructor.
@@ -121,6 +125,8 @@ public class ProfileFragment extends Fragment {
         // Retrieve the userID for this device or authenticated user
         userID = AppInstallationId.get(requireContext());
         userController = UserController.getInstance();
+
+        invitationController = new InvitationController();
 
         // Setup editable panels for name, email, and phone
         profileNamePanel.setOnClickListener(v -> showEditDialog(
@@ -228,7 +234,10 @@ public class ProfileFragment extends Fragment {
 
         // Ensure user exists before observing
         userController.getUser(userID)
-                .addOnSuccessListener(user -> startUserListener(userID))
+                .addOnSuccessListener(user -> {
+                        startUserListener(userID);
+                        checkPendingInvites();
+                })
                 .addOnFailureListener(err -> showError("Failed to find user: " + err.getMessage()));
     }
 
@@ -473,6 +482,45 @@ public class ProfileFragment extends Fragment {
         }
     }
 
+
+    /**
+     * Checks Firestore for any pending invitations for this user and, if found,
+     * opens InvitationActivity for the first pending invite.
+     */
+    private void checkPendingInvites() {
+        com.google.firebase.firestore.Filter filter =
+                com.google.firebase.firestore.Filter.equalTo("recipientID", userID);
+
+        invitationController.getInvites(filter)
+                .addOnSuccessListener(invitations -> {
+                    if (!isAdded()) {
+                        return;
+                    }
+
+                    for (Invitation invite : invitations) {
+                        if (Boolean.TRUE.equals(invite.getCancelled())) {
+                            continue;
+                        }
+
+                        if (invite.getResponseTime() != null) {
+                            continue;
+                        }
+
+                        Boolean accepted = invite.getAccepted();
+                        boolean isPending = (accepted == null) || !accepted;
+
+                        if (isPending) {
+                            Intent intent = new Intent(requireContext(), InvitationActivity.class);
+                            intent.putExtra(
+                                    InvitationActivity.EXTRA_INVITATION_ID,
+                                    invite.getInvitation()
+                            );
+                            startActivity(intent);
+                            break;
+                        }
+                    }
+                });
+    }
 
 
 
