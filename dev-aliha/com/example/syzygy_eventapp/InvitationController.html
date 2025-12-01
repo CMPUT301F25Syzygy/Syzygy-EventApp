@@ -355,6 +355,22 @@ public class <span class="typeNameLabel"><a href=InvitationController.html>Invit
                                             <td class="colLast">Get invitations for any filter in real time.</td>
                                         </tr>
                                         
+                                        <tr id="i13" class="rowColor">
+                                            <td class="colFirst"><code>Task&lt;Void&gt;</code>
+                                            </td>
+                                            <th class="colSecond" scope="row"><code><a href=InvitationController.html#deleteInvite(java.lang.String)>deleteInvite</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> invitationId) </code>
+                                            </th>
+                                            <td class="colLast"></td>
+                                        </tr>
+                                        
+                                        <tr id="i14" class="altColor">
+                                            <td class="colFirst"><code>ListenerRegistration</code>
+                                            </td>
+                                            <th class="colSecond" scope="row"><code><a href=InvitationController.html#observeUserEventInvite(java.lang.String,java.lang.String,java.util.function.Consumer)>observeUserEventInvite</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> eventId, <a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> recipientId, <a href=https://developer.android.com/reference/kotlin/java/util/function/Consumer.html>Consumer</a>&lt;<a href=Invitation.html>Invitation</a>&gt; onChange) </code>
+                                            </th>
+                                            <td class="colLast">Observe the invitation (if any) for a specific event/recipient in real time.</td>
+                                        </tr>
+                                        
                                         </tbody>
                                     </table>
                                 </div>
@@ -815,7 +831,7 @@ public class <span class="typeNameLabel"><a href=InvitationController.html>Invit
                                     <!--   -->
                                 </a>
                                 <ul class=
-                                              "blockListLast"
+                                              "blockList"
                                           >
                                     <li class="blockList">
                                         <h4>getInvites</h4>
@@ -833,6 +849,70 @@ public class <span class="typeNameLabel"><a href=InvitationController.html>Invit
                                             
                                         
 
+                                        
+
+                                        
+
+                                        </dl>
+                                    </li>
+                                </ul>
+                                
+                                <a id="deleteInvite(java.lang.String)">
+                                    <!--   -->
+                                </a>
+                                <ul class=
+                                              "blockList"
+                                          >
+                                    <li class="blockList">
+                                        <h4>deleteInvite</h4>
+                                        <pre class="methodSignature"> Task&lt;Void&gt; <a href=InvitationController.html#deleteInvite(java.lang.String)>deleteInvite</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> invitationId)</pre>
+                                        <div class="block"></div>
+
+                                        <dl>
+
+                                        
+
+                                        
+
+                                        
+
+                                        </dl>
+                                    </li>
+                                </ul>
+                                
+                                <a id="observeUserEventInvite(java.lang.String,java.lang.String,java.util.function.Consumer)">
+                                    <!--   -->
+                                </a>
+                                <ul class=
+                                              "blockListLast"
+                                          >
+                                    <li class="blockList">
+                                        <h4>observeUserEventInvite</h4>
+                                        <pre class="methodSignature"> ListenerRegistration <a href=InvitationController.html#observeUserEventInvite(java.lang.String,java.lang.String,java.util.function.Consumer)>observeUserEventInvite</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> eventId, <a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> recipientId, <a href=https://developer.android.com/reference/kotlin/java/util/function/Consumer.html>Consumer</a>&lt;<a href=Invitation.html>Invitation</a>&gt; onChange)</pre>
+                                        <div class="block"><p>Observe the invitation (if any) for a specific event/recipient in real time.</p></div>
+
+                                        <dl>
+
+                                        
+                                            <dt><span class="paramLabel">Parameters:</span></dt>
+                                            
+                                            
+                                            <dd><code>eventId</code> - Event document ID</dd>
+                                            
+                                            
+                                            
+                                            <dd><code>recipientId</code> - Recipient user ID</dd>
+                                            
+                                            
+                                            
+                                            <dd><code>onChange</code> - Callback with the latest Invitation, or null if none</dd>
+                                            
+                                            
+                                        
+
+                                        
+                                            <dt><span class="returnLabel">Returns:</span></dt>
+                                            <dd><p>ListenerRegistration that must be removed when no longer needed</p></dd>
                                         
 
                                         
