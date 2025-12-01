@@ -115,8 +115,8 @@ public class Event {
 
     // --- Getters and Setters ---
 
-    public Task<Status> getRelativeStatus(String userId) {
-        Status absoluteStatus = getAbsoluteStatus();
+    public Task<Status> calculateRelativeStatus(String userId) {
+        Status absoluteStatus = calculateAbsoluteStatus();
         if (absoluteStatus == Status.EventOver) {
             return Tasks.forResult(absoluteStatus);
         }
@@ -152,7 +152,7 @@ public class Event {
                 });
     }
 
-    public Status getAbsoluteStatus() {
+    public Status calculateAbsoluteStatus() {
         if (isOpen()) {
             if (lotteryComplete) {
                 return Status.DrawnEarly;

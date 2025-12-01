@@ -112,7 +112,7 @@ public class OrganizerEventSummaryListView extends LinearLayout {
         for (Event event : events) {
             OrganizerEventSummaryFragment row = new OrganizerEventSummaryFragment(getContext());
 
-            Event.Status status = event.getAbsoluteStatus();
+            Event.Status status = event.calculateAbsoluteStatus();
             row.bind(event, status);
 
 

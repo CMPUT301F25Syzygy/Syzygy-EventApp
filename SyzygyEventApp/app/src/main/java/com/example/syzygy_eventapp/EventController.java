@@ -18,7 +18,7 @@ import java.util.Objects;
 import java.util.function.Consumer;
 
 /**
- * Controller for reading/writing {@link Event, Invitation} data in Firestore DB.
+ * Controller for reading/writing {@link Event} data in Firestore DB.
  * EventViews will call this class to create, update, and observe events.
  * Firestore is the source of truth; views have real-time listeners.
  */
