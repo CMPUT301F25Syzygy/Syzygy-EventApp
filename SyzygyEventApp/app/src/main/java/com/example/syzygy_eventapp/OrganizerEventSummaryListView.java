@@ -14,15 +14,6 @@ import java.util.List;
  * Used primarily by OrganizerFragment.
  */
 public class OrganizerEventSummaryListView extends LinearLayout {
-
-    /**
-     * Provides the attendee’s {@link OrganizerEventSummaryFragment.AttendeeStatus} for a given {@link Event}.
-     * Allows the list to display user-specific status coloring when needed.
-     */
-    public interface StatusProvider {
-        OrganizerEventSummaryFragment.AttendeeStatus getStatus(Event event);
-    }
-
     private LinearLayout listContainer;
     private ImageView arrow;
     private TextView titleText;
@@ -102,14 +93,12 @@ public class OrganizerEventSummaryListView extends LinearLayout {
      * banner toggling and removal functionality.
      *
      * @param events              the list of {@link Event} objects to display
-     * @param statusProvider      optional provider for attendee status (nullable)
      * @param onRowClick          click listener for opening event details
      * @param onToggleBannerClick click listener for enabling/disabling banners
      * @param onRemoveClick       click listener for removing events
      */
     public void setItems(
             List<Event> events,
-            StatusProvider statusProvider,
             OnClickListener onRowClick,
             OnClickListener onToggleBannerClick,
             OnClickListener onRemoveClick
@@ -120,17 +109,17 @@ public class OrganizerEventSummaryListView extends LinearLayout {
         countText.setText(String.valueOf(size));
         if (size == 0) return;
 
-        for (Event e : events) {
+        for (Event event : events) {
             OrganizerEventSummaryFragment row = new OrganizerEventSummaryFragment(getContext());
-            OrganizerEventSummaryFragment.AttendeeStatus status =
-                    (statusProvider != null) ? statusProvider.getStatus(e) : null;
 
-            row.bind(e, status);
+            Event.Status status = event.calculateAbsoluteStatus();
+            row.bind(event, status);
 
-            row.setTag(e);
+
+            row.setTag(event);
 
             row.setOnOpenDetailsClickListener(v -> {
-                v.setTag(e);
+                v.setTag(event);
                 onRowClick.onClick(v);
             });
 
@@ -139,7 +128,7 @@ public class OrganizerEventSummaryListView extends LinearLayout {
     }
 
     /**
-     * Simpler version of {@link #setItems(List, StatusProvider, OnClickListener, OnClickListener, OnClickListener)}
+     * Simpler version of {@link #setItems(List, OnClickListener, OnClickListener, OnClickListener)}
      * that omits banner and removal functionality.
      * <p>
      * Useful for entrant-facing lists where events are only opened, not managed.
@@ -148,6 +137,6 @@ public class OrganizerEventSummaryListView extends LinearLayout {
      * @param onRowClick click listener for opening event details
      */
     public void setItems(List<Event> events, boolean isAdmin, OnClickListener onRowClick) {
-        setItems(events, null, onRowClick, v -> {}, v -> {});
+        setItems(events, onRowClick, v -> {}, v -> {});
     }
 }

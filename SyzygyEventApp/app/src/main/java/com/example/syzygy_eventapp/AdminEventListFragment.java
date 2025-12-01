@@ -107,7 +107,6 @@ public class AdminEventListFragment extends Fragment {
             upcomingEventList.setItems(
                     upcoming,
                     true,
-                    null,
                     this::eventClickedCallback,
                     this::eventRemoveBannerButtonClickedCallback,
                     this::eventDeleteButtonClickedCallback
@@ -117,7 +116,6 @@ public class AdminEventListFragment extends Fragment {
             pastEventList.setItems(
                     past,
                     true,
-                    null,
                     this::eventClickedCallback,
                     this::eventRemoveBannerButtonClickedCallback,
                     this::eventDeleteButtonClickedCallback

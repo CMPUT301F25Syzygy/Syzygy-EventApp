@@ -33,11 +33,6 @@ public class OrganizerEventSummaryFragment extends LinearLayout {
     private ListenerRegistration inviteListener;
 
     /**
-     * Represents the status of an entrant for a given event.
-     */
-    public enum AttendeeStatus {WAITLIST, NOT_SELECTED, PENDING, ACCEPTED, REJECTED}
-
-    /**
      * Default constructor for inflating via code.
      *
      * @param context the current {@link Context}.
@@ -95,7 +90,7 @@ public class OrganizerEventSummaryFragment extends LinearLayout {
      * @param event          the {@link Event} to display.
      * @param attendeeStatus the status of the current entrant, or {@code null} if admin view.
      */
-    public void bind(Event event, AttendeeStatus attendeeStatus) {
+    public void bind(Event event, Event.Status attendeeStatus) {
         titleText.setText(event.getName());
         locationText.setText(event.getLocationName());
 
@@ -148,65 +143,99 @@ public class OrganizerEventSummaryFragment extends LinearLayout {
             return;
         }
 
-        // Show a loading state
         acceptedCountText.setText("—");
         interestedCountText.setText("—");
 
-        // Get accepted count (accepted = true, cancelled = false)
-
         if (inviteListener != null) {
             inviteListener.remove();
+            inviteListener = null;
         }
 
-        Filter acceptedFilter = Filter.and(
-                Filter.equalTo("event", eventID),
-                Filter.equalTo("accepted", true),
-                Filter.equalTo("cancelled", false));
+        InvitationController invitationController = InvitationController.getInstance();
 
-        inviteListener = new InvitationController().observeInvites(acceptedFilter, (invites) -> {
-            int acceptedCount = invites.size();
-            acceptedCountText.setText(acceptedCount + "/" + maxAttendees);
+        com.google.firebase.firestore.Filter baseFilter = com.google.firebase.firestore.Filter.and(
+                com.google.firebase.firestore.Filter.equalTo("event", eventID),
+                com.google.firebase.firestore.Filter.or(
+                        com.google.firebase.firestore.Filter.equalTo("cancelled", false),
+                        com.google.firebase.firestore.Filter.equalTo("cancelled", null)
+                )
+        );
+
+        inviteListener = invitationController.observeInvites(baseFilter, invites -> {
+            int acceptedCount = 0;
+            int pendingCount = 0;
+
+            if (invites != null) {
+                for (Invitation inv : invites) {
+                    if (inv == null) {
+                        continue;
+                    }
+
+                    Boolean accepted = inv.getAccepted();
+                    com.google.firebase.Timestamp responseTime = inv.getResponseTime();
+
+                    if (Boolean.TRUE.equals(accepted)) {
+                        acceptedCount++;
+                    }
+                    else if (responseTime == null) {
+                        pendingCount++;
+                    }
+                }
+            }
+
+            if (maxAttendees != null) {
+                acceptedCountText.setText(acceptedCount + "/" + maxAttendees);
+            } else {
+                acceptedCountText.setText(String.valueOf(acceptedCount));
+            }
+
+            final int pendingCountFinal = pendingCount;
+
+            EventController.getInstance().getEvent(eventID)
+                    .addOnSuccessListener(event -> {
+                        int waitingSize = (event != null) ? event.getWaitingSize() : 0;
+                        int interestedTotal = waitingSize + pendingCountFinal;
+                        interestedCountText.setText(String.valueOf(interestedTotal));
+                    })
+                    .addOnFailureListener(error -> {
+                        int interestedTotal = pendingCountFinal;
+                        interestedCountText.setText(String.valueOf(interestedTotal));
+                    });
         });
-        // Get interested count (basically just get the waiting list size from the event)
-        EventController.getInstance().getEvent(eventID)
-                .addOnSuccessListener(event -> {
-                    interestedCountText.setText(String.valueOf(event.getWaitingSize()));
-                })
-                .addOnFailureListener(error -> {
-                    interestedCountText.setText("0");
-                });
     }
+
 
     /**
      * Sets the color and label of the status chip based on the entrant’s event status.
      * Used for entrant-facing summaries.
      *
-     * @param status the {@link AttendeeStatus} of the user in the event.
+     * @param status the {@link Event.Status} of the user in the event.
      */
-    private void setAttendeeChipColor(AttendeeStatus status) {
+    private void setAttendeeChipColor(Event.Status status) {
         int color;
         String label;
 
         switch (status) {
-            case ACCEPTED:
-                color = R.color.green;
-                label = "Accepted";
+            case Open:
+                color = R.color.purple;
+                label = "Open";
                 break;
-            case PENDING:
-                color = R.color.yellow;
-                label = "Pending";
-                break;
-            case REJECTED:
-                color = R.color.red;
-                label = "Rejected";
-                break;
-            case WAITLIST:
+            case DrawnEarly:
                 color = R.color.blue;
-                label = "Waitlist";
+                label = "Drawn Early";
+                break;
+            case RegistrationOver:
+                color = R.color.yellow;
+                label = "Registration Over";
+                break;
+            case EventOver:
+                color = R.color.grey;
+                label = "Event Over";
                 break;
             default:
+            case Unknown:
                 color = R.color.grey;
-                label = "Not Selected";
+                label = "Unknown";
                 break;
         }
 

@@ -7,7 +7,6 @@ import com.google.firebase.Timestamp;
  * Synced with DB. Other classes are responsible for initializing values upon creation.
  */
 public class Invitation {
-
     private String invitation;
     private String event;
     private String organizerID;
@@ -89,6 +88,11 @@ public class Invitation {
     public Timestamp getResponseTime() {
         return responseTime;
     }
+
+    public boolean hasResponse() {
+        return responseTime != null;
+    }
+
 
     public void setResponseTime(Timestamp responseTime) {
         this.responseTime = responseTime;
