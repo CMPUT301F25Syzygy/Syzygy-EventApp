@@ -1,9 +1,6 @@
 package com.example.syzygy_eventapp;
 
-import android.Manifest;
-import android.app.Notification;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -35,6 +32,7 @@ public class MainActivity extends AppCompatActivity implements OnItemSelectedLis
     private Fragment joinedFragment;
     private Fragment organizerFragment;
     private Fragment adminFragment;
+    private boolean inviteScreenShowing = false;
 
     // controllers
     private UserControllerInterface userController;
@@ -165,26 +163,66 @@ public class MainActivity extends AppCompatActivity implements OnItemSelectedLis
         return true;
     }
 
+    private void showInviteFragmentSafely(Invitation pendingInvite) {
+        if (pendingInvite == null) {
+            return;
+        }
+
+        Runnable action = () -> {
+            if (inviteScreenShowing) {
+                return;
+            }
+
+            InvitationFragment inviteFragment =
+                    new InvitationFragment(pendingInvite.getInvitation(), navStack);
+
+            try {
+                navStack.pushScreen(inviteFragment);
+                inviteScreenShowing = true;
+            } catch (IllegalArgumentException e) {
+                getWindow().getDecorView().post(() -> {
+                    try {
+                        navStack.pushScreen(inviteFragment);
+                        inviteScreenShowing = true;
+                    } catch (IllegalArgumentException ignored) {
+                    }
+                });
+            }
+        };
+
+        if (navStack.getView() == null) {
+            getWindow().getDecorView().post(action);
+        } else {
+            action.run();
+        }
+    }
+
     /**
      * Checks Firestore for any pending invitations for this user and, if found,
      * opens InvitationActivity for the first pending invite.
      */
     private void setupInviteListener(User user) {
-        Filter filter = Filter.equalTo("recipientID", user.getUserID());
+        Filter filter = Filter.and(
+                Filter.equalTo("recipientID", user.getUserID()),
+                Filter.equalTo("cancelled", false)
+        );
 
-        inviteController.observeInvites(filter, (invitations) -> {
+        inviteController.observeInvites(filter, invitations -> {
+            Invitation pending = null;
             for (Invitation invite : invitations) {
-                if (Boolean.TRUE.equals(invite.getCancelled())) {
-                    continue;
+                if (invite.getResponseTime() == null) {
+                    pending = invite;
+                    break;
                 }
+            }
 
-                if (invite.getResponseTime() != null) {
-                    continue;
+            if (pending != null) {
+                showInviteFragmentSafely(pending);
+            } else {
+                if (inviteScreenShowing && !navStack.isEmpty()) {
+                    navStack.popScreen();
                 }
-
-                InvitationFragment inviteFragment = new InvitationFragment(invite.getInvitation(), navStack);
-                navStack.pushScreen(inviteFragment);
-                break;
+                inviteScreenShowing = false;
             }
         });
     }

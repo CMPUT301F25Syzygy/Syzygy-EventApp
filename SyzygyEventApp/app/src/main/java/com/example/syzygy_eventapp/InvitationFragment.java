@@ -177,7 +177,23 @@ public class InvitationFragment extends Fragment {
      */
     private void handleAccept() {
         invitationController.acceptInvite(invitationId)
-                .addOnSuccessListener(updated -> openEventDetails(true))
+                .addOnSuccessListener(updated -> {
+                    if (Boolean.TRUE.equals(updated)) {
+                        // Invite was accepted: go to event details
+                        openEventDetails(true);
+                    } else {
+                        // Condition failed: already declined or cancelled, or otherwise invalid
+                        Toast.makeText(requireContext(),
+                                "This invitation can no longer be accepted.",
+                                Toast.LENGTH_LONG).show();
+                        // leave this screen, go back to whatever was under it
+                        try {
+                            navStack.popScreen();
+                        } catch (IllegalStateException ignored) {
+                            // If there's nothing to pop, just stay here
+                        }
+                    }
+                })
                 .addOnFailureListener(error -> {
                     Toast.makeText(requireContext(),
                             "Failed to accept invitation: " + error.getMessage(),
@@ -190,13 +206,19 @@ public class InvitationFragment extends Fragment {
      */
     private void handleDecline() {
         invitationController.declineInvite(invitationId)
-                .addOnSuccessListener(updated -> navStack.popScreen())
+                .addOnSuccessListener(updated -> {
+                    try {
+                        navStack.popScreen();
+                    } catch (IllegalStateException ignored) {
+                    }
+                })
                 .addOnFailureListener(e -> {
                     Toast.makeText(requireContext(),
                             "Failed to decline invitation: " + e.getMessage(),
                             Toast.LENGTH_LONG).show();
                 });
     }
+
 
     /**
      * Opens MainActivity and pushes the entrant event details screen.
@@ -220,4 +242,5 @@ public class InvitationFragment extends Fragment {
             navStack.pushScreen(eventFragment);
         }
     }
+
 }

@@ -57,6 +57,7 @@ public class EventFragment extends Fragment {
 
     private final NavigationStackFragment navStack;
     private final String eventID;
+    private final InvitationController invitationController;
 
     // declare UI components
     private TextView eventNameText;
@@ -70,11 +71,14 @@ public class EventFragment extends Fragment {
     private Button joinWaitingListButton;
     private Button leaveWaitingListButton;
     private Button openMapButton;
+    private Button cancelAttendanceButton;
 
     private ListenerRegistration eventListener;
+    private ListenerRegistration inviteListener;
     private Event currentEvent;
     private String userID;
     private boolean isOnWaitingList = false;
+    private Invitation currentInvite;
 
     private final ActivityResultLauncher<String> requestPermissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
         if (isGranted) {
@@ -97,6 +101,7 @@ public class EventFragment extends Fragment {
         this.navStack = navStack;
         this.eventID = eventID;
         this.eventController = EventController.getInstance();
+        this.invitationController = new InvitationController();
     }
 
     // set up onCreate
@@ -133,6 +138,12 @@ public class EventFragment extends Fragment {
 
         //start observing the event
         eventListener = eventController.observeEvent(eventID, this::onEventUpdated, navStack::popScreen);
+
+        inviteListener = invitationController.observeUserEventInvite(
+                eventID,
+                userID,
+                this::onInviteUpdated
+        );
     }
 
     @Override
@@ -142,6 +153,11 @@ public class EventFragment extends Fragment {
         if (eventListener != null) {
             eventListener.remove();
             eventListener = null;
+        }
+
+        if (inviteListener != null) {
+            inviteListener.remove();
+            inviteListener = null;
         }
     }
 
@@ -160,6 +176,7 @@ public class EventFragment extends Fragment {
         joinWaitingListButton = view.findViewById(R.id.join_waiting_list_button);
         leaveWaitingListButton = view.findViewById(R.id.leave_waiting_list_button);
         openMapButton = view.findViewById(R.id.open_map_button);
+        cancelAttendanceButton = view.findViewById(R.id.cancel_attendance_button);
     }
 
     /**
@@ -169,6 +186,7 @@ public class EventFragment extends Fragment {
         joinWaitingListButton.setOnClickListener(v -> joinWaitingList());
         leaveWaitingListButton.setOnClickListener(v -> leaveWaitingList());
         openMapButton.setOnClickListener(v -> openLocationInMap());
+        cancelAttendanceButton.setOnClickListener(v -> cancelAttendance());
     }
 
     /**
@@ -242,8 +260,8 @@ public class EventFragment extends Fragment {
         // Display poster image (now using Base64)
         loadPosterImage();
 
-        // Update button states based on whether user is on waiting list
-        checkUserWaitingListStatus();
+        // Update button states
+        updateButtons();
     }
 
     /**
@@ -300,16 +318,21 @@ public class EventFragment extends Fragment {
     }
 
     /**
-     * Check if current user is on the waiting list
+     * Update button visibility and enabled state based on
+     * - waiting list membership
+     * - invite status (pending / accepted / declined / cancelled)
      */
-    private void checkUserWaitingListStatus() {
+    private void updateButtons() {
+        if (currentEvent == null) {
+            return;
+        }
+
         if (currentEvent.getWaitingList() != null) {
             isOnWaitingList = currentEvent.getWaitingList().contains(userID);
         } else {
             isOnWaitingList = false;
         }
 
-        // Update button visibility
         if (isOnWaitingList) {
             joinWaitingListButton.setVisibility(View.GONE);
             leaveWaitingListButton.setVisibility(View.VISIBLE);
@@ -318,7 +341,7 @@ public class EventFragment extends Fragment {
             leaveWaitingListButton.setVisibility(View.GONE);
         }
 
-        // Disable join button if waiting list is full
+        // Disable join if waiting list full
         if (currentEvent.getMaxWaitingList() != null &&
                 currentEvent.getWaitingList() != null &&
                 currentEvent.getWaitingList().size() >= currentEvent.getMaxWaitingList()) {
@@ -328,6 +351,38 @@ public class EventFragment extends Fragment {
             joinWaitingListButton.setEnabled(true);
             joinWaitingListButton.setText("Join Waiting List");
         }
+
+        // Pending invite: hide join/leave, no cancel attendance
+        // Accepted invite: hide join/leave, show cancel attendance
+        if (currentInvite != null) {
+            Boolean cancelled = currentInvite.getCancelled();
+            Boolean accepted = currentInvite.getAccepted();
+            com.google.firebase.Timestamp responseTime = currentInvite.getResponseTime();
+
+            boolean isCancelled = Boolean.TRUE.equals(cancelled);
+            boolean isAccepted = Boolean.TRUE.equals(accepted);
+            boolean hasResponded = responseTime != null;
+
+            // Pending = not cancelled and no response yet
+            if (!isCancelled && !hasResponded) {
+                joinWaitingListButton.setVisibility(View.GONE);
+                leaveWaitingListButton.setVisibility(View.GONE);
+                cancelAttendanceButton.setVisibility(View.GONE);
+                return;
+            }
+
+            // Accepted & not cancelled: show Cancel Attendance
+            if (!isCancelled && isAccepted) {
+                joinWaitingListButton.setVisibility(View.GONE);
+                leaveWaitingListButton.setVisibility(View.GONE);
+                cancelAttendanceButton.setVisibility(View.VISIBLE);
+                cancelAttendanceButton.setEnabled(true);
+                return;
+            }
+        }
+
+        // Declined / cancelled / no invite: no cancel button
+        cancelAttendanceButton.setVisibility(View.GONE);
     }
 
     /**
@@ -486,5 +541,53 @@ public class EventFragment extends Fragment {
         if (currentEvent != null) {
             Maps.openInMaps(requireActivity(), currentEvent);
         }
+    }
+
+    private void onInviteUpdated(Invitation invite) {
+        this.currentInvite = invite;
+        if (!isAdded()) {
+            return;
+        }
+        updateButtons();
+    }
+
+    /**
+     * Cancel attendance for an accepted invitation.
+     * This is equivalent to pressing "Decline" on the invite screen.
+     */
+    private void cancelAttendance() {
+        if (currentInvite == null || currentInvite.getInvitation() == null) {
+            if (isAdded()) {
+                Toast.makeText(requireContext(),
+                        "No invitation to cancel.",
+                        Toast.LENGTH_SHORT).show();
+            }
+            return;
+        }
+
+        cancelAttendanceButton.setEnabled(false);
+
+        invitationController.declineInvite(currentInvite.getInvitation())
+                .addOnSuccessListener(updated -> {
+                    if (!isAdded()) return;
+
+                    if (Boolean.TRUE.equals(updated)) {
+                        Toast.makeText(requireContext(),
+                                "Attendance cancelled.",
+                                Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(requireContext(),
+                                "This invitation can no longer be changed.",
+                                Toast.LENGTH_SHORT).show();
+                    }
+                    cancelAttendanceButton.setEnabled(true);
+                })
+                .addOnFailureListener(e -> {
+                    if (!isAdded()) return;
+                    Toast.makeText(requireContext(),
+                            "Failed to cancel: " + e.getMessage(),
+                            Toast.LENGTH_SHORT).show();
+                    cancelAttendanceButton.setEnabled(true);
+                });
     }
 }

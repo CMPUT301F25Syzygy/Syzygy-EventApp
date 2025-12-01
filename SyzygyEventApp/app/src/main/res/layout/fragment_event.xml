@@ -144,5 +144,13 @@
             android:visibility="visible"
             android:textColor="@color/button_text"/>
 
+        <!-- Cancel Attendance Button -->
+        <Button
+            android:id="@+id/cancel_attendance_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Cancel Attendance"
+            android:visibility="gone" />
+
     </LinearLayout>
 </ScrollView>
