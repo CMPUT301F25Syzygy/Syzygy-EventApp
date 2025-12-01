@@ -115,19 +115,22 @@ public class FindEventsFragment extends Fragment {
 
         EventController.getInstance().observeAllEvents((events) -> {
             joinableEvents.clear();
+            Date now = new Date();
+
             for (Event event : events) {
                 boolean isOwnEvent = currentUserID.equals(event.getOrganizerID());
 
-                if (event.isOpen() && !isOwnEvent) {
+                boolean registrationOpen =
+                        event.getRegistrationEnd() == null
+                                || event.getRegistrationEnd().toDate().after(now);
+
+                if (registrationOpen && !isOwnEvent) {
                     joinableEvents.add(event);
                 }
             }
 
-            // store all events, and call the helper applySearchFilter to show events based on the search text
             applySearchFilter(searchBox.getText().toString());
-
         });
-
         return view;
     }
 

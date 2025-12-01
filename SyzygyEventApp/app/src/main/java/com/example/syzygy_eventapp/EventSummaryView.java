@@ -166,13 +166,14 @@ public class EventSummaryView extends LinearLayout {
         int color;
         String label;
 
-        if (lotteryComplete) {
+        if (registrationEnd.before(new Date())) {
             label = "Finished";
             color = R.color.grey;
-        } else if (registrationEnd.before(new Date())) {
-            label = "Lottery Done";
-            color = R.color.purple;
-        } else {
+        //} else if (lotteryComplete) {
+        //    label = "Lottery Done";
+        //    color = R.color.purple;
+        }
+        else {
             label = "Open";
             color = R.color.green;
         }

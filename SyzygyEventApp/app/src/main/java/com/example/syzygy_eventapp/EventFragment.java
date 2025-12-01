@@ -3,11 +3,14 @@ package com.example.syzygy_eventapp;
 import static androidx.core.content.ContentProviderCompat.requireContext;
 
 import android.Manifest;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Base64;
 import android.util.Log;
@@ -19,6 +22,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
@@ -30,6 +35,8 @@ import com.google.android.gms.location.LocationServices;
 import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.ListenerRegistration;
 
+import java.util.HashMap;
+
 /**
  * EventView - Displays event details for entrants.
  * Responsibilities:
@@ -40,12 +47,14 @@ import com.google.firebase.firestore.ListenerRegistration;
  * - Display location
  * - Open location in map software
  * - Join/leave waiting list
- *
+ * <p>
  * Collaborators: Event, EventController
  */
 public class EventFragment extends Fragment {
     private static final String TAG = "EventFragment";
+
     private final EventController eventController;
+
     private final NavigationStackFragment navStack;
     private final String eventID;
     private final InvitationController invitationController;
@@ -71,10 +80,21 @@ public class EventFragment extends Fragment {
     private boolean isOnWaitingList = false;
     private Invitation currentInvite;
 
+    private final ActivityResultLauncher<String> requestPermissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+        if (isGranted) {
+            // just got permission
+        } else {
+            Toast.makeText(requireContext(),
+                    "Notification permission was denied",
+                    Toast.LENGTH_SHORT).show();
+        }
+    });
+
     /**
      * Constructor for EventFragment
+     *
      * @param navStack Navigation stack for managing screens
-     * @param eventID The ID of the event to display
+     * @param eventID  The ID of the event to display
      */
     public EventFragment(NavigationStackFragment navStack, String eventID) {
         super();
@@ -178,6 +198,7 @@ public class EventFragment extends Fragment {
         this.currentEvent = event;
         updateUI();
     }
+
     /**
      * Update the UI with current event data
      */
@@ -213,8 +234,7 @@ public class EventFragment extends Fragment {
             waitingListCountText.setText("Waiting List: " + waitingListSize + "/" + currentEvent.getMaxWaitingList() + " entrants");
             waitingListLimitText.setText("Maximum Waiting List: " + currentEvent.getMaxWaitingList());
             waitingListLimitText.setVisibility(View.VISIBLE);
-        }
-        else {
+        } else {
             // No limit will just show the number of interested entrants
             waitingListCountText.setText("Waiting List: " + waitingListSize + " entrants");
             waitingListLimitText.setVisibility(View.GONE);
@@ -284,14 +304,14 @@ public class EventFragment extends Fragment {
         StringBuilder period = new StringBuilder("Registration: ");
 
         if (currentEvent.getRegistrationStart() != null) {
-            period.append("Starts ").append(currentEvent.getRegistrationStart().toDate().toString());
+            period.append("Starts ").append(currentEvent.getRegistrationStart().toDate());
         }
 
         if (currentEvent.getRegistrationEnd() != null) {
             if (currentEvent.getRegistrationStart() != null) {
                 period.append(" | ");
             }
-            period.append("Ends ").append(currentEvent.getRegistrationEnd().toDate().toString());
+            period.append("Ends ").append(currentEvent.getRegistrationEnd().toDate());
         }
 
         return period.toString();
@@ -379,6 +399,28 @@ public class EventFragment extends Fragment {
         }
     }
 
+    private void askNotificationPermission() {
+        // This is only necessary for API level >= 33 (TIRAMISU)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.POST_NOTIFICATIONS) ==
+                    PackageManager.PERMISSION_GRANTED) {
+                // already got permission
+            } else if (shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)) {
+                new AlertDialog.Builder(requireContext())
+                        .setMessage("Notifications can alert you when you're chosen for an event. You may miss an invitation without them.")
+                        .setTitle("Allow notifications?")
+                        .setCancelable(false)
+                        .setPositiveButton("Allow", (dialog, which) -> {
+                            requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
+                        })
+                        .setNegativeButton("No thanks", (dialog, which) -> {
+                        }).create().show();
+            } else {
+                requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
+            }
+        }
+    }
+
     /**
      * Request location permission and get user's location
      */
@@ -448,6 +490,8 @@ public class EventFragment extends Fragment {
                         joinWaitingListButton.setEnabled(true);
                     }
                 });
+
+        askNotificationPermission();
     }
 
     @Override

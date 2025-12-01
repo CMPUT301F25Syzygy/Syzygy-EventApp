@@ -1,9 +1,12 @@
 import { CloudTasksClient } from "@google-cloud/tasks";
-import { DocumentData, Firestore, getFirestore, Timestamp } from "firebase-admin/firestore";
+import {
+    CollectionReference, DocumentData, Firestore, getFirestore, Timestamp,
+} from "firebase-admin/firestore";
 import { Change, DocumentSnapshot, onDocumentWritten } from "firebase-functions/v2/firestore";
 import { logger } from "firebase-functions/v2";
 import { onSchedule } from "firebase-functions/v2/scheduler";
 import { HttpsError, onCall, onRequest } from "firebase-functions/v2/https";
+import { NotificationManager } from "./notificationManager";
 
 /** location for Google Cloud tasks */
 const taskLocation = "us-central1";
@@ -11,7 +14,7 @@ const taskLocation = "us-central1";
 /** Name of the Google Cloud task queue used to call {drawLottery} when it is time */
 const taskQueue = "firestore-lottery";
 
-const debug = false;
+const debug = true;
 
 
 /**
@@ -28,7 +31,7 @@ const taskMillisLimit = 1000 * 60 * 60 * 24 * 10; // 10 days in milliseconds
 const refreshLotteriesSchedule = "0 0 * * 0"; // every Sunday at midnight
 
 interface EventData extends DocumentData {
-    registrationEnd: Timestamp
+    registrationEnd: Timestamp;
     lotteryComplete: boolean;
     lotteryTaskName: string | null | undefined;
 }
@@ -118,6 +121,8 @@ class LotteryManager {
 
     tasksClient: CloudTasksClient;
     db: Firestore;
+    eventsRef: CollectionReference;
+    invitationsRef: CollectionReference;
 
 
     /**
@@ -128,6 +133,8 @@ class LotteryManager {
     constructor() {
         this.tasksClient = new CloudTasksClient();
         this.db = getFirestore();
+        this.eventsRef = this.db.collection("events");
+        this.invitationsRef = this.db.collection("invitations");
     }
 
     /**
@@ -279,11 +286,7 @@ class LotteryManager {
      * @return {*}
      */
     async drawLottery(eventId: string, early: boolean) {
-        if (debug) logger.debug("drawLottery A", eventId);
-        const eventsCollection = this.db.collection("events");
-        const invitationsCollection = this.db.collection("invitations");
-
-        const eventRef = eventsCollection.doc(eventId);
+        const eventRef = this.eventsRef.doc(eventId);
         const eventSnap = await eventRef.get();
 
         // get event info
@@ -291,8 +294,6 @@ class LotteryManager {
         const waitingList = eventSnap.get("waitingList") as string[];
         const organizerId = eventSnap.get("organizerID") as string;
         const invites = eventSnap.get("invites") ?? [] as string[];
-        if (debug) logger.debug("drawLottery B", maxAttendees, waitingList, organizerId);
-
 
         if (waitingList == null) {
             logger.warn(`Ignoring ${eventRef.id} since "waitingList" is null`);
@@ -303,18 +304,20 @@ class LotteryManager {
         }
 
         const invitesIds = [];
+        const winnerIds = [];
         const inviteCount = Math.min(maxAttendees - invites.length, waitingList.length);
 
         const tasks: Promise<unknown>[] = [];
 
         for (let i = 0; i < inviteCount; i++) {
-            const inviteRef = invitationsCollection.doc();
+            const inviteRef = this.invitationsRef.doc();
             invitesIds.push(inviteRef.id);
 
             // pick random index and remove from waitingList
             const index = Math.floor(Math.random() * waitingList.length);
-            if (debug) logger.debug("drawLottery C", index);
-            const [recipientID] = waitingList.splice(index, 1);
+            const [recipientId] = waitingList.splice(index, 1);
+
+            winnerIds.push(recipientId);
 
             // create invite
             tasks.push(inviteRef.create({
@@ -324,7 +327,7 @@ class LotteryManager {
                 event: eventSnap.id,
                 invitation: inviteRef.id,
                 organizerID: organizerId,
-                recipientID: recipientID,
+                recipientID: recipientId,
                 responseTime: null,
                 sendTime: Timestamp.now(),
             }));
@@ -338,11 +341,15 @@ class LotteryManager {
         }, {
             merge: true,
         }));
-        if (debug) logger.debug("drawLottery D", invitesIds, waitingList);
 
         if (early) {
             tasks.push(this.deleteLotteryTask(eventSnap));
         }
+
+        const eventName = eventSnap.get("name");
+        const notificationManager = NotificationManager.getInstance();
+        tasks.push(
+            notificationManager.notifyOfLottery(eventId, eventName, winnerIds, waitingList));
 
         // wait for everything to finish
         await Promise.all(tasks);
