@@ -15,7 +15,7 @@ interface NotificationData extends DocumentData {
     sent: boolean;
 }
 
-const debug = true;
+const debug = false;
 
 /**
  * Sends notifications to users when they are added to the database
@@ -216,9 +216,11 @@ export class NotificationManager {
 
         const message = {
             data: {
-                title,
-                description,
                 eventId: eventId ?? "",
+            },
+            notification: {
+                title: title,
+                body: description,
             },
             tokens: recipientTokens,
         };
