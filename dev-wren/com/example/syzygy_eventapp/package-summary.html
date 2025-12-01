@@ -161,6 +161,10 @@ var pathtoroot = "../../../";
 
     <tr class="altColor"><th class="colFirst" scope="row"><a href=WaitlistEntry.html>WaitlistEntry</a></th><td class="colLast">Represents an entry in a waitlist or event participant list.</td></tr>
 
+    <tr class="rowColor"><th class="colFirst" scope="row"><a href=NotificationListViewAdapter.ListItemViewHolder.html>ListItemViewHolder</a></th><td class="colLast">ViewHolder class for notification items.</td></tr>
+
+    <tr class="altColor"><th class="colFirst" scope="row"><a href=NotificationListViewAdapter.html>NotificationListViewAdapter</a></th><td class="colLast">RecyclerView Adapter for displaying a list of Notifications.</td></tr>
+
     <tr class="rowColor"><th class="colFirst" scope="row"><a href=QRScanFragment.html>QRScanFragment</a></th><td class="colLast">QRScanFragment: scans QR codes and opens EventView when valid codes are detected</td></tr>
 
     <tr class="altColor"><th class="colFirst" scope="row"><a href=QRGenerateFragment.html>QRGenerateFragment</a></th><td class="colLast">This fragment will generatr and display QR Codes for events.</td></tr>
@@ -201,15 +205,17 @@ var pathtoroot = "../../../";
 
     <tr class="altColor"><th class="colFirst" scope="row"><a href=MessagingService.html>MessagingService</a></th><td class="colLast"></td></tr>
 
-    <tr class="rowColor"><th class="colFirst" scope="row"><a href=JoinedEventsFragment.html>JoinedEventsFragment</a></th><td class="colLast">Shows the events the user has joined: - Upcoming events that the user is in the waiting list for, which are still open or awaiting lottery - History of events the user has interacted with or participated in  Uses EventSummaryListView for both lists, and real-time listeners keep them updated whenever event docs change on Firestore </td></tr>
+    <tr class="rowColor"><th class="colFirst" scope="row"><a href=NotificationListView.html>NotificationListView</a></th><td class="colLast">A view representing a list of <a href=User.html>User</a> objects.</td></tr>
 
-    <tr class="altColor"><th class="colFirst" scope="row"><a href=OrganizerEventSummaryFragment.html>OrganizerEventSummaryFragment</a></th><td class="colLast">A custom view that displays a compact summary of an event, including its title, location, date, time, and status.</td></tr>
+    <tr class="altColor"><th class="colFirst" scope="row"><a href=JoinedEventsFragment.html>JoinedEventsFragment</a></th><td class="colLast">Shows the events the user has joined: - Upcoming events that the user is in the waiting list for, which are still open or awaiting lottery - History of events the user has interacted with or participated in  Uses EventSummaryListView for both lists, and real-time listeners keep them updated whenever event docs change on Firestore </td></tr>
 
-    <tr class="rowColor"><th class="colFirst" scope="row"><a href=AdminEventListFragment.html>AdminEventListFragment</a></th><td class="colLast">Fragment displaying a list of events for the administrator to manage.</td></tr>
+    <tr class="rowColor"><th class="colFirst" scope="row"><a href=OrganizerEventSummaryFragment.html>OrganizerEventSummaryFragment</a></th><td class="colLast">A custom view that displays a compact summary of an event, including its title, location, date, time, and status.</td></tr>
 
-    <tr class="altColor"><th class="colFirst" scope="row"><a href=UserNotification.html>UserNotification</a></th><td class="colLast"></td></tr>
+    <tr class="altColor"><th class="colFirst" scope="row"><a href=AdminEventListFragment.html>AdminEventListFragment</a></th><td class="colLast">Fragment displaying a list of events for the administrator to manage.</td></tr>
 
-    <tr class="rowColor"><th class="colFirst" scope="row"><a href=AdministratorFragment.html>AdministratorFragment</a></th><td class="colLast">The administrator dashboard fragment.</td></tr>
+    <tr class="rowColor"><th class="colFirst" scope="row"><a href=UserNotification.html>UserNotification</a></th><td class="colLast"></td></tr>
+
+    <tr class="altColor"><th class="colFirst" scope="row"><a href=AdministratorFragment.html>AdministratorFragment</a></th><td class="colLast">The administrator dashboard fragment.</td></tr>
 </tbody>
 </table>
 
@@ -239,9 +245,11 @@ var pathtoroot = "../../../";
 
     <tr class="altColor"><th class="colFirst" scope="row"><a href=EventSummaryListView.StatusProvider.html>StatusProvider</a></th><td class="colLast">Provides the attendee’s <a href=EventSummaryView.AttendeeStatus.html>EventSummaryView.AttendeeStatus</a> for a given <a href=Event.html>Event</a>.</td></tr>
 
-    <tr class="rowColor"><th class="colFirst" scope="row"><a href=OrganizerEventSummaryListView.StatusProvider.html>StatusProvider</a></th><td class="colLast">Provides the attendee’s <a href=OrganizerEventSummaryFragment.AttendeeStatus.html>OrganizerEventSummaryFragment.AttendeeStatus</a> for a given <a href=Event.html>Event</a>.</td></tr>
+    <tr class="rowColor"><th class="colFirst" scope="row"><a href=NotificationListViewAdapter.OnItemClickListener.html>OnItemClickListener</a></th><td class="colLast">Interface for handling notification item clicks.</td></tr>
 
-    <tr class="altColor"><th class="colFirst" scope="row"><a href=UserControllerInterface.html>UserControllerInterface</a></th><td class="colLast"></td></tr>
+    <tr class="altColor"><th class="colFirst" scope="row"><a href=OrganizerEventSummaryListView.StatusProvider.html>StatusProvider</a></th><td class="colLast">Provides the attendee’s <a href=OrganizerEventSummaryFragment.AttendeeStatus.html>OrganizerEventSummaryFragment.AttendeeStatus</a> for a given <a href=Event.html>Event</a>.</td></tr>
+
+    <tr class="rowColor"><th class="colFirst" scope="row"><a href=UserControllerInterface.html>UserControllerInterface</a></th><td class="colLast"></td></tr>
 </tbody>
 </table>
 
