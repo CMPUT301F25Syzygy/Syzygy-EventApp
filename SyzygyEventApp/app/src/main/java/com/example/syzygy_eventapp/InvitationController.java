@@ -323,4 +323,78 @@ public class InvitationController {
 
         return invitationsRef.document(invitationId).delete();
     }
+
+    /**
+     * Observe the invitation (if any) for a specific event/recipient in real time.
+     *
+     * @param eventId     Event document ID
+     * @param recipientId Recipient user ID
+     * @param onChange    Callback with the latest Invitation, or null if none
+     * @return ListenerRegistration that must be removed when no longer needed
+     */
+    public ListenerRegistration observeUserEventInvite(
+            String eventId,
+            String recipientId,
+            java.util.function.Consumer<Invitation> onChange
+    ) {
+        Filter filter = Filter.and(
+                Filter.equalTo("event", eventId),
+                Filter.equalTo("recipientID", recipientId)
+        );
+
+        return observeInvites(filter, invites -> {
+            if (invites == null || invites.isEmpty()) {
+                onChange.accept(null);
+                return;
+            }
+
+            Invitation bestPending = null;
+            Invitation newestNonCancelled = null;
+
+            for (Invitation inv : invites) {
+                if (inv == null) {
+                    continue;
+                }
+
+                Boolean cancelled = inv.getCancelled();
+                com.google.firebase.Timestamp responseTime = inv.getResponseTime();
+                com.google.firebase.Timestamp sendTime = inv.getSendTime();
+
+                boolean isCancelled = Boolean.TRUE.equals(cancelled);
+                boolean hasResponded = (responseTime != null);
+
+                // Skip cancelled invites entirely
+                if (isCancelled) {
+                    continue;
+                }
+
+                // Track newest non-cancelled invite
+                if (newestNonCancelled == null || isAfter(sendTime, newestNonCancelled.getSendTime())) {
+                    newestNonCancelled = inv;
+                }
+
+                // Pending = not cancelled + no response
+                if (!hasResponded) {
+                    if (bestPending == null || isAfter(sendTime, bestPending.getSendTime())) {
+                        bestPending = inv;
+                    }
+                }
+            }
+
+            Invitation chosen = (bestPending != null) ? bestPending : newestNonCancelled;
+            onChange.accept(chosen);
+        });
+    }
+
+    private boolean isAfter(com.google.firebase.Timestamp a, com.google.firebase.Timestamp b) {
+        if (a == null) {
+            return false;
+        }
+        if (b == null) {
+            return true;
+        }
+        return a.compareTo(b) > 0;
+    }
+
+
 }
