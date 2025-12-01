@@ -121,7 +121,7 @@ public class EventSummaryListView extends LinearLayout {
             EventSummaryView row = new EventSummaryView(getContext());
 
             row.bind(event, Event.Status.Unknown, isAdmin);
-            
+
             String userID = AppInstallationId.get(getContext());
             event.getRelativeStatus(userID)
                     .addOnSuccessListener((status) -> {

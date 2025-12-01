@@ -207,10 +207,7 @@ public class InvitationFragment extends Fragment {
     private void handleDecline() {
         invitationController.declineInvite(invitationId)
                 .addOnSuccessListener(updated -> {
-                    try {
-                        navStack.popScreen();
-                    } catch (IllegalStateException ignored) {
-                    }
+                    navStack.popScreen();
                 })
                 .addOnFailureListener(e -> {
                     Toast.makeText(requireContext(),

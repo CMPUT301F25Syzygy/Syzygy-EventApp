@@ -121,6 +121,11 @@ public class NavigationStackFragment extends Fragment implements OnItemSelectedL
      * @throws IllegalStateException when there is only one screen left to pop
      */
     public void popScreen() {
+        try {
+            int a = 5 / 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         if (screenStack.size() == 1) {
             throw new IllegalStateException("Shouldn't pop last screen");
         }
@@ -145,7 +150,6 @@ public class NavigationStackFragment extends Fragment implements OnItemSelectedL
      * @param fragment a fragment to replace the screen contents
      */
     public void replaceScreen(Fragment fragment) {
-
         FragmentManager manager = getParentFragmentManager();
         manager.beginTransaction()
                 .replace(R.id.fragment_frame, fragment)

@@ -4,39 +4,33 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import androidx.core.app.ActivityCompat;
-import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationBarView.OnItemSelectedListener;
 import com.google.firebase.firestore.Filter;
 import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.HashMap;
-import java.util.Map;
+import java.util.HashSet;
+import java.util.Set;
 
 public class MainActivity extends AppCompatActivity implements OnItemSelectedListener {
-    public static final String EXTRA_OPEN_EVENT_ID = "extra_open_event_id";
-
     private NavigationStackFragment navStack;
     private Fragment profileFragment;
     private Fragment findFragment;
     private Fragment joinedFragment;
     private Fragment organizerFragment;
     private Fragment adminFragment;
-    private boolean inviteScreenShowing = false;
 
     // controllers
     private UserControllerInterface userController;
     private InvitationController inviteController;
+
+    private Set<String> openedInvites = new HashSet<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +38,6 @@ public class MainActivity extends AppCompatActivity implements OnItemSelectedLis
         setContentView(R.layout.activity_main);
 
         Intent launchIntent = getIntent();
-        final String pendingEventIdFromIntent = launchIntent.getStringExtra(EXTRA_OPEN_EVENT_ID);
 
         // Log the current AppInstallationId each time
         // the app starts.
@@ -75,13 +68,7 @@ public class MainActivity extends AppCompatActivity implements OnItemSelectedLis
                 .addOnSuccessListener((user) -> {
                     this.setupUser(user);
 
-                    if (pendingEventIdFromIntent != null) {
-                        EventFragment entrantEventFragment =
-                                new EventFragment(navStack, pendingEventIdFromIntent);
-                        navStack.pushScreen(entrantEventFragment);
-                    } else {
-                        navStack.selectNavItem(R.id.profile_nav_button);
-                    }
+                    navStack.selectNavItem(R.id.profile_nav_button);
                 })
                 .addOnFailureListener(e -> {
                     // No user found: redirect to welcome / onboarding
@@ -163,31 +150,16 @@ public class MainActivity extends AppCompatActivity implements OnItemSelectedLis
         return true;
     }
 
-    private void showInviteFragmentSafely(Invitation pendingInvite) {
+    private void showInviteFragment(Invitation pendingInvite) {
         if (pendingInvite == null) {
             return;
         }
 
         Runnable action = () -> {
-            if (inviteScreenShowing) {
-                return;
-            }
-
             InvitationFragment inviteFragment =
                     new InvitationFragment(pendingInvite.getInvitation(), navStack);
 
-            try {
-                navStack.pushScreen(inviteFragment);
-                inviteScreenShowing = true;
-            } catch (IllegalArgumentException e) {
-                getWindow().getDecorView().post(() -> {
-                    try {
-                        navStack.pushScreen(inviteFragment);
-                        inviteScreenShowing = true;
-                    } catch (IllegalArgumentException ignored) {
-                    }
-                });
-            }
+            navStack.pushScreen(inviteFragment);
         };
 
         if (navStack.getView() == null) {
@@ -208,21 +180,13 @@ public class MainActivity extends AppCompatActivity implements OnItemSelectedLis
         );
 
         inviteController.observeInvites(filter, invitations -> {
-            Invitation pending = null;
             for (Invitation invite : invitations) {
                 if (invite.getResponseTime() == null) {
-                    pending = invite;
-                    break;
+                    if (!openedInvites.contains(invite.getInvitation())) {
+                        showInviteFragment(invite);
+                        openedInvites.add(invite.getInvitation());
+                    }
                 }
-            }
-
-            if (pending != null) {
-                showInviteFragmentSafely(pending);
-            } else {
-                if (inviteScreenShowing && !navStack.isEmpty()) {
-                    navStack.popScreen();
-                }
-                inviteScreenShowing = false;
             }
         });
     }
