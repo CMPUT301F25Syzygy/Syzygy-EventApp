@@ -14,6 +14,8 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.firestore.WriteBatch;
+import com.google.firebase.functions.FirebaseFunctions;
+import com.google.firebase.functions.HttpsCallableReference;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,13 +30,26 @@ import java.util.function.Predicate;
  * Firestore is the source of truth; views have real-time listeners and render {@link Invitation} models from snapshots. Writes (create/accept/reject/cancel) go through this controller.
  */
 public class InvitationController {
+    private static InvitationController singletonInstance = null;
 
     private final FirebaseFirestore db;
     private final CollectionReference invitationsRef;
 
-    public InvitationController() {
+    private InvitationController() {
         this.db = FirebaseFirestore.getInstance();
         this.invitationsRef = db.collection("invitations");
+    }
+
+    /**
+     * Gets a single global instance of the InvitationController
+     *
+     * @return a InvitationController singleton
+     */
+    public static InvitationController getInstance() {
+        if (singletonInstance == null)
+            singletonInstance = new InvitationController();
+
+        return singletonInstance;
     }
 
     /**

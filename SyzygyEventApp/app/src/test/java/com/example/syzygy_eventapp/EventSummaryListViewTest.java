@@ -145,16 +145,9 @@ public class EventSummaryListViewTest {
     public void testStatusProviderDrivesChipLabels() {
         List<Event> events = sampleEvents3();
 
-        // ACCEPTED for event1, REJECTED for others
-        EventSummaryListView.StatusProvider provider = e ->
-                "event1".equals(e.getEventID())
-                        ? EventSummaryView.AttendeeStatus.ACCEPTED
-                        : EventSummaryView.AttendeeStatus.REJECTED;
-
         listView.setItems(
                 events,
                 /*isAdmin=*/false,
-                provider,
                 v -> {},
                 v -> {},
                 v -> {}
@@ -201,7 +194,6 @@ public class EventSummaryListViewTest {
         listView.setItems(
                 events,
                 /*isAdmin=*/false,
-                null,
                 v -> {
                     Object tag = v.getTag();
                     if (tag instanceof Event) {

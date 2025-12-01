@@ -16,12 +16,9 @@ import java.util.List;
 public class EventSummaryListView extends LinearLayout {
 
     /**
-     * Provides the attendee’s {@link EventSummaryView.AttendeeStatus} for a given {@link Event}.
+     * Provides the attendee’s {@link Event.Status} for a given {@link Event}.
      * Allows the list to display user-specific status coloring when needed.
      */
-    public interface StatusProvider {
-        EventSummaryView.AttendeeStatus getStatus(Event event);
-    }
 
     private LinearLayout listContainer;
     private ImageView arrow;
@@ -103,7 +100,6 @@ public class EventSummaryListView extends LinearLayout {
      *
      * @param events              the list of {@link Event} objects to display
      * @param isAdmin             whether this view is shown for an admin
-     * @param statusProvider      optional provider for attendee status (nullable)
      * @param onRowClick          click listener for opening event details
      * @param onToggleBannerClick click listener for enabling/disabling banners
      * @param onRemoveClick       click listener for removing events
@@ -111,7 +107,6 @@ public class EventSummaryListView extends LinearLayout {
     public void setItems(
             List<Event> events,
             boolean isAdmin,
-            StatusProvider statusProvider,
             OnClickListener onRowClick,
             OnClickListener onToggleBannerClick,
             OnClickListener onRemoveClick
@@ -122,25 +117,29 @@ public class EventSummaryListView extends LinearLayout {
         countText.setText(String.valueOf(size));
         if (size == 0) return;
 
-        for (Event e : events) {
+        for (Event event : events) {
             EventSummaryView row = new EventSummaryView(getContext());
-            EventSummaryView.AttendeeStatus status =
-                    (statusProvider != null) ? statusProvider.getStatus(e) : null;
 
-            row.bind(e, status, isAdmin);
+            String userID = AppInstallationId.get(getContext());
+            event.getRelativeStatus(userID)
+                    .addOnSuccessListener((status) -> {
+                row.bind(event, status, isAdmin);
+            }).addOnFailureListener((exception) -> {
+                row.bind(event, Event.Status.Unknown, isAdmin);
+            });
 
-            row.setTag(e);
+            row.setTag(event);
 
             row.setOnOpenDetailsClickListener(v -> {
-                v.setTag(e);
+                v.setTag(event);
                 onRowClick.onClick(v);
             });
             row.setOnToggleBannerClickListener(v -> {
-                v.setTag(e);
+                v.setTag(event);
                 onToggleBannerClick.onClick(v);
             });
             row.setOnRemoveClickListener(v -> {
-                v.setTag(e);
+                v.setTag(event);
                 onRemoveClick.onClick(v);
             });
 
@@ -149,7 +148,7 @@ public class EventSummaryListView extends LinearLayout {
     }
 
     /**
-     * Simpler version of {@link #setItems(List, boolean, StatusProvider, OnClickListener, OnClickListener, OnClickListener)}
+     * Simpler version of {@link #setItems(List, boolean, OnClickListener, OnClickListener, OnClickListener)}
      * that omits banner and removal functionality.
      * <p>
      * Useful for entrant-facing lists where events are only opened, not managed.
@@ -159,6 +158,6 @@ public class EventSummaryListView extends LinearLayout {
      * @param onRowClick click listener for opening event details
      */
     public void setItems(List<Event> events, boolean isAdmin, OnClickListener onRowClick) {
-        setItems(events, isAdmin, null, onRowClick, v -> {}, v -> {});
+        setItems(events, isAdmin, onRowClick, v -> {}, v -> {});
     }
 }

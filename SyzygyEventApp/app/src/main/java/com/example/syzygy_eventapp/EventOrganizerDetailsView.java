@@ -108,7 +108,7 @@ public class EventOrganizerDetailsView extends Fragment {
         // Initialize controllers for Firebase operations
         eventController = EventController.getInstance();
         userController = UserController.getInstance();
-        invitationController = new InvitationController();
+        invitationController = InvitationController.getInstance();
         notificationController = NotificationController.getInstance();
 
         eventListener = eventController.observeEvent(event.getEventID(), this::setEvent, navStack::popScreen);

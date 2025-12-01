@@ -36,7 +36,7 @@ public class EventController {
         FirebaseFunctions fbFunctions = FirebaseFunctions.getInstance();
         drawLotteryEarly = fbFunctions.getHttpsCallable("drawLotteryEarly");
 
-        invitationController = new InvitationController();
+        invitationController = InvitationController.getInstance();
     }
 
     /**

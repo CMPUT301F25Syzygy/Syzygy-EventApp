@@ -56,7 +56,7 @@ public class InvitationFragment extends Fragment {
         // Inflate this fragment's layout
         View view = inflater.inflate(R.layout.fragment_event_invite, container, false);
 
-        invitationController = new InvitationController();
+        invitationController = InvitationController.getInstance();
         eventController = EventController.getInstance();
         userController = UserController.getInstance();
 

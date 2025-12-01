@@ -67,7 +67,7 @@ public class MainActivity extends AppCompatActivity implements OnItemSelectedLis
 
         String userID = AppInstallationId.get(this);
         userController = UserController.getInstance();
-        inviteController = new InvitationController();
+        inviteController = InvitationController.getInstance();
 
         // Ensure user exists before proceeding.
         // If user is missing, go back to WelcomeActivity.

@@ -80,7 +80,7 @@ public class EventSummaryViewTest {
     @Test
     public void testBindEntrantAcceptedShowsAcceptedChip() {
         Event e = makeEvent("Title", "Loc", 1, false);
-        view.bind(e, EventSummaryView.AttendeeStatus.ACCEPTED, false);
+        view.bind(e, Event.Status.Accepted, false);
 
         Chip chip = view.findViewById(R.id.chip_event_status);
         assertEquals("Accepted", chip.getText().toString());
@@ -101,7 +101,7 @@ public class EventSummaryViewTest {
     @Test
     public void testBindEntrantHidesAdminButtons() {
         Event e = makeEvent("User Event", "Library", 5, false);
-        view.bind(e, EventSummaryView.AttendeeStatus.PENDING, false);
+        view.bind(e, Event.Status.Accepted, false);
 
         View adminButtons = view.findViewById(R.id.layout_admin_buttons);
         assertEquals(View.GONE, adminButtons.getVisibility());

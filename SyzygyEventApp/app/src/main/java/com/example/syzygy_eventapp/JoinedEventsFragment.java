@@ -79,7 +79,7 @@ public class JoinedEventsFragment extends Fragment {
         // Load current user ID and event controller
         userID = AppInstallationId.get(requireContext());
         eventController = EventController.getInstance();
-        invitationController = new InvitationController();
+        invitationController = InvitationController.getInstance();
 
         // Start listening for event updates
         startObservers();

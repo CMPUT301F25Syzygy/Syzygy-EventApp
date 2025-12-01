@@ -30,10 +30,6 @@ public class EventSummaryView extends LinearLayout {
     private Chip statusChip;
     private LinearLayout adminButtons;
 
-    /**
-     * Represents the status of an entrant for a given event.
-     */
-    public enum AttendeeStatus { WAITLIST, NOT_SELECTED, PENDING, ACCEPTED, REJECTED }
 
     /**
      * Default constructor for inflating via code.
@@ -88,10 +84,10 @@ public class EventSummaryView extends LinearLayout {
      * Also controls admin button visibility.
      *
      * @param event the {@link Event} to display.
-     * @param attendeeStatus the status of the current entrant, or {@code null} if admin view.
+     * @param status the status of the current entrant, or {@code null} if admin view.
      * @param isAdmin whether the current user has admin privileges.
      */
-    public void bind(Event event, AttendeeStatus attendeeStatus, boolean isAdmin) {
+    public void bind(Event event, Event.Status status, boolean isAdmin) {
         titleText.setText(event.getName());
         locationText.setText(event.getLocationName());
 
@@ -103,14 +99,8 @@ public class EventSummaryView extends LinearLayout {
             dateText.setText(dateFormat.format(date));
         }
 
-        if (attendeeStatus != null) {
-            setAttendeeChipColor(attendeeStatus);
-        } else {
-            // Guard against events with null dates to prevent app crashes
-            if (event.getRegistrationEnd() != null)
-            {
-                setAdminChipColor(event.isLotteryComplete(), event.getRegistrationEnd().toDate());
-            }
+        if (status != null) {
+            setAttendeeChipColor(status);
         }
 
         adminButtons.setVisibility(isAdmin ? VISIBLE : GONE);
@@ -120,62 +110,50 @@ public class EventSummaryView extends LinearLayout {
      * Sets the color and label of the status chip based on the entrant’s event status.
      * Used for entrant-facing summaries.
      *
-     * @param status the {@link AttendeeStatus} of the user in the event.
+     * @param status the {@link Event.Status} of the user in the event.
      */
-    private void setAttendeeChipColor(AttendeeStatus status) {
+    private void setAttendeeChipColor(Event.Status status) {
         int color;
         String label;
 
         switch (status) {
-            case ACCEPTED:
+            case Open:
+                color = R.color.purple;
+                label = "Open";
+                break;
+            case Accepted:
                 color = R.color.green;
                 label = "Accepted";
                 break;
-            case PENDING:
+            case Pending:
                 color = R.color.yellow;
                 label = "Pending";
                 break;
-            case REJECTED:
+            case Declined:
                 color = R.color.red;
-                label = "Rejected";
+                label = "Declined";
                 break;
-            case WAITLIST:
+            case Waitlisted:
                 color = R.color.blue;
                 label = "Waitlist";
                 break;
-            default:
+            case DrawnEarly:
                 color = R.color.grey;
-                label = "Not Selected";
+                label = "Drawn Early";
                 break;
-        }
-
-        statusChip.setText(label);
-        statusChip.setChipBackgroundColor(
-                ContextCompat.getColorStateList(getContext(), color)
-        );
-    }
-
-    /**
-     * Sets the color and label of the status chip based on the event’s administrative state.
-     * Used for organizer/admin-facing summaries.
-     *
-     * @param lotteryComplete whether the lottery for the event has been completed.
-     * @param registrationEnd the registration end date of the event.
-     */
-    private void setAdminChipColor(boolean lotteryComplete, Date registrationEnd) {
-        int color;
-        String label;
-
-        if (registrationEnd.before(new Date())) {
-            label = "Finished";
-            color = R.color.grey;
-        //} else if (lotteryComplete) {
-        //    label = "Lottery Done";
-        //    color = R.color.purple;
-        }
-        else {
-            label = "Open";
-            color = R.color.green;
+            case RegistrationOver:
+                color = R.color.grey;
+                label = "Registration Over";
+                break;
+            case EventOver:
+                color = R.color.grey;
+                label = "Event Over";
+                break;
+            default:
+            case Unknown:
+                color = R.color.grey;
+                label = "Unknown";
+                break;
         }
 
         statusChip.setText(label);

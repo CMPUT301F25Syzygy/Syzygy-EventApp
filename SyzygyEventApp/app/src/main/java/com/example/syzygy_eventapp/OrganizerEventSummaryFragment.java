@@ -33,11 +33,6 @@ public class OrganizerEventSummaryFragment extends LinearLayout {
     private ListenerRegistration inviteListener;
 
     /**
-     * Represents the status of an entrant for a given event.
-     */
-    public enum AttendeeStatus {WAITLIST, NOT_SELECTED, PENDING, ACCEPTED, REJECTED}
-
-    /**
      * Default constructor for inflating via code.
      *
      * @param context the current {@link Context}.
@@ -95,7 +90,7 @@ public class OrganizerEventSummaryFragment extends LinearLayout {
      * @param event          the {@link Event} to display.
      * @param attendeeStatus the status of the current entrant, or {@code null} if admin view.
      */
-    public void bind(Event event, AttendeeStatus attendeeStatus) {
+    public void bind(Event event, Event.Status attendeeStatus) {
         titleText.setText(event.getName());
         locationText.setText(event.getLocationName());
 
@@ -156,7 +151,7 @@ public class OrganizerEventSummaryFragment extends LinearLayout {
             inviteListener = null;
         }
 
-        InvitationController invitationController = new InvitationController();
+        InvitationController invitationController = InvitationController.getInstance();
 
         com.google.firebase.firestore.Filter baseFilter = com.google.firebase.firestore.Filter.and(
                 com.google.firebase.firestore.Filter.equalTo("event", eventID),
@@ -214,32 +209,33 @@ public class OrganizerEventSummaryFragment extends LinearLayout {
      * Sets the color and label of the status chip based on the entrant’s event status.
      * Used for entrant-facing summaries.
      *
-     * @param status the {@link AttendeeStatus} of the user in the event.
+     * @param status the {@link Event.Status} of the user in the event.
      */
-    private void setAttendeeChipColor(AttendeeStatus status) {
+    private void setAttendeeChipColor(Event.Status status) {
         int color;
         String label;
 
         switch (status) {
-            case ACCEPTED:
-                color = R.color.green;
-                label = "Accepted";
+            case Open:
+                color = R.color.purple;
+                label = "Open";
                 break;
-            case PENDING:
-                color = R.color.yellow;
-                label = "Pending";
-                break;
-            case REJECTED:
-                color = R.color.red;
-                label = "Rejected";
-                break;
-            case WAITLIST:
+            case DrawnEarly:
                 color = R.color.blue;
-                label = "Waitlist";
+                label = "Drawn Early";
+                break;
+            case RegistrationOver:
+                color = R.color.yellow;
+                label = "Registration Over";
+                break;
+            case EventOver:
+                color = R.color.grey;
+                label = "Event Over";
                 break;
             default:
+            case Unknown:
                 color = R.color.grey;
-                label = "Not Selected";
+                label = "Unknown";
                 break;
         }
 
