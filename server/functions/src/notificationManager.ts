@@ -6,14 +6,23 @@ import { HttpsError, onCall } from "firebase-functions/v2/https";
 import { getMessaging, Messaging } from "firebase-admin/messaging";
 import { onDocumentWritten } from "firebase-functions/v2/firestore";
 
-interface NotificationData extends DocumentData {
-    eventID: string | null | undefined;
-    organizerID: string | null | undefined;
+interface Notification {
+    id: number;
+    eventId: string | null | undefined;
+    organizerId: string | null | undefined;
     title: string;
     description: string;
     creationDate: Timestamp;
     sent: boolean;
+    deleted: boolean;
 }
+
+interface UserNotification {
+    userId: string,
+    notificationId: number,
+}
+
+interface NotificationData extends DocumentData, Notification { }
 
 const debug = false;
 
@@ -48,7 +57,7 @@ export const sendNotificationFromDB =
             notif.content.title,
             notif.content.description,
             notif.recipientIds,
-            notif.content.eventID);
+            notif.content.eventId);
 
         // mark as sent
         await notificationManager.markNotificationSend(notificationId);
@@ -147,8 +156,8 @@ export class NotificationManager {
      *
      * @param {string} title title of the notification
      * @param {string} description description of the notification
-     * @param {string[]} recipientIds userIDs of the recipients
-     * @param {string | undefined} eventId associated eventID, optional
+     * @param {string[]} recipientIds userIds of the recipients
+     * @param {string | undefined} eventId associated eventId, optional
      */
     async createNotification(
         title: string, description: string,
@@ -158,7 +167,8 @@ export class NotificationManager {
         const sendTask =
             this.sendNotification(title, description, recipientIds, eventId);
 
-        const notifRef = this.notifsRef.doc();
+        const id = Math.floor(Math.random() * Number.MAX_SAFE_INTEGER);
+        const notifRef = this.notifsRef.doc(String(id));
 
         const batch = this.db.batch();
 
@@ -166,22 +176,23 @@ export class NotificationManager {
             const newUserNotif = this.userNotifsRef.doc();
 
             batch.create(newUserNotif, {
-                userID: recipientId,
-                notificationID: notifRef.id,
-            });
+                userId: recipientId,
+                notificationId: id,
+            } as UserNotification);
         }
 
         await batch.commit();
 
         await notifRef.create({
-            ID: notifRef.id,
-            eventID: eventId,
-            organizerID: null,
+            id,
+            eventId: eventId,
+            organizerId: null,
             title,
             description,
             creationDate: Timestamp.now(),
             sent: true,
-        });
+            deleted: false,
+        } as Notification);
 
         await sendTask;
     }
@@ -191,8 +202,8 @@ export class NotificationManager {
      *
      * @param {string} title title of the notification
      * @param {string} description description of the notification
-     * @param {string[]} recipientIds userIDs of the recipients
-     * @param {string | undefined} eventId associated eventID, optional
+     * @param {string[]} recipientIds userIds of the recipients
+     * @param {string | undefined} eventId associated eventId, optional
      */
     async sendNotification(
         title: string, description: string,
@@ -254,7 +265,7 @@ export class NotificationManager {
         const notifTask = this.notifsRef.doc(notificationId).get();
 
         const notifUsersTask = await this.userNotifsRef
-            .where("notificationID", "==", notificationId)
+            .where("notificationId", "==", notificationId)
             .get();
 
         const notif = (await notifTask).data();
@@ -264,7 +275,7 @@ export class NotificationManager {
         }
 
         const recipientIds = (await notifUsersTask).docs.map(
-            (doc) => doc.get("userID")
+            (doc) => doc.get("userId")
         );
 
         return {
