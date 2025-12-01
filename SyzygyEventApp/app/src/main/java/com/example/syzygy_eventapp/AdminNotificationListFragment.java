@@ -15,14 +15,19 @@ import android.view.ViewGroup;
 
 import com.google.firebase.firestore.ListenerRegistration;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 /**
  * Fragment displaying a list of notifications for the administrator to manage.
  */
 public class AdminNotificationListFragment extends Fragment {
 
-    /// Firestore listener for user data
-    private ListenerRegistration userListener;
+    private NotificationListView notificationListView;
+    private ListenerRegistration notificationListener;
+
+
     /// Navigation stack fragment
     private NavigationStackFragment navStack;
 
@@ -47,6 +52,12 @@ public class AdminNotificationListFragment extends Fragment {
 
         View root = inflater.inflate(R.layout.fragment_admin_notification_list, container, false);
 
+        // Bind list view
+        notificationListView = root.findViewById(R.id.notification_list_view);
+
+        // Start listening to Firestore
+        setupNotificationListener();
+
         return root;
     }
 
@@ -62,5 +73,47 @@ public class AdminNotificationListFragment extends Fragment {
             navStack.popScreen();
             return true;
         });
+    }
+
+    /**
+     * Sets up Firestore listener for notifications
+     */
+    private void setupNotificationListener() {
+        notificationListener = NotificationController.getInstance()
+                .observeAllNotifications(this::onNotificationsChanged);
+    }
+
+    /**
+     * Handles changes to the notification list
+     */
+    private void onNotificationsChanged(List<Notification> notifications) {
+
+        // List<Notification> mockNotifications = new ArrayList<>();
+
+        // mockNotifications.add(new Notification(
+        //         "Event Approved",
+        //         "Your upcoming event has been approved!",
+        //         null,                       // mock Event
+        //         null,                       // mock Organizer
+        //         new ArrayList<>()           // empty recipients
+        // ));
+
+        // mockNotifications.add(new Notification(
+        //         "Event Reminder",
+        //         "Your event starts in 2 hours.",
+        //         null,
+        //         null,
+        //         new ArrayList<>()
+        // ));
+
+        // mockNotifications.add(new Notification(
+        //         "Profile Notice",
+        //         "Your profile has been updated successfully.",
+        //         null,
+        //         null,
+        //         new ArrayList<>()
+        // ));
+
+        notificationListView.setNotifications(notifications);
     }
 }
