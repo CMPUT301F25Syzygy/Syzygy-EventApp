@@ -2,9 +2,13 @@ package com.example.syzygy_eventapp;
 
 public class UserNotification {
     private String userId;
-    private long notificationId;
+    private int notificationId;
 
-    public UserNotification(String userId, long notificationId) {
+    public UserNotification() {
+
+    }
+
+    public UserNotification(String userId, int notificationId) {
         this.userId = userId;
         this.notificationId = notificationId;
     }
@@ -17,11 +21,11 @@ public class UserNotification {
         this.userId = userId;
     }
 
-    public long getNotificationId() {
+    public int getNotificationId() {
         return notificationId;
     }
 
-    public void setNotificationId(long notificationId) {
+    public void setNotificationId(int notificationId) {
         this.notificationId = notificationId;
     }
 }

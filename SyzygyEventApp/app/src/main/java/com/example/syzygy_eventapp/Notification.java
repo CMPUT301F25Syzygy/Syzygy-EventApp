@@ -8,10 +8,7 @@ import java.util.concurrent.ThreadLocalRandom;
  * Notification model class.
  */
 public class Notification {
-    // max safe integer that can be stored in a double, thanks javascript <3
-    private static final long MAX_SAFE_DOUBLE_INTEGER = 9007199254740991L; // 2 ^ 53 - 1
-
-    private long id = ThreadLocalRandom.current().nextLong(MAX_SAFE_DOUBLE_INTEGER);;
+    private int id = ThreadLocalRandom.current().nextInt(Integer.MAX_VALUE);
     private String title;
     private String description;
     private String eventId;
@@ -33,11 +30,11 @@ public class Notification {
     public Notification() {
     }
 
-    public long getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(int id) {
         this.id = id;
     }
 

@@ -7,7 +7,6 @@ import com.google.firebase.Timestamp;
  * Synced with DB. Other classes are responsible for initializing values upon creation.
  */
 public class Invitation {
-
     private String invitation;
     private String event;
     private String organizerID;

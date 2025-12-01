@@ -63,7 +63,7 @@ public class NotificationController {
          * @param onChange Callback invoked with the latest list of Notification objects
          */
     public ListenerRegistration observeUserNotifications(String userId, Consumer<List<Notification>> onChange) {
-        Set<Long> notifIds = new HashSet<>();
+        Set<Integer> notifIds = new HashSet<>();
 
         // handle when the set of notifications for the user changes somehow
         Consumer<List<Notification>> handleChangedNotifs = (notifs) -> {
@@ -172,8 +172,8 @@ public class NotificationController {
      * @param notificationId the ID of the notification to delete
      * @return a Task representing success or failure
      */
-    public Task<Void> deleteNotification(long notificationId) {
-        DocumentReference notifRef = notifsRef.document(Long.toString(notificationId));
+    public Task<Void> deleteNotification(int notificationId) {
+        DocumentReference notifRef = notifsRef.document(Integer.toString(notificationId));
 
         return notifRef.set(new HashMap<>() {{
             put("deleted", true);
@@ -192,7 +192,7 @@ public class NotificationController {
             return Tasks.forResult(null);
         }
 
-        DocumentReference notifRef = notifsRef.document(Long.toString(notification.getId()));
+        DocumentReference notifRef = notifsRef.document(Integer.toString(notification.getId()));
 
         List<Task<Void>> tasks = new ArrayList<>();
 
