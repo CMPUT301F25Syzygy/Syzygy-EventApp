@@ -3,12 +3,12 @@ import {
 } from "firebase-admin/firestore";
 import { logger } from "firebase-functions/v2";
 import { HttpsError, onCall } from "firebase-functions/v2/https";
-import { ServerValue } from "firebase-admin/database";
 import { getMessaging, Messaging } from "firebase-admin/messaging";
 import { onDocumentWritten } from "firebase-functions/v2/firestore";
 
 interface NotificationData extends DocumentData {
-    eventID?: string;
+    eventID: string | null | undefined;
+    organizerID: string | null | undefined;
     title: string;
     description: string;
     creationDate: Timestamp;
@@ -119,13 +119,13 @@ export class NotificationManager {
     /**
      * Notifies users in the waiting list about a lottery that took place.
      *
-     * @param {string} eventName name of the event
      * @param {string} eventId id of the event
+     * @param {string} eventName name of the event
      * @param {string[]} winnerIds ids of each user that won
      * @param {string[]} loserIds ids of each user that lost
      */
     async notifyOfLottery(
-        eventName: string, eventId: string, winnerIds: string[], loserIds: string[]) {
+        eventId: string, eventName: string, winnerIds: string[], loserIds: string[]) {
         if (debug) logger.debug("notifyOfLottery", eventName, winnerIds, loserIds);
 
         const tasks: Promise<unknown>[] = [];
@@ -151,7 +151,10 @@ export class NotificationManager {
      * @param {string | undefined} eventId associated eventID, optional
      */
     async createNotification(
-        title: string, description: string, recipientIds: string[], eventId?: string) {
+        title: string, description: string,
+        recipientIds: string[], eventId: string | null | undefined) {
+        if (recipientIds.length == 0) return;
+
         const sendTask =
             this.sendNotification(title, description, recipientIds, eventId);
 
@@ -173,9 +176,10 @@ export class NotificationManager {
         await notifRef.create({
             ID: notifRef.id,
             eventID: eventId,
+            organizerID: null,
             title,
             description,
-            creationDate: ServerValue.TIMESTAMP,
+            creationDate: Timestamp.now(),
             sent: true,
         });
 
@@ -191,16 +195,22 @@ export class NotificationManager {
      * @param {string | undefined} eventId associated eventID, optional
      */
     async sendNotification(
-        title: string, description: string, recipientIds: string[], eventId?: string) {
+        title: string, description: string,
+        recipientIds: string[], eventId: string | null | undefined) {
         if (recipientIds.length == 0) return;
 
-        const recipientRefs = recipientIds.map(this.usersRef.doc);
+        if (debug) logger.debug("sendNotification A", title, description, recipientIds, eventId);
+
+        const recipientRefs = recipientIds.map(
+            (recipientId) => this.usersRef.doc(recipientId));
         const recipientTokens: string[] = [];
 
-        this.db.getAll(...recipientRefs, { fieldMask: ["fcmToken"] }).then(docs => {
-            const token = docs[0].get("fcmToken");
-            if (token != null) {
-                recipientTokens.push(token);
+        await this.db.getAll(...recipientRefs, { fieldMask: ["fcmToken"] }).then(docs => {
+            for (const doc of docs) {
+                const token = doc.get("fcmToken");
+                if (token != null) {
+                    recipientTokens.push(token);
+                }
             }
         });
 
@@ -213,12 +223,20 @@ export class NotificationManager {
             tokens: recipientTokens,
         };
 
-        const response = await this.messaging.sendEachForMulticast(message);
+        if (debug) logger.debug("sendNotification B", JSON.stringify(message));
 
-        if (response.successCount == 0) {
-            logger.error("Failed to send message to any recipients");
-        } else if (response.failureCount > 0) {
-            logger.warn("Failed to send to some recipients");
+        if (recipientTokens.length > 0) {
+            const response = await this.messaging.sendEachForMulticast(message);
+
+            if (response.successCount == 0) {
+                logger.error("Failed to send message to any recipients");
+            } else if (response.failureCount > 0) {
+                logger.warn("Failed to send to some recipients");
+            }
+
+            if (debug) logger.debug("sendNotification C", JSON.stringify(response));
+        } else {
+            if (debug) logger.debug("sendNotification C", "No recipientTokens");
         }
     }
 
@@ -243,7 +261,9 @@ export class NotificationManager {
             return null;
         }
 
-        const recipientIds = (await notifUsersTask).docs.map((doc) => doc.get("userID"));
+        const recipientIds = (await notifUsersTask).docs.map(
+            (doc) => doc.get("userID")
+        );
 
         return {
             content: notif as NotificationData,

@@ -14,7 +14,7 @@ const taskLocation = "us-central1";
 /** Name of the Google Cloud task queue used to call {drawLottery} when it is time */
 const taskQueue = "firestore-lottery";
 
-const debug = false;
+const debug = true;
 
 
 /**
