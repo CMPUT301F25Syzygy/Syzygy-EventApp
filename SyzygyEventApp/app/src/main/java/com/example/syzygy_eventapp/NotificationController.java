@@ -1,5 +1,7 @@
 package com.example.syzygy_eventapp;
 
+import androidx.annotation.NonNull;
+
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.CollectionReference;
@@ -49,13 +51,17 @@ public class NotificationController {
         this.userNotifsRef = db.collection("userNotifications");
     }
 
-    /**
-     * Observe notifications for a user in real time.
-     * Caller must hold the returned ListenerRegistration and remove it appropriately.
-     *
-     * @param userId   The id of the user who's notifications we are observering
-     * @param onChange Callback invoked with the latest list of Notification objects
-     */
+    public ListenerRegistration observeAllNotifications(Consumer<List<Notification>> onChange) {
+        return observeNotifications(null, onChange);
+    }
+
+        /**
+         * Observe notifications for a user in real time.
+         * Caller must hold the returned ListenerRegistration and remove it appropriately.
+         *
+         * @param userId   The id of the user who's notifications we are observering
+         * @param onChange Callback invoked with the latest list of Notification objects
+         */
     public ListenerRegistration observeUserNotifications(String userId, Consumer<List<Notification>> onChange) {
         Set<Long> notifIds = new HashSet<>();
 
@@ -220,4 +226,5 @@ public class NotificationController {
             return Tasks.forResult(notifs);
         });
     }
+
 }

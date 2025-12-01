@@ -1,6 +1,7 @@
 package com.example.syzygy_eventapp;
 
 
+import android.app.AlertDialog;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.text.format.DateFormat;
@@ -11,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -138,8 +140,7 @@ public class EventOrganizerDetailsView extends Fragment {
         });
 
         sendNotificationButton.setOnClickListener(v -> {
-            // TODO
-            showToast("Not implemented");
+            openSendNotificationDialog();
         });
     }
 
