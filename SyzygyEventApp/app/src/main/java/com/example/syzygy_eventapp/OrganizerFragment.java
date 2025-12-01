@@ -81,20 +81,24 @@ public class OrganizerFragment extends Fragment {
     }
 
     private void startEventObserver() {
-        EventController.getInstance().observeAllEvents(events -> {
+        eventsListener = EventController.getInstance().observeAllEvents(events -> {
             List<Event> upcoming = new ArrayList<>();
             List<Event> past = new ArrayList<>();
             Date now = new Date();
 
-            // Filter events for the current organizer
             for (Event event : events) {
-
                 if (!event.getOrganizerID().equals(userID)) {
                     continue;
-                 }
+                }
 
-                // An event will be considered as "past" if the lottery is complete OR if the registration end time is before now
-                boolean isPast = event.isLotteryComplete() || (event.getRegistrationEnd() != null && event.getRegistrationEnd().toDate().before(now));
+                Date eventDate = null;
+                if (event.getRegistrationEnd() != null) {
+                    eventDate = event.getRegistrationEnd().toDate();
+                } else if (event.getEventTime() != null) {
+                    eventDate = event.getEventTime().toDate();
+                }
+
+                boolean isPast = eventDate != null && eventDate.before(now);
 
                 if (isPast) {
                     past.add(event);
@@ -103,10 +107,7 @@ public class OrganizerFragment extends Fragment {
                 }
             }
 
-            // Populate the upcoming events list.
             organizerSummaryListViewUpcoming.setItems(upcoming, false, this::eventClickedCallback);
-
-            // Populate the past event list.
             organizerSummaryListViewHistory.setItems(past, false, this::eventClickedCallback);
         });
     }
