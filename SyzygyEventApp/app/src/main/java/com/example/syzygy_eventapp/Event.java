@@ -12,8 +12,10 @@ import com.google.firebase.firestore.GeoPoint;
 
 import java.sql.Time;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Event (model)
@@ -130,25 +132,34 @@ public class Event {
                 Filter.equalTo("event", eventID));
         return InvitationController.getInstance().getInvites(filter)
                 .continueWithTask((task) -> {
-                    List<Invitation> invites = task.getResult();
-
-                    for (Invitation invite : invites) {
-                        if (invite.getCancelled()) {
-                            continue;
-                        }
-
-                        if (invite.hasResponse()) {
-                            if (invite.getAccepted()) {
-                                return Tasks.forResult(Status.Accepted);
-                            } else {
-                                return Tasks.forResult(Status.Declined);
-                            }
-                        } else {
-                            return Tasks.forResult(Status.Pending);
-                        }
+                    if (!task.isSuccessful()) {
+                        return Tasks.forResult(Status.Unknown);
                     }
 
-                    return Tasks.forResult(absoluteStatus);
+                    List<Invitation> invites = task.getResult();
+
+                    // remove cancelled invites
+                    List<Invitation> filteredInvites = invites.stream()
+                            .filter(invite -> !invite.getCancelled())
+                            .sorted(Comparator.comparing(Invitation::getResponseTime))
+                            .collect(Collectors.toList());
+
+                    if (filteredInvites.isEmpty()) {
+                        return Tasks.forResult(absoluteStatus);
+                    }
+
+                    // remove cancelled invites
+                    Invitation invite = filteredInvites.get(filteredInvites.size() - 1);
+
+                    if (invite.hasResponse()) {
+                        if (invite.getAccepted()) {
+                            return Tasks.forResult(Status.Accepted);
+                        } else {
+                            return Tasks.forResult(Status.Declined);
+                        }
+                    } else {
+                        return Tasks.forResult(Status.Pending);
+                    }
                 });
     }
 

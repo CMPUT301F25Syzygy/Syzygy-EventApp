@@ -221,19 +221,21 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
             updateTimeButtonText(endTimeButton, endTime);
         }));
 
-        // View map button
-        viewMapButton.setOnClickListener(v -> {
-            WaitlistMapFragment mapFragment = new WaitlistMapFragment(event, navStack);
-            navStack.pushScreen(mapFragment);
-        });
+        if (!isEditMode) {
+            geolocationToggle.setOnClickListener((view) -> {
+                if (geolocationToggle.isChecked()) {
+                    viewMapButton.setVisibility(View.VISIBLE);
+                } else {
+                    viewMapButton.setVisibility(View.GONE);
+                }
+            });
 
-        geolocationToggle.setOnClickListener((view) -> {
-            if (geolocationToggle.isChecked()) {
-                viewMapButton.setVisibility(View.VISIBLE);
-            } else {
-                viewMapButton.setVisibility(View.GONE);
-            }
-        });
+            // View map button
+            viewMapButton.setOnClickListener(v -> {
+                WaitlistMapFragment mapFragment = new WaitlistMapFragment(event, navStack);
+                navStack.pushScreen(mapFragment);
+            });
+        }
     }
 
     /**
