@@ -1,9 +1,10 @@
 $dokka.format:javadoc-v1
 $dokka.linkExtension:html
-$dokka.location:com.example.syzygy_eventapp/EventSummaryListView.StatusProvider///PointingToDeclaration/com/example/syzygy_eventapp/EventSummaryListView.StatusProvider.html
-$dokka.location:com.example.syzygy_eventapp/EventSummaryView.AttendeeStatus///PointingToDeclaration/com/example/syzygy_eventapp/EventSummaryView.AttendeeStatus.html
-$dokka.location:com.example.syzygy_eventapp/OrganizerEventSummaryFragment.AttendeeStatus///PointingToDeclaration/com/example/syzygy_eventapp/OrganizerEventSummaryFragment.AttendeeStatus.html
-$dokka.location:com.example.syzygy_eventapp/OrganizerEventSummaryListView.StatusProvider///PointingToDeclaration/com/example/syzygy_eventapp/OrganizerEventSummaryListView.StatusProvider.html
+$dokka.location:com.example.syzygy_eventapp/ImageListViewAdapter.ImageViewHolder///PointingToDeclaration/com/example/syzygy_eventapp/ImageListViewAdapter.ImageViewHolder.html
+$dokka.location:com.example.syzygy_eventapp/ImageListViewAdapter.OnImageClickListener///PointingToDeclaration/com/example/syzygy_eventapp/ImageListViewAdapter.OnImageClickListener.html
+$dokka.location:com.example.syzygy_eventapp/ImageWrapper.ImageSourceType///PointingToDeclaration/com/example/syzygy_eventapp/ImageWrapper.ImageSourceType.html
+$dokka.location:com.example.syzygy_eventapp/NotificationListViewAdapter.ListItemViewHolder///PointingToDeclaration/com/example/syzygy_eventapp/NotificationListViewAdapter.ListItemViewHolder.html
+$dokka.location:com.example.syzygy_eventapp/NotificationListViewAdapter.OnItemClickListener///PointingToDeclaration/com/example/syzygy_eventapp/NotificationListViewAdapter.OnItemClickListener.html
 $dokka.location:com.example.syzygy_eventapp/UserListViewAdapter.OnUserClickListener///PointingToDeclaration/com/example/syzygy_eventapp/UserListViewAdapter.OnUserClickListener.html
 $dokka.location:com.example.syzygy_eventapp/UserListViewAdapter.UserViewHolder///PointingToDeclaration/com/example/syzygy_eventapp/UserListViewAdapter.UserViewHolder.html
 $dokka.location:com.example.syzygy_eventapp/WaitlistEntryAdapter.EntryViewHolder///PointingToDeclaration/com/example/syzygy_eventapp/WaitlistEntryAdapter.EntryViewHolder.html
