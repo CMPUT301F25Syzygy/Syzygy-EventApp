@@ -4,6 +4,7 @@ package com.example.syzygy_eventapp;
 import android.app.AlertDialog;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.os.Environment;
 import android.text.Layout;
 import android.text.format.DateFormat;
 import android.util.Log;
@@ -27,8 +28,13 @@ import androidx.fragment.app.Fragment;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.android.material.switchmaterial.SwitchMaterial;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,7 +51,7 @@ public class EventOrganizerDetailsView extends Fragment {
     private Button openMapButton;
     private UserListView acceptedListView, pendingListView, waitingListView;
     private ImageView posterImage;
-    private Button cancelInvitesButton, sendInvitesButton, sendNotificationButton;
+    private Button cancelInvitesButton, sendInvitesButton, sendNotificationButton, exportBtn;
 
     // Controllers for Firebase operations
     private EventController eventController;
@@ -104,6 +110,7 @@ public class EventOrganizerDetailsView extends Fragment {
         cancelInvitesButton = view.findViewById(R.id.cancel_invites_button);
         sendInvitesButton = view.findViewById(R.id.send_invites_button);
         sendNotificationButton = view.findViewById(R.id.send_notification_button);
+        exportBtn = view.findViewById(R.id.download_accepted_csv_button);
 
         // Initialize controllers for Firebase operations
         eventController = EventController.getInstance();
@@ -150,7 +157,131 @@ public class EventOrganizerDetailsView extends Fragment {
         sendNotificationButton.setOnClickListener(v -> {
             openSendNotificationDialog();
         });
+
+        exportBtn.setOnClickListener(v -> {
+            exportFinalEntrantsToCSV(event.getEventID(), event.getName());
+        });
     }
+
+    /**
+     * Gets all the data from events and user together to input into CSV
+     * @param eventId: String of the event ID to find all invitations under that ID
+     * @param eventName: To save the CSV as event name
+     */
+    public void exportFinalEntrantsToCSV(String eventId, String eventName) {
+
+        FirebaseFirestore.getInstance()
+                .collection("invitations")
+                .whereEqualTo("event", eventId)
+                .whereEqualTo("accepted", true)
+                .whereEqualTo("cancelled", false)
+                .get()
+                .addOnSuccessListener(snapshot -> {
+
+                    if(snapshot.isEmpty()){
+                        Toast.makeText(getContext(),"No accepted entrants",Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    List<Task<DocumentSnapshot>> userTasks = new ArrayList<>();
+
+                    for (DocumentSnapshot inviteDoc : snapshot) {
+
+                        String userId = inviteDoc.getString("recipientID");
+
+                        if (userId != null) {
+                            Task<DocumentSnapshot> task =
+                                    FirebaseFirestore.getInstance()
+                                            .collection("users")
+                                            .document(userId)
+                                            .get();
+
+                            userTasks.add(task);
+                        }
+                    }
+
+                    Tasks.whenAllSuccess(userTasks)
+                            .addOnSuccessListener(results -> {
+
+                                List<User> users = new ArrayList<>();
+
+                                for (Object obj : results) {
+                                    if (obj instanceof DocumentSnapshot) {
+                                        DocumentSnapshot doc = (DocumentSnapshot) obj;
+
+                                        User user = doc.toObject(User.class);
+                                        if (user != null) users.add(user);
+                                    }
+                                }
+
+                                try {
+                                    generateAndDownloadCSV(users, eventName);
+                                } catch (Exception e) {
+                                    Toast.makeText(getContext(),
+                                            "File error",
+                                            Toast.LENGTH_LONG).show();
+                                    Log.e("CSV_EXPORT","File error", e);
+                                }
+
+                            });
+
+                })
+                .addOnFailureListener(e -> Log.e("CSV_EXPORT","Invite query failed", e));
+
+    }
+
+    /**
+     * Attempts to generate the CSV file and download it into the downloads/Syzygy directory
+     * @param eventName: Event name to input as file name of CSV
+     * @param users: List of users to put all info like name, phone, email into an entry in the CSV
+     */
+    private void generateAndDownloadCSV(List<User> users, String eventName) throws IOException {
+
+        String time = String.valueOf(System.currentTimeMillis());
+
+        //Put time into file name cause android throws a fit if you try to overwrite a file
+        String fileName = eventName.replaceAll("[^a-zA-Z0-9]", "_")
+                + "_Entrants_" + time + ".csv";
+
+        File folder = new File(
+                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
+                "Syzygy"
+        );
+
+        if (!folder.exists()) folder.mkdirs();
+
+        File file = new File(folder, fileName);
+        FileWriter writer = new FileWriter(file);
+
+        writer.append("Entrant Name,Email,Phone,Status\n");
+
+        for (User user : users) {
+
+            String name = safe(user.getName());
+            String email = safe(user.getEmail());
+            String phone = safe(user.getPhone());
+
+            writer.append(name).append(",")
+                    .append(email).append(",")
+                    .append(phone).append(",")
+                    .append("Confirmed\n");
+        }
+
+        writer.flush();
+        writer.close();
+
+        Toast.makeText(getContext(),
+                "CSV downloaded: Downloads/Syzygy",
+                Toast.LENGTH_LONG).show();
+    }
+
+    /**
+     * Removes all commas from a string
+     */
+    private String safe(String s){
+        return s == null ? "" : s.replace(",", " ");
+    }
+
 
     /**
      * Sets up nav bar buttons and listener
