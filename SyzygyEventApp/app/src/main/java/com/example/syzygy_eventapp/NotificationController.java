@@ -7,11 +7,13 @@ import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 
 
 /**
@@ -20,8 +22,49 @@ import java.util.Objects;
 public class NotificationController {
     private final FirebaseFirestore db;
 
+    private static NotificationController singletonInstance = null;
+
+    public NotificationController() {
+        this.db = FirebaseFirestore.getInstance();
+    }
     public NotificationController(FirebaseFirestore db) {
         this.db = db;
+    }
+
+    /**
+     * Gets a single global instance of the EventController
+     *
+     * @return a UserController singleton
+     */
+    public static NotificationController getInstance() {
+        if (singletonInstance == null)
+            singletonInstance = new NotificationController();
+
+        return singletonInstance;
+    }
+
+
+    public ListenerRegistration observeAllNotifications(Consumer<List<Notification>> onChange) {
+        return db.collection("notifications")
+                .addSnapshotListener((snap, error) -> {
+                        if (error != null) {
+                            System.err.println(error);
+                            return;
+                        }
+
+                        List<Notification> notifications = new ArrayList<>();
+                        if (snap != null) {
+                            for (DocumentSnapshot doc : snap.getDocuments()) {
+                                Notification notification = doc.toObject(Notification.class);
+                                if (notification != null) {
+//                                    notification.setId(doc.getId());
+                                    notifications.add(notification);
+                                }
+                            }
+                        }
+
+                        onChange.accept(notifications);
+                });
     }
 
     /**
