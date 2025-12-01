@@ -6,3 +6,4 @@ setGlobalOptions({ maxInstances: 3 });
 initializeApp();
 
 export * from "./lotteryManager";
+export * from "./notificationManager";

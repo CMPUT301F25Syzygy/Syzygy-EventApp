@@ -250,9 +250,19 @@ public class Event {
 
     public boolean isOpen() {
         if (registrationEnd == null) {
-            return false;
+            return false; // missing important info, false to be safe
         }
-        return registrationEnd.toDate().after(new Date());
+
+        Date now = new Date();
+        if (!registrationEnd.toDate().after(now)) {
+            return false; // event is closed
+        }
+
+        if (registrationStart == null) {
+            return true; // eh good enough
+        }
+
+        return registrationStart.toDate().before(now);
     }
 
     public Timestamp getCreatedAt() {
