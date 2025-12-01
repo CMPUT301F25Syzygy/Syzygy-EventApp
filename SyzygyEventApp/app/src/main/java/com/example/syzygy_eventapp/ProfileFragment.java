@@ -178,29 +178,27 @@ public class ProfileFragment extends Fragment {
                 return;
             }
 
-            Role currentRole = currentUser.getRole();
+            if (currentUser.getRole() != Role.ENTRANT) {
+                Toast.makeText(getContext(),
+                        "An admin must change your role ",
+                        Toast.LENGTH_SHORT).show();
+            } else {
+                if (currentUser.isDemoted()) {
+                    Toast.makeText(getContext(),
+                            "You've been demoted by an admin",
+                            Toast.LENGTH_SHORT).show();
+                } else {
+                    Role newRole = Role.ORGANIZER;
 
-            Role newRole = currentRole;
-            switch (currentRole) {
-                case ENTRANT:
-                    newRole = Role.ORGANIZER;
-                    break;
-                case ORGANIZER:
-                    newRole = Role.ADMIN;
-                    break;
-                case ADMIN:
-                    newRole = Role.ENTRANT;
-                    break;
+                    userController.setUserRole(userID, newRole)
+                            .addOnSuccessListener(updatedUser ->
+                                    Toast.makeText(getContext(),
+                                            "Role changed to " + newRole.name().toLowerCase(),
+                                            Toast.LENGTH_SHORT).show())
+                            .addOnFailureListener(err ->
+                                    showError("Failed to change role: " + err.getMessage()));
+                }
             }
-
-            Role finalNewRole = newRole;
-            userController.setUserRole(userID, newRole)
-                    .addOnSuccessListener(updatedUser ->
-                            Toast.makeText(getContext(),
-                                    "Role changed to " + finalNewRole.name(),
-                                    Toast.LENGTH_SHORT).show())
-                    .addOnFailureListener(err ->
-                            showError("Failed to change role: " + err.getMessage()));
         });
 
         deleteProfileButton.setOnClickListener(v -> {
