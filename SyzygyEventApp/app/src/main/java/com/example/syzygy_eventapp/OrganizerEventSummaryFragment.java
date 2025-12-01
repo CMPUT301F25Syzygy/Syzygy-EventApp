@@ -148,34 +148,67 @@ public class OrganizerEventSummaryFragment extends LinearLayout {
             return;
         }
 
-        // Show a loading state
         acceptedCountText.setText("—");
         interestedCountText.setText("—");
 
-        // Get accepted count (accepted = true, cancelled = false)
-
         if (inviteListener != null) {
             inviteListener.remove();
+            inviteListener = null;
         }
 
-        Filter acceptedFilter = Filter.and(
-                Filter.equalTo("event", eventID),
-                Filter.equalTo("accepted", true),
-                Filter.equalTo("cancelled", false));
+        InvitationController invitationController = new InvitationController();
 
-        inviteListener = new InvitationController().observeInvites(acceptedFilter, (invites) -> {
-            int acceptedCount = invites.size();
-            acceptedCountText.setText(acceptedCount + "/" + maxAttendees);
+        com.google.firebase.firestore.Filter baseFilter = com.google.firebase.firestore.Filter.and(
+                com.google.firebase.firestore.Filter.equalTo("event", eventID),
+                com.google.firebase.firestore.Filter.or(
+                        com.google.firebase.firestore.Filter.equalTo("cancelled", false),
+                        com.google.firebase.firestore.Filter.equalTo("cancelled", null)
+                )
+        );
+
+        inviteListener = invitationController.observeInvites(baseFilter, invites -> {
+            int acceptedCount = 0;
+            int pendingCount = 0;
+
+            if (invites != null) {
+                for (Invitation inv : invites) {
+                    if (inv == null) {
+                        continue;
+                    }
+
+                    Boolean accepted = inv.getAccepted();
+                    com.google.firebase.Timestamp responseTime = inv.getResponseTime();
+
+                    if (Boolean.TRUE.equals(accepted)) {
+                        acceptedCount++;
+                    }
+                    else if (responseTime == null) {
+                        pendingCount++;
+                    }
+                }
+            }
+
+            if (maxAttendees != null) {
+                acceptedCountText.setText(acceptedCount + "/" + maxAttendees);
+            } else {
+                acceptedCountText.setText(String.valueOf(acceptedCount));
+            }
+
+            final int pendingCountFinal = pendingCount;
+
+            EventController.getInstance().getEvent(eventID)
+                    .addOnSuccessListener(event -> {
+                        int waitingSize = (event != null) ? event.getWaitingSize() : 0;
+                        int interestedTotal = waitingSize + pendingCountFinal;
+                        interestedCountText.setText(String.valueOf(interestedTotal));
+                    })
+                    .addOnFailureListener(error -> {
+                        int interestedTotal = pendingCountFinal;
+                        interestedCountText.setText(String.valueOf(interestedTotal));
+                    });
         });
-        // Get interested count (basically just get the waiting list size from the event)
-        EventController.getInstance().getEvent(eventID)
-                .addOnSuccessListener(event -> {
-                    interestedCountText.setText(String.valueOf(event.getWaitingSize()));
-                })
-                .addOnFailureListener(error -> {
-                    interestedCountText.setText("0");
-                });
     }
+
 
     /**
      * Sets the color and label of the status chip based on the entrant’s event status.
