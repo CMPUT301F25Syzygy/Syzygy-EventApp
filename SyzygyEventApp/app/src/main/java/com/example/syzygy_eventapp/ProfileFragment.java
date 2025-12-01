@@ -220,6 +220,14 @@ public class ProfileFragment extends Fragment {
             }
             openImagePicker();
         });
+
+        lotteryNotificationsSwitch.setOnClickListener(v -> {
+            updateUserField("systemNotifications", lotteryNotificationsSwitch.isChecked());
+        });
+
+        organizerNotificationsSwitch.setOnClickListener(v -> {
+            updateUserField("organizerNotifications", organizerNotificationsSwitch.isChecked());
+        });
     }
 
     /**
@@ -271,6 +279,9 @@ public class ProfileFragment extends Fragment {
         if (user == null || getView() == null) return;
 
         requireActivity().runOnUiThread(() -> {
+            lotteryNotificationsSwitch.setChecked(user.isSystemNotifications());
+            organizerNotificationsSwitch.setChecked(user.isOrganizerNotifications());
+
             profileNameText.setText(user.getName() != null ? user.getName() : "(No name)");
             profileEmailText.setText(user.getEmail() != null ? user.getEmail() : "(No email)");
             profilePhoneNumberText.setText(user.getPhone() != null ? user.getPhone() : "(No phone)");
@@ -299,7 +310,7 @@ public class ProfileFragment extends Fragment {
      * @param key   The name of the field to update (e.g., "name", "email").
      * @param value The new value to set for the field.
      */
-    private void updateUserField(String key, String value) {
+    private void updateUserField(String key, Object value) {
         if (userID == null) {
             showError("User ID not available.");
             return;

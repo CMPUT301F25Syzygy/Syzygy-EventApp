@@ -48,6 +48,10 @@ public class User {
      */
     private boolean demoted = false;
 
+    private boolean systemNotifications = true;
+
+    private boolean organizerNotifications = true;
+
     /**
      * Default Constructor used for creating users normally.
      * Starts with these default fields.
@@ -211,6 +215,29 @@ public class User {
             put("phone", phone);
         }});
     }
+
+    public boolean isSystemNotifications() {
+        return systemNotifications;
+    }
+
+    public Task<Void> setSystemNotifications(boolean systemNotifications) {
+        this.systemNotifications = systemNotifications;
+        return updateDB(new HashMap<>() {{
+            put("systemNotifications", systemNotifications);
+        }});
+    }
+
+    public boolean isOrganizerNotifications() {
+        return organizerNotifications;
+    }
+
+    public Task<Void> setOrganizerNotifications(boolean organizerNotifications) {
+        this.organizerNotifications = organizerNotifications;
+        return updateDB(new HashMap<>() {{
+            put("organizerNotifications", organizerNotifications);
+        }});
+    }
+
 
     public User demote() {
         return this;

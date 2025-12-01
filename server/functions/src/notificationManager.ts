@@ -20,6 +20,7 @@ interface Notification {
 interface UserNotification {
     userId: string,
     notificationId: number,
+    sent: boolean;
 }
 
 interface NotificationData extends DocumentData, Notification { }
@@ -62,7 +63,8 @@ export const sendNotificationFromDB =
                 notif.content.title,
                 notif.content.description,
                 notif.recipientIds,
-                notif.content.eventId);
+                notif.content.eventId,
+                notif.content.organizerId != null);
 
             // mark as sent
             await notificationManager.markNotificationSend(notificationId);
@@ -174,7 +176,8 @@ export class NotificationManager {
 
         const id = Math.floor(Math.random() * MAX_NOTIFICATION_ID);
         const sendTask =
-            this.sendNotification(id, title, description, recipientIds, eventId);
+            this.sendNotification(
+                id, title, description, recipientIds, eventId, organizerId != null);
 
         const notifRef = this.notifsRef.doc(String(id));
 
@@ -186,6 +189,7 @@ export class NotificationManager {
             batch.create(newUserNotif, {
                 userId: recipientId,
                 notificationId: id,
+                sent: false,
             } as UserNotification);
         }
 
@@ -213,10 +217,11 @@ export class NotificationManager {
      * @param {string} description description of the notification
      * @param {string[]} recipientIds userIds of the recipients
      * @param {string | undefined} eventId associated eventId, optional
+     * @param {boolean} fromOrganizer if the notification should be considered from an organizer
      */
     async sendNotification(
         id: number, title: string, description: string,
-        recipientIds: string[], eventId: string | null | undefined) {
+        recipientIds: string[], eventId: string | null | undefined, fromOrganizer: boolean) {
         if (recipientIds.length == 0) return;
 
         if (debug) logger.debug("sendNotification A", title, description, recipientIds, eventId);
@@ -225,10 +230,31 @@ export class NotificationManager {
             (recipientId) => this.usersRef.doc(recipientId));
         const recipientTokens: string[] = [];
 
-        await this.db.getAll(...recipientRefs, { fieldMask: ["fcmToken"] }).then(docs => {
-            for (const doc of docs) {
+        await this.db.getAll(...recipientRefs, {
+            fieldMask: ["fcmToken", "organizerNotifications", "systemNotifications"],
+        }).then(docs => {
+            for (const [i, doc] of docs.entries()) {
                 const token = doc.get("fcmToken");
-                if (token != null) {
+
+                let enabled: boolean;
+                if (fromOrganizer) {
+                    enabled = doc.get("organizerNotifications") ?? true;
+                } else {
+                    enabled = doc.get("systemNotifications") ?? true;
+                }
+
+                if (token != null && enabled) {
+                    this.userNotifsRef
+                        .where("userId", "==", recipientIds[i])
+                        .where("notificationId", "==", id).get().then((querySnap) => {
+                            querySnap.forEach((snap) => {
+                                snap.ref.set({
+                                    "sent": true,
+                                }, {
+                                    merge: true,
+                                });
+                            });
+                        });
                     recipientTokens.push(token);
                 }
             }
@@ -288,10 +314,12 @@ export class NotificationManager {
             (recipientId) => this.usersRef.doc(recipientId));
         const recipientTokens: string[] = [];
 
-        await this.db.getAll(...recipientRefs, { fieldMask: ["fcmToken"] }).then(docs => {
+        await this.db.getAll(...recipientRefs, { fieldMask: ["fcmToken", "sent"] }).then(docs => {
             for (const doc of docs) {
                 const token = doc.get("fcmToken");
-                if (token != null) {
+                const wasSent = doc.get("sent") ?? true;
+
+                if (token != null && wasSent) {
                     recipientTokens.push(token);
                 }
             }
