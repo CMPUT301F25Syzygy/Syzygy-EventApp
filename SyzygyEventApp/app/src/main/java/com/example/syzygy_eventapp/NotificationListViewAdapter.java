@@ -28,6 +28,8 @@ public class NotificationListViewAdapter extends RecyclerView.Adapter<Notificati
     /// The listener for notification item clicks.
     private OnItemClickListener<Notification> listener;
 
+    private EventController eventController;
+
     /**
      * Interface for handling notification item clicks.
      */
@@ -37,6 +39,7 @@ public class NotificationListViewAdapter extends RecyclerView.Adapter<Notificati
 
     public NotificationListViewAdapter(List<Notification> notifications) {
         this.notifications = notifications;
+        this.eventController = EventController.getInstance();
     }
 
     /**
@@ -64,12 +67,16 @@ public class NotificationListViewAdapter extends RecyclerView.Adapter<Notificati
         holder.titleText.setText(notification.getTitle());
         holder.descriptionText.setText(notification.getDescription());
 
-        Event event = notification.getEvent();
-        if (event != null && event.getName() != null) {
-            holder.eventText.setText("From Event: " + notification.getEvent().getName());
-        }
-        else {
-            holder.eventText.setVisibility(View.GONE);
+
+        holder.eventText.setVisibility(View.GONE);
+
+        String eventId = notification.getEventId();
+        if(eventId != null) {
+            this.eventController.getEvent(eventId).addOnSuccessListener((event) -> {
+                if (event.getName() != null) {
+                    holder.eventText.setText("From Event: " + event.getName());
+                }
+            });
         }
 
         holder.itemView.setOnClickListener(v -> {

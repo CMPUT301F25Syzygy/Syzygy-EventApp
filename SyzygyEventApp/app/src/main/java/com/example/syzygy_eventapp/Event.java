@@ -4,7 +4,10 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Base64;
 
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.Timestamp;
+import com.google.firebase.firestore.Filter;
 import com.google.firebase.firestore.GeoPoint;
 
 import java.sql.Time;
@@ -31,6 +34,17 @@ import java.util.List;
  * - Organizer
  */
 public class Event {
+    enum Status {
+        Unknown,
+        Open,
+        DrawnEarly,
+        RegistrationOver,
+        EventOver,
+        Waitlisted,
+        Pending,
+        Accepted,
+        Declined,
+    }
 
     // --- Basic Info ---
     private String eventID;
@@ -100,6 +114,59 @@ public class Event {
     }
 
     // --- Getters and Setters ---
+
+    public Task<Status> calculateRelativeStatus(String userId) {
+        Status absoluteStatus = calculateAbsoluteStatus();
+        if (absoluteStatus == Status.EventOver) {
+            return Tasks.forResult(absoluteStatus);
+        }
+
+        if (waitingList.contains(userId)) {
+            return Tasks.forResult(Status.Waitlisted);
+        }
+
+        Filter filter = Filter.and(
+                Filter.equalTo("recipientID", userId),
+                Filter.equalTo("event", eventID));
+        return InvitationController.getInstance().getInvites(filter)
+                .continueWithTask((task) -> {
+                    List<Invitation> invites = task.getResult();
+
+                    for (Invitation invite : invites) {
+                        if (invite.getCancelled()) {
+                            continue;
+                        }
+
+                        if (invite.hasResponse()) {
+                            if (invite.getAccepted()) {
+                                return Tasks.forResult(Status.Accepted);
+                            } else {
+                                return Tasks.forResult(Status.Declined);
+                            }
+                        } else {
+                            return Tasks.forResult(Status.Pending);
+                        }
+                    }
+
+                    return Tasks.forResult(absoluteStatus);
+                });
+    }
+
+    public Status calculateAbsoluteStatus() {
+        if (isOpen()) {
+            if (lotteryComplete) {
+                return Status.DrawnEarly;
+            } else {
+                return Status.Open;
+            }
+        } else {
+            if (getEventTime().toDate().before(new Date())) {
+                return Status.EventOver;
+            } else {
+                return Status.RegistrationOver;
+            }
+        }
+    }
 
     public String getEventID() {
         return eventID;

@@ -1,36 +1,43 @@
 package com.example.syzygy_eventapp;
 
-import java.util.List;
+import com.google.firebase.Timestamp;
+
+import java.util.concurrent.ThreadLocalRandom;
+
 /**
  * Notification model class.
  */
 public class Notification {
-    private String message;
+    private int id = ThreadLocalRandom.current().nextInt(Integer.MAX_VALUE);
     private String title;
-    private Event event;
-    private Organizer organizer;
-    private List<User> recipients;
-    private String id;
-    private long timestamp;
+    private String description;
+    private String eventId;
+    private String organizerId;
+    private Timestamp creationDate = Timestamp.now();
+    private boolean sent = false;
+    private boolean deleted = false;
 
-
-    public Notification(String title, String message, Event event,
-                        Organizer organizer, List<User> recipients) {
+    public Notification(String title, String description, String eventId, String organizerId) {
         this.title = title;
-        this.message = message;
-        this.event = event;
-        this.organizer = organizer;
-        this.recipients = recipients;
+        this.description = description;
+        this.eventId = eventId;
+        this.organizerId = organizerId;
     }
 
     /**
      * Default constructor for frameworks requiring this.
      */
-    public Notification(){
-
+    public Notification() {
     }
 
-    //Getters and setters
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
     public String getTitle() {
         return title;
     }
@@ -39,57 +46,51 @@ public class Notification {
         this.title = title;
     }
 
-    public long getTimestamp() {
-        return timestamp;
-    }
-
-    public void setTimestamp(long timestamp) {
-        this.timestamp = timestamp;
-    }
-
     public String getDescription() {
-        return message;
+        return description;
     }
 
-    public void setDescription(String message) {
-        this.message = message;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
-    public Event getEvent() {
-        return event;
+    public String getEventId() {
+        return eventId;
     }
 
-    public void setEvent(Event event) {
-        this.event = event;
+    public void setEventId(String eventId) {
+        this.eventId = eventId;
     }
 
-    public Organizer getOrganizer() {
-        return organizer;
+    public String getOrganizerId() {
+        return organizerId;
     }
 
-    public String getId() {
-        return id;
+    public void setOrganizerId(String organizerId) {
+        this.organizerId = organizerId;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public Timestamp getCreationDate() {
+        return creationDate;
     }
 
-    public void setOrganizer(Organizer organizer) {
-        this.organizer = organizer;
+    public void setCreationDate(Timestamp creationDate) {
+        this.creationDate = creationDate;
     }
 
-    public List<User> getRecipients() {
-        return recipients;
+    public boolean isDeleted() {
+        return deleted;
     }
 
-    public void addRecipient(User user) {
-        if (!recipients.contains(user)) {
-            recipients.add(user);
-        }
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
     }
 
-    public void removeRecipient(User user) {
-        recipients.remove(user);
+    public boolean isSent() {
+        return sent;
+    }
+
+    public void setSent(boolean sent) {
+        this.sent = sent;
     }
 }

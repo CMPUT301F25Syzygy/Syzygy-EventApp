@@ -2,7 +2,6 @@ package com.example.syzygy_eventapp;
 
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
 
 import android.Manifest;
 import android.app.Notification;
@@ -14,11 +13,11 @@ import android.os.Build;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
-import java.util.ArrayList;
 import java.util.Map;
 
 public class MessagingService extends FirebaseMessagingService {
-    private NotificationChannel channel;
+    private static final String CHANNEL_ID = "DEFAULT_CHANNEL";
+
     private NotificationManager manager;
 
     @Override
@@ -28,8 +27,8 @@ public class MessagingService extends FirebaseMessagingService {
         manager = getSystemService(NotificationManager.class);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            channel = new NotificationChannel(
-                    "DEFAULT_CHANNEL",
+            NotificationChannel channel = new NotificationChannel(
+                    CHANNEL_ID,
                     "Notifications",
                     NotificationManager.IMPORTANCE_DEFAULT
             );
@@ -42,14 +41,18 @@ public class MessagingService extends FirebaseMessagingService {
     public void onMessageReceived(RemoteMessage remoteMessage) {
         Map<String, String> data = remoteMessage.getData();
 
-        Notification notification = new NotificationCompat.Builder(this, channel.getId())
-                .setSmallIcon(R.mipmap.ic_launcher)
-                .setContentTitle(remoteMessage.getNotification().getTitle())
-                .setContentText(remoteMessage.getNotification().getBody()).build();
+        if (Boolean.parseBoolean(data.get("deleted"))) {
+            manager.cancel(Integer.parseInt(data.get("id")));
+        } else {
+            Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
+                    .setSmallIcon(R.mipmap.ic_launcher)
+                    .setContentTitle(remoteMessage.getNotification().getTitle())
+                    .setContentText(remoteMessage.getNotification().getBody()).build();
 
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-            return;
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                return;
+            }
+            manager.notify(Integer.parseInt(data.get("id")), notification);
         }
-        manager.notify(0, notification);
     }
 }

@@ -6,16 +6,27 @@ import { HttpsError, onCall } from "firebase-functions/v2/https";
 import { getMessaging, Messaging } from "firebase-admin/messaging";
 import { onDocumentWritten } from "firebase-functions/v2/firestore";
 
-interface NotificationData extends DocumentData {
-    eventID: string | null | undefined;
-    organizerID: string | null | undefined;
+interface Notification {
+    id: number;
+    eventId: string | null | undefined;
+    organizerId: string | null | undefined;
     title: string;
     description: string;
     creationDate: Timestamp;
     sent: boolean;
+    deleted: boolean;
 }
 
-const debug = false;
+interface UserNotification {
+    userId: string,
+    notificationId: number,
+    sent: boolean;
+}
+
+interface NotificationData extends DocumentData, Notification { }
+
+const debug = true;
+const MAX_NOTIFICATION_ID = 2 ** 31 - 1;
 
 /**
  * Sends notifications to users when they are added to the database
@@ -25,10 +36,10 @@ const debug = false;
 export const sendNotificationFromDB =
     onDocumentWritten("/notifications/{notificationId}", async (event) => {
         if (event === undefined || event.data === undefined) return;
-        const notificationId = event.params.notificationId;
+        const notificationId = Number(event.params.notificationId);
 
         // don't try if notification was just created
-        if (event.data.before.exists || !event.data.after.exists) return;
+        if (!event.data.after.exists) return;
 
         if (debug) logger.debug("sendNotificationFromDB", notificationId);
 
@@ -41,17 +52,23 @@ export const sendNotificationFromDB =
         }
 
         // don't send again
-        if (notif.content.sent) return;
+        if (notif.content.deleted) {
+            await notificationManager.deleteNotification(
+                notif.content.id,
+                notif.recipientIds);
+        } else if (!notif.content.sent) {
+            // send to users
+            await notificationManager.sendNotification(
+                notif.content.id,
+                notif.content.title,
+                notif.content.description,
+                notif.recipientIds,
+                notif.content.eventId,
+                notif.content.organizerId != null);
 
-        // send to users
-        await notificationManager.sendNotification(
-            notif.content.title,
-            notif.content.description,
-            notif.recipientIds,
-            notif.content.eventID);
-
-        // mark as sent
-        await notificationManager.markNotificationSend(notificationId);
+            // mark as sent
+            await notificationManager.markNotificationSend(notificationId);
+        }
     });
 
 /**
@@ -68,7 +85,8 @@ export const createNotification =
                 req.data.title,
                 req.data.description,
                 req.data.recipientIds,
-                req.data.eventId
+                req.data.eventId,
+                req.data.organizerId
             );
         } catch (err) {
             throw new HttpsError("internal", String(err));
@@ -132,12 +150,12 @@ export class NotificationManager {
         tasks.push(this.createNotification(
             "Won event lottery",
             `You were selected to attend ${eventName}!`,
-            winnerIds, eventId));
+            winnerIds, eventId, null));
 
         tasks.push(this.createNotification(
             "Lost event lottery",
             `A lottery was run for ${eventName}. You were not selected this time.`,
-            loserIds, eventId));
+            loserIds, eventId, null));
 
         await Promise.all(tasks);
     }
@@ -147,18 +165,21 @@ export class NotificationManager {
      *
      * @param {string} title title of the notification
      * @param {string} description description of the notification
-     * @param {string[]} recipientIds userIDs of the recipients
-     * @param {string | undefined} eventId associated eventID, optional
+     * @param {string[]} recipientIds userIds of the recipients
+     * @param {string | undefined} eventId associated event, optional
+     * @param {string | undefined} organizerId associated organizer, optional
      */
     async createNotification(
-        title: string, description: string,
-        recipientIds: string[], eventId: string | null | undefined) {
+        title: string, description: string, recipientIds: string[],
+        eventId: string | null | undefined, organizerId: string | null | undefined) {
         if (recipientIds.length == 0) return;
 
+        const id = Math.floor(Math.random() * MAX_NOTIFICATION_ID);
         const sendTask =
-            this.sendNotification(title, description, recipientIds, eventId);
+            this.sendNotification(
+                id, title, description, recipientIds, eventId, organizerId != null);
 
-        const notifRef = this.notifsRef.doc();
+        const notifRef = this.notifsRef.doc(String(id));
 
         const batch = this.db.batch();
 
@@ -166,22 +187,24 @@ export class NotificationManager {
             const newUserNotif = this.userNotifsRef.doc();
 
             batch.create(newUserNotif, {
-                userID: recipientId,
-                notificationID: notifRef.id,
-            });
+                userId: recipientId,
+                notificationId: id,
+                sent: false,
+            } as UserNotification);
         }
 
         await batch.commit();
 
         await notifRef.create({
-            ID: notifRef.id,
-            eventID: eventId,
-            organizerID: null,
+            id,
+            eventId,
+            organizerId,
             title,
             description,
             creationDate: Timestamp.now(),
             sent: true,
-        });
+            deleted: false,
+        } as Notification);
 
         await sendTask;
     }
@@ -189,14 +212,16 @@ export class NotificationManager {
     /**
      * Sends a notification to user devices.
      *
+     * @param {number} id id of the notification
      * @param {string} title title of the notification
      * @param {string} description description of the notification
-     * @param {string[]} recipientIds userIDs of the recipients
-     * @param {string | undefined} eventId associated eventID, optional
+     * @param {string[]} recipientIds userIds of the recipients
+     * @param {string | undefined} eventId associated eventId, optional
+     * @param {boolean} fromOrganizer if the notification should be considered from an organizer
      */
     async sendNotification(
-        title: string, description: string,
-        recipientIds: string[], eventId: string | null | undefined) {
+        id: number, title: string, description: string,
+        recipientIds: string[], eventId: string | null | undefined, fromOrganizer: boolean) {
         if (recipientIds.length == 0) return;
 
         if (debug) logger.debug("sendNotification A", title, description, recipientIds, eventId);
@@ -205,10 +230,31 @@ export class NotificationManager {
             (recipientId) => this.usersRef.doc(recipientId));
         const recipientTokens: string[] = [];
 
-        await this.db.getAll(...recipientRefs, { fieldMask: ["fcmToken"] }).then(docs => {
-            for (const doc of docs) {
+        await this.db.getAll(...recipientRefs, {
+            fieldMask: ["fcmToken", "organizerNotifications", "systemNotifications"],
+        }).then(docs => {
+            for (const [i, doc] of docs.entries()) {
                 const token = doc.get("fcmToken");
-                if (token != null) {
+
+                let enabled: boolean;
+                if (fromOrganizer) {
+                    enabled = doc.get("organizerNotifications") ?? true;
+                } else {
+                    enabled = doc.get("systemNotifications") ?? true;
+                }
+
+                if (token != null && enabled) {
+                    this.userNotifsRef
+                        .where("userId", "==", recipientIds[i])
+                        .where("notificationId", "==", id).get().then((querySnap) => {
+                            querySnap.forEach((snap) => {
+                                snap.ref.set({
+                                    "sent": true,
+                                }, {
+                                    merge: true,
+                                });
+                            });
+                        });
                     recipientTokens.push(token);
                 }
             }
@@ -216,11 +262,21 @@ export class NotificationManager {
 
         const message = {
             data: {
+                id: String(id),
                 eventId: eventId ?? "",
+                deleted: String(false),
             },
             notification: {
                 title: title,
                 body: description,
+            },
+            android: {
+                collapse_key: String(id),
+                notification: {
+                    title: title,
+                    body: description,
+                    tag: String(id),
+                },
             },
             tokens: recipientTokens,
         };
@@ -243,18 +299,78 @@ export class NotificationManager {
     }
 
     /**
+     * Delete a notification already send user devices.
+     *
+     * @param {number} id id of the notification
+     * @param {string[]} recipientIds userIds of the recipients
+     */
+    async deleteNotification(
+        id: number, recipientIds: string[]) {
+        if (recipientIds.length == 0) return;
+
+        if (debug) logger.debug("deleteNotification A", recipientIds);
+
+        const recipientRefs = recipientIds.map(
+            (recipientId) => this.usersRef.doc(recipientId));
+        const recipientTokens: string[] = [];
+
+        await this.db.getAll(...recipientRefs, { fieldMask: ["fcmToken", "sent"] }).then(docs => {
+            for (const doc of docs) {
+                const token = doc.get("fcmToken");
+                const wasSent = doc.get("sent") ?? true;
+
+                if (token != null && wasSent) {
+                    recipientTokens.push(token);
+                }
+            }
+        });
+
+        const message = {
+            data: {
+                id: String(id),
+                deleted: String(true),
+            },
+            android: {
+                collapse_key: String(id),
+                notification: {
+                    title: "Deleted",
+                    body: "Deleted notification",
+                    tag: String(id),
+                },
+            },
+            tokens: recipientTokens,
+        };
+
+        if (debug) logger.debug("deleteNotification B", JSON.stringify(message));
+
+        if (recipientTokens.length > 0) {
+            const response = await this.messaging.sendEachForMulticast(message);
+
+            if (response.successCount == 0) {
+                logger.error("Failed to send message to any recipients");
+            } else if (response.failureCount > 0) {
+                logger.warn("Failed to send to some recipients");
+            }
+
+            if (debug) logger.debug("deleteNotification C", JSON.stringify(response));
+        } else {
+            if (debug) logger.debug("deleteNotification C", "No recipientTokens");
+        }
+    }
+
+    /**
      * Gets a notification and it's recipientIds from the database
      *
      * @param {string} notificationId the id of the notification
      * @return {Promise<null | { content: NotificationData, recipientIds: string[] }>}
      *      the notification content, and recipients
      */
-    async getNotification(notificationId: string):
+    async getNotification(notificationId: number):
         Promise<null | { content: NotificationData, recipientIds: string[] }> {
-        const notifTask = this.notifsRef.doc(notificationId).get();
+        const notifTask = this.notifsRef.doc(String(notificationId)).get();
 
         const notifUsersTask = await this.userNotifsRef
-            .where("notificationID", "==", notificationId)
+            .where("notificationId", "==", notificationId)
             .get();
 
         const notif = (await notifTask).data();
@@ -264,7 +380,7 @@ export class NotificationManager {
         }
 
         const recipientIds = (await notifUsersTask).docs.map(
-            (doc) => doc.get("userID")
+            (doc) => doc.get("userId")
         );
 
         return {
@@ -278,9 +394,9 @@ export class NotificationManager {
      *
      * @param {string} notificationId the id of the notification
      */
-    async markNotificationSend(notificationId: string) {
-        await this.notifsRef.doc(notificationId)
-            .set({ "send": true }, {
+    async markNotificationSend(notificationId: number) {
+        await this.notifsRef.doc(String(notificationId))
+            .set({ "sent": true }, {
                 merge: true,
             });
     }

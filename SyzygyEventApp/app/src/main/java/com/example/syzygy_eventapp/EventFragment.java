@@ -101,7 +101,7 @@ public class EventFragment extends Fragment {
         this.navStack = navStack;
         this.eventID = eventID;
         this.eventController = EventController.getInstance();
-        this.invitationController = new InvitationController();
+        this.invitationController = InvitationController.getInstance();
     }
 
     // set up onCreate

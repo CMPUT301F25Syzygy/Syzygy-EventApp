@@ -80,13 +80,14 @@ public class ProfileFragment extends Fragment {
     /**
      * Default constructor.
      */
-    public ProfileFragment() { }
+    public ProfileFragment() {
+    }
 
     /**
      * Inflates the fragment layout.
      *
-     * @param inflater  LayoutInflater object used to inflate views.
-     * @param container Parent view that the fragment's UI should attach to.
+     * @param inflater           LayoutInflater object used to inflate views.
+     * @param container          Parent view that the fragment's UI should attach to.
      * @param savedInstanceState Previously saved state (if any).
      * @return The root view of the fragment layout.
      */
@@ -99,7 +100,7 @@ public class ProfileFragment extends Fragment {
      * Called after the view has been created. Initializes all view references,
      * retrieves the user ID, and sets up editable panels with click listeners.
      *
-     * @param view The fragment's root view.
+     * @param view               The fragment's root view.
      * @param savedInstanceState Previously saved state (if any).
      */
     @Override
@@ -126,6 +127,7 @@ public class ProfileFragment extends Fragment {
         profileNamePanel.setOnClickListener(v -> showEditDialog(
                 "Edit Username",
                 profileNameText.getText().toString(),
+                "username",
                 InputType.TYPE_CLASS_TEXT,
                 newValue -> updateUserField("name", newValue)
         ));
@@ -145,6 +147,7 @@ public class ProfileFragment extends Fragment {
         profileEmailPanel.setOnClickListener(v -> showEditDialog(
                 "Edit Email",
                 profileEmailText.getText().toString(),
+                "emailAddress",
                 InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS,
                 newValue -> {
                     if (Patterns.EMAIL_ADDRESS.matcher(newValue).matches()) {
@@ -158,6 +161,7 @@ public class ProfileFragment extends Fragment {
         phoneNumberPanel.setOnClickListener(v -> showEditDialog(
                 "Edit Phone Number",
                 profilePhoneNumberText.getText().toString(),
+                "phone",
                 InputType.TYPE_CLASS_PHONE,
                 newValue -> {
                     if (Patterns.PHONE.matcher(newValue).matches()) {
@@ -177,7 +181,7 @@ public class ProfileFragment extends Fragment {
             Role currentRole = currentUser.getRole();
 
             Role newRole = currentRole;
-            switch(currentRole) {
+            switch (currentRole) {
                 case ENTRANT:
                     newRole = Role.ORGANIZER;
                     break;
@@ -215,6 +219,14 @@ public class ProfileFragment extends Fragment {
                 return;
             }
             openImagePicker();
+        });
+
+        lotteryNotificationsSwitch.setOnClickListener(v -> {
+            updateUserField("systemNotifications", lotteryNotificationsSwitch.isChecked());
+        });
+
+        organizerNotificationsSwitch.setOnClickListener(v -> {
+            updateUserField("organizerNotifications", organizerNotificationsSwitch.isChecked());
         });
     }
 
@@ -267,6 +279,9 @@ public class ProfileFragment extends Fragment {
         if (user == null || getView() == null) return;
 
         requireActivity().runOnUiThread(() -> {
+            lotteryNotificationsSwitch.setChecked(user.isSystemNotifications());
+            organizerNotificationsSwitch.setChecked(user.isOrganizerNotifications());
+
             profileNameText.setText(user.getName() != null ? user.getName() : "(No name)");
             profileEmailText.setText(user.getEmail() != null ? user.getEmail() : "(No email)");
             profilePhoneNumberText.setText(user.getPhone() != null ? user.getPhone() : "(No phone)");
@@ -295,7 +310,7 @@ public class ProfileFragment extends Fragment {
      * @param key   The name of the field to update (e.g., "name", "email").
      * @param value The new value to set for the field.
      */
-    private void updateUserField(String key, String value) {
+    private void updateUserField(String key, Object value) {
         if (userID == null) {
             showError("User ID not available.");
             return;
@@ -315,12 +330,15 @@ public class ProfileFragment extends Fragment {
      * @param inputType  The input type (e.g. text, phone, email) for the EditText.
      * @param onSave     Callback invoked with the new value when the user clicks "Save".
      */
-    private void showEditDialog(String title, String currentVal, int inputType, Consumer<String> onSave) {
+    private void showEditDialog(String title, String currentVal, String autofillHint, int inputType, Consumer<String> onSave) {
         if (getContext() == null) return;
 
         final EditText input = new EditText(getContext());
         input.setInputType(inputType);
-        input.setText(currentVal);
+        input.setHint(currentVal);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            input.setAutofillHints(autofillHint);
+        }
         input.setSelection(input.getText().length());
         input.setPadding(60, 50, 60, 50);
 
@@ -330,6 +348,7 @@ public class ProfileFragment extends Fragment {
                 .setPositiveButton("Save", (dialog, which) -> {
                     String newValue = input.getText().toString().trim();
                     if (!newValue.isEmpty()) onSave.accept(newValue);
+                    else onSave.accept(currentVal);
                 })
                 .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
                 .show();
@@ -441,14 +460,15 @@ public class ProfileFragment extends Fragment {
     /**
      * Resizes a bitmap to fit within the specified max. dimensions while maintaining aspect ratio
      *
-     * @param bitmap  The original bitmap to resize
+     * @param bitmap The original bitmap to resize
      * @return The resized bitmpa, or the original if already smaller than maxSize
      */
     private Bitmap resizeBitmap(Bitmap bitmap) {
         int width = bitmap.getWidth();
         int height = bitmap.getHeight();
 
-        if (width <= ProfileFragment.MAX_IMAGE_SIZE && height <= ProfileFragment.MAX_IMAGE_SIZE) return bitmap;
+        if (width <= ProfileFragment.MAX_IMAGE_SIZE && height <= ProfileFragment.MAX_IMAGE_SIZE)
+            return bitmap;
 
         float ratio = Math.min((float) ProfileFragment.MAX_IMAGE_SIZE / width, (float) ProfileFragment.MAX_IMAGE_SIZE / height);
         int newW = Math.round(width * ratio);

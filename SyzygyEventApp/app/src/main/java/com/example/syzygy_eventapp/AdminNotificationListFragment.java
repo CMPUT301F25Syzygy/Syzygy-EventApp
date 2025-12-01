@@ -13,9 +13,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.firebase.firestore.Filter;
 import com.google.firebase.firestore.ListenerRegistration;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 
@@ -29,7 +31,7 @@ public class AdminNotificationListFragment extends Fragment {
 
 
     /// Navigation stack fragment
-    private NavigationStackFragment navStack;
+    private final NavigationStackFragment navStack;
 
     /// Required empty constructor
     public AdminNotificationListFragment() {
@@ -54,6 +56,7 @@ public class AdminNotificationListFragment extends Fragment {
 
         // Bind list view
         notificationListView = root.findViewById(R.id.notification_list_view);
+        notificationListView.setOnListItemClickListener(this::showActionDialog);
 
         // Start listening to Firestore
         setupNotificationListener();
@@ -79,9 +82,27 @@ public class AdminNotificationListFragment extends Fragment {
      * Sets up Firestore listener for notifications
      */
     private void setupNotificationListener() {
+        Filter filter = Filter.notEqualTo("deleted", true);
         notificationListener = NotificationController.getInstance()
-                .observeAllNotifications(this::onNotificationsChanged);
+                .observeNotifications(filter, this::onNotificationsChanged);
     }
+
+
+    /**
+     * Shows a dialog with actions for the selected image
+     */
+    private void showActionDialog(Notification notif) {
+        new AlertDialog.Builder(requireContext())
+                .setTitle("Delete notification?")
+                .setMessage("This will permanently delete the notification.")
+                .setPositiveButton("Delete", (dialog, which) -> {
+                   NotificationController.getInstance().deleteNotification(notif.getId());
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
+
+    }
+
 
     /**
      * Handles changes to the notification list
@@ -115,5 +136,17 @@ public class AdminNotificationListFragment extends Fragment {
         // ));
 
         notificationListView.setNotifications(notifications);
+    }
+
+    /**
+     * Cleans up Firestore listeners
+     */
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (notificationListener != null) {
+            notificationListener.remove();
+            notificationListener = null;
+        }
     }
 }
