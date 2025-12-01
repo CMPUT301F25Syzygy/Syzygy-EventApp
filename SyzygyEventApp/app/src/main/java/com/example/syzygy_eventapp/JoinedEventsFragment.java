@@ -35,6 +35,12 @@ public class JoinedEventsFragment extends Fragment {
     private String userID;
     private NavigationStackFragment navStack;
 
+    private InvitationController invitationController;
+    private ListenerRegistration invitesListener;
+
+    private List<Event> lastEvents = new ArrayList<>();
+    private List<Invitation> userInvites = new ArrayList<>();
+
     // required empty constructor
     public JoinedEventsFragment() {
         this.navStack = null;
@@ -73,9 +79,10 @@ public class JoinedEventsFragment extends Fragment {
         // Load current user ID and event controller
         userID = AppInstallationId.get(requireContext());
         eventController = EventController.getInstance();
+        invitationController = new InvitationController();
 
         // Start listening for event updates
-        startObserver();
+        startObservers();
         return view;
     }
 
@@ -89,56 +96,102 @@ public class JoinedEventsFragment extends Fragment {
      * </p>
      * ListenerRegistration is stored so it can be removed in onDestroyView
      */
-    private void startObserver() {
+    private void startObservers() {
         allEventsListener = eventController.observeAllEvents(events -> {
-
-            List<Event> upcoming = new ArrayList<>();
-            List<Event> past = new ArrayList<>();
-            Date now = new Date();
-
-            // Filter events for the current user
-            for (Event event : events) {
-
-                // Skip events that the user is NOT in the waiting list for
-                if (event.getWaitingList() == null || !event.getWaitingList().contains(userID)) {
-                    continue;
-                }
-
-                // An event will be considered as "past" if the lottery is complete OR if the registration end time is before now
-                boolean isPast = (event.getRegistrationEnd() != null && event.getRegistrationEnd().toDate().before(now));
-
-                if (isPast) {
-                    past.add(event);
-                }
-                else {
-                    upcoming.add(event);
-                }
-            }
-
-            // Update the event count text
-            TextView countText = getView().findViewById(R.id.event_count_text);
-            int totalEvents = upcoming.size() + past.size();
-            if (totalEvents == 1) {
-                countText.setText("You're registered for 1 event");
-            } else {
-                countText.setText("You're registered for " + totalEvents + " events");
-            }
-
-            // Show/hide empty messages
-            TextView upcomingEmpty = getView().findViewById(R.id.upcoming_empty_message);
-            TextView historyEmpty = getView().findViewById(R.id.history_empty_message);
-
-            upcomingEmpty.setVisibility(upcoming.isEmpty() ? View.VISIBLE : View.GONE);
-
-            // Populate the upcoming events list. Upcoming events should be clickable and take the user to the event details
-            upcomingListView.setItems(upcoming, false, v -> {
-                Event clicked = (Event) v.getTag();
-                navStack.pushScreen(new EventFragment(navStack, clicked.getEventID()));
-            });
-
-            // Populate the past event list. I don't think past events need to be clickable, but this part can be modified if needed
-            historyListView.setItems(past, false, v -> {});
+            lastEvents = events;
+            recomputeLists();
         });
+
+        invitesListener = invitationController.observeInvites(
+                com.google.firebase.firestore.Filter.equalTo("recipientID", userID),
+                invites -> {
+                    userInvites = invites != null ? invites : new ArrayList<>();
+                    recomputeLists();
+                }
+        );
+    }
+
+    private void recomputeLists() {
+        if (lastEvents == null || upcomingListView == null || historyListView == null) {
+            return;
+        }
+
+        View root = getView();
+        if (root == null) {
+            return;
+        }
+
+        List<Event> upcoming = new ArrayList<>();
+        List<Event> past = new ArrayList<>();
+        Date now = new Date();
+
+        java.util.HashSet<String> userEventIds = new java.util.HashSet<>();
+
+        for (Event event : lastEvents) {
+            List<String> waiting = event.getWaitingList();
+            if (waiting != null && waiting.contains(userID)) {
+                userEventIds.add(event.getEventID());
+            }
+        }
+
+        for (Invitation inv : userInvites) {
+            if (inv == null) {
+                continue;
+            }
+
+            Boolean cancelled = inv.getCancelled();
+            if (Boolean.TRUE.equals(cancelled)) {
+                continue;
+            }
+
+            String eventId = inv.getEvent();
+            if (eventId != null) {
+                userEventIds.add(eventId);
+            }
+        }
+
+        for (Event event : lastEvents) {
+            if (!userEventIds.contains(event.getEventID())) {
+                continue;
+            }
+
+            Date eventDate = null;
+
+            if (event.getRegistrationEnd() != null) {
+                eventDate = event.getRegistrationEnd().toDate();
+            } else if (event.getEventTime() != null) {
+                eventDate = event.getEventTime().toDate();
+            }
+
+            boolean isPast = eventDate != null && eventDate.before(now);
+
+            if (isPast) {
+                past.add(event);
+            } else {
+                upcoming.add(event);
+            }
+        }
+
+        TextView countText = root.findViewById(R.id.event_count_text);
+        int totalEvents = upcoming.size() + past.size();
+        if (totalEvents == 1) {
+            countText.setText("You're registered for 1 event");
+        } else {
+            countText.setText("You're registered for " + totalEvents + " events");
+        }
+
+        TextView upcomingEmpty = root.findViewById(R.id.upcoming_empty_message);
+        TextView historyEmpty = root.findViewById(R.id.history_empty_message);
+
+        upcomingEmpty.setVisibility(upcoming.isEmpty() ? View.VISIBLE : View.GONE);
+        historyEmpty.setVisibility(past.isEmpty() ? View.VISIBLE : View.GONE);
+
+        upcomingListView.setItems(upcoming, false, v -> {
+            Event clicked = (Event) v.getTag();
+            navStack.pushScreen(new EventFragment(navStack, clicked.getEventID()));
+        });
+
+        historyListView.setItems(past, false, v -> {});
     }
 
     /**
@@ -150,6 +203,10 @@ public class JoinedEventsFragment extends Fragment {
         if (allEventsListener != null) {
             allEventsListener.remove();
             allEventsListener = null;
+        }
+        if (invitesListener != null) {
+            invitesListener.remove();
+            invitesListener = null;
         }
     }
 }

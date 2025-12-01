@@ -22,6 +22,7 @@ public class WelcomeActivity extends AppCompatActivity {
     private UserControllerInterface userController;
     private String userID;
     private Button createProfileButton;
+    private Button enterSyzygyButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,24 +38,41 @@ public class WelcomeActivity extends AppCompatActivity {
         }
 
         createProfileButton = findViewById(R.id.createProfileButton);
+        enterSyzygyButton = findViewById(R.id.enterSyzygyButton);
+
         createProfileButton.setOnClickListener(v -> createProfile());
+        enterSyzygyButton.setOnClickListener(v -> openMainActivity());
     }
 
     @Override
     protected void onStart() {
         super.onStart();
 
-        // If a user profile already exists for this device, skip the welcome screen.
+        // If a user profile already exists for this device, show "Enter the Syzygy".
+        // If not, show "Create Profile".
         userController.getUser(userID)
                 .addOnSuccessListener(user -> {
-                    // Profile exists -> go straight into the app.
-                    openMainActivity();
+                    // Profile exists: show Enter button, hide Create button
+                    if (enterSyzygyButton != null) {
+                        enterSyzygyButton.setVisibility(View.VISIBLE);
+                    }
+                    if (createProfileButton != null) {
+                        createProfileButton.setVisibility(View.GONE);
+                    }
+
+                    // User must tap "Enter the Syzygy".
                 })
                 .addOnFailureListener(err -> {
-                    // User not found -> show the Create Profile button.
-                    createProfileButton.setVisibility(View.VISIBLE);
+                    // User not found: show Create Profile button, hide Enter button
+                    if (createProfileButton != null) {
+                        createProfileButton.setVisibility(View.VISIBLE);
+                    }
+                    if (enterSyzygyButton != null) {
+                        enterSyzygyButton.setVisibility(View.GONE);
+                    }
                 });
     }
+
 
     /**
      * Creates a new entrant profile and then enters the main app.
