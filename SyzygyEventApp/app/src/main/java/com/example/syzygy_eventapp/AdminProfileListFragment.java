@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import com.google.firebase.firestore.ListenerRegistration;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -123,7 +124,9 @@ public class AdminProfileListFragment extends Fragment {
                 actions.add(new ActionItem("Promote", () ->
                         UserController.getInstance().setUserRole(user.getUserID(), Role.ORGANIZER)
                 ));
-                actions.add(new ActionItem("Disable Picture", () -> {}));
+                actions.add(new ActionItem("Disable Picture", () -> {
+                    this.deleteUserProfilePicture(user);
+                }));
                 actions.add(new ActionItem("Delete", () ->
                         showConfirmDeleteDialog(user)
                 ));
@@ -136,7 +139,9 @@ public class AdminProfileListFragment extends Fragment {
                 actions.add(new ActionItem("Demote", () ->
                         UserController.getInstance().setUserRole(user.getUserID(), Role.ENTRANT)
                 ));
-                actions.add(new ActionItem("Disable Picture", () -> {}));
+                actions.add(new ActionItem("Disable Picture", () -> {
+                    this.deleteUserProfilePicture(user);
+                }));
                 actions.add(new ActionItem("Delete", () ->
                         showConfirmDeleteDialog(user)
                 ));
@@ -146,7 +151,9 @@ public class AdminProfileListFragment extends Fragment {
                 actions.add(new ActionItem("Demote", () ->
                         UserController.getInstance().setUserRole(user.getUserID(), Role.ORGANIZER)
                 ));
-                actions.add(new ActionItem("Disable Picture", () -> {}));
+                actions.add(new ActionItem("Disable Picture", () -> {
+                    this.deleteUserProfilePicture(user);
+                }));
                 actions.add(new ActionItem("Delete", () ->
                         showConfirmDeleteDialog(user)
                 ));
@@ -177,6 +184,16 @@ public class AdminProfileListFragment extends Fragment {
                 )
                 .setNegativeButton("Cancel", null)
                 .show();
+    }
+
+    private void deleteUserProfilePicture(User user) {
+        // Delete the image
+        HashMap<String, Object> updates = new HashMap<>();
+        updates.put("photoURL", null);
+        UserController.getInstance().updateFields(
+                user.getUserID(),
+                updates
+        );
     }
 
     /**
