@@ -117,7 +117,7 @@ var pathtoroot = "../../../";
 public class <span class="typeNameLabel"><a href=JoinedEventsFragment.html>JoinedEventsFragment</a></span>
 
                     </pre>
-                    <div class="block"><p>A empty placeholder for JoinedEventsFragment</p></div>
+                    <div class="block"><p>Shows the events the user has joined: - Upcoming events that the user is in the waiting list for, which are still open or awaiting lottery - History of events the user has interacted with or participated in </p><p> Uses EventSummaryListView for both lists, and real-time listeners keep them updated whenever event docs change on Firestore </p></div>
 
                     <dl>
 
@@ -202,6 +202,12 @@ public class <span class="typeNameLabel"><a href=JoinedEventsFragment.html>Joine
                                                 <td class="colLast"></td>
                                             </tr>
                                         
+                                            <tr class="rowColor">
+                                                <th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a
+                                                        href="#JoinedEventsFragment(com.example.syzygy_eventapp.NavigationStackFragment)">JoinedEventsFragment</a></span>(<a href=NavigationStackFragment.html>NavigationStackFragment</a> navStack)</code></th>
+                                                <td class="colLast"></td>
+                                            </tr>
+                                        
 
                                         </tbody>
                                     </table>
@@ -256,7 +262,15 @@ public class <span class="typeNameLabel"><a href=JoinedEventsFragment.html>Joine
                                             </td>
                                             <th class="colSecond" scope="row"><code><a href=JoinedEventsFragment.html#onCreateView(LayoutInflater,ViewGroup,Bundle)>onCreateView</a>(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) </code>
                                             </th>
-                                            <td class="colLast"></td>
+                                            <td class="colLast">Inflates the layout, and initializes the UI components.</td>
+                                        </tr>
+                                        
+                                        <tr id="i1" class="rowColor">
+                                            <td class="colFirst"><code>void</code>
+                                            </td>
+                                            <th class="colSecond" scope="row"><code><a href=JoinedEventsFragment.html#onDestroyView()>onDestroyView</a>() </code>
+                                            </th>
+                                            <td class="colLast">Cleans up the real-time listeners when this fragment's view is destroyed to prevent memory leaks and stale listeners when switching screens.</td>
                                         </tr>
                                         
                                         </tbody>
@@ -300,6 +314,16 @@ public class <span class="typeNameLabel"><a href=JoinedEventsFragment.html>Joine
                                     </li>
                                 </ul>
                                 
+                                <a name="JoinedEventsFragment(com.example.syzygy_eventapp.NavigationStackFragment)"></a>
+                                <ul class="blockList">
+                                    <li class="blockList">
+                                        <h4>JoinedEventsFragment</h4>
+                                        <pre>JoinedEventsFragment(<a href=NavigationStackFragment.html>NavigationStackFragment</a> navStack)</pre>
+                                        <div class="block"></div>
+                                        
+                                    </li>
+                                </ul>
+                                
                             </li>
                         </ul>
                     </section>
@@ -317,12 +341,50 @@ public class <span class="typeNameLabel"><a href=JoinedEventsFragment.html>Joine
                                     <!--   -->
                                 </a>
                                 <ul class=
-                                              "blockListLast"
+                                              "blockList"
                                           >
                                     <li class="blockList">
                                         <h4>onCreateView</h4>
                                         <pre class="methodSignature"> View <a href=JoinedEventsFragment.html#onCreateView(LayoutInflater,ViewGroup,Bundle)>onCreateView</a>(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)</pre>
-                                        <div class="block"></div>
+                                        <div class="block"><p>Inflates the layout, and initializes the UI components. Sets up the navigation reference, initializes the list views, loads current userID, and starts Firestore observation</p></div>
+
+                                        <dl>
+
+                                        
+                                            <dt><span class="paramLabel">Parameters:</span></dt>
+                                            
+                                            
+                                            <dd><code>inflater</code> - The LayoutInflater object that can be used to inflate any views in the fragment,</dd>
+                                            
+                                            
+                                            
+                                            <dd><code>container</code> - If non-null, this is the parent view that the fragment's UI should be attached to.</dd>
+                                            
+                                            
+                                            
+                                            <dd><code>savedInstanceState</code> - If non-null, this fragment is being re-constructed from a previous saved state as given here.</dd>
+                                            
+                                            
+                                        
+
+                                        
+
+                                        
+
+                                        </dl>
+                                    </li>
+                                </ul>
+                                
+                                <a id="onDestroyView()">
+                                    <!--   -->
+                                </a>
+                                <ul class=
+                                              "blockListLast"
+                                          >
+                                    <li class="blockList">
+                                        <h4>onDestroyView</h4>
+                                        <pre class="methodSignature"> void <a href=JoinedEventsFragment.html#onDestroyView()>onDestroyView</a>()</pre>
+                                        <div class="block"><p>Cleans up the real-time listeners when this fragment's view is destroyed to prevent memory leaks and stale listeners when switching screens.</p></div>
 
                                         <dl>
 

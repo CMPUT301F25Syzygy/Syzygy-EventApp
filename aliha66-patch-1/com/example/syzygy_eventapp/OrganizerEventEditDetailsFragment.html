@@ -117,7 +117,7 @@ var pathtoroot = "../../../";
 public class <span class="typeNameLabel"><a href=OrganizerEventEditDetailsFragment.html>OrganizerEventEditDetailsFragment</a></span>
 
                     </pre>
-                    <div class="block"><p>Fragment class that allows an organizer to create or edit an event’s details.</p></div>
+                    <div class="block"><p>Fragment class that allows an organizer to create or edit an event's details. Provides functionality for managing event info, including dates, times, posters, and for viewing waiting lists or invitation statuses in real-time</p></div>
 
                     <dl>
 
@@ -198,8 +198,14 @@ public class <span class="typeNameLabel"><a href=OrganizerEventEditDetailsFragme
                                         
                                             <tr class="altColor">
                                                 <th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a
-                                                        href="#OrganizerEventEditDetailsFragment()">OrganizerEventEditDetailsFragment</a></span>()</code></th>
-                                                <td class="colLast"></td>
+                                                        href="#OrganizerEventEditDetailsFragment(java.lang.String,com.example.syzygy_eventapp.NavigationStackFragment)">OrganizerEventEditDetailsFragment</a></span>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> organizerID, <a href=NavigationStackFragment.html>NavigationStackFragment</a> navStack)</code></th>
+                                                <td class="colLast">Creates a new instance of OrganizerEventEditDetailsFragment in create mode</td>
+                                            </tr>
+                                        
+                                            <tr class="rowColor">
+                                                <th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a
+                                                        href="#OrganizerEventEditDetailsFragment(com.example.syzygy_eventapp.Event,com.example.syzygy_eventapp.NavigationStackFragment)">OrganizerEventEditDetailsFragment</a></span>(<a href=Event.html>Event</a> event, <a href=NavigationStackFragment.html>NavigationStackFragment</a> navStack)</code></th>
+                                                <td class="colLast">Creates a new instance of OrganizerEventEditDetailsFragment in edit mode</td>
                                             </tr>
                                         
 
@@ -252,11 +258,11 @@ public class <span class="typeNameLabel"><a href=OrganizerEventEditDetailsFragme
                                         </tr>
                                         
                                         <tr id="i0" class="altColor">
-                                            <td class="colFirst"><code>static <a href=OrganizerEventEditDetailsFragment.html>OrganizerEventEditDetailsFragment</a></code>
+                                            <td class="colFirst"><code>void</code>
                                             </td>
-                                            <th class="colSecond" scope="row"><code><a href=OrganizerEventEditDetailsFragment.html#newInstance(com.example.syzygy_eventapp.Event,com.example.syzygy_eventapp.Organizer)>newInstance</a>(<a href=Event.html>Event</a> existingEvent, <a href=Organizer.html>Organizer</a> organizer) </code>
+                                            <th class="colSecond" scope="row"><code><a href=OrganizerEventEditDetailsFragment.html#onCreate(Bundle)>onCreate</a>(Bundle savedInstanceState) </code>
                                             </th>
-                                            <td class="colLast">Factory method for creating a new instance of this fragment</td>
+                                            <td class="colLast"></td>
                                         </tr>
                                         
                                         <tr id="i1" class="rowColor">
@@ -264,7 +270,15 @@ public class <span class="typeNameLabel"><a href=OrganizerEventEditDetailsFragme
                                             </td>
                                             <th class="colSecond" scope="row"><code><a href=OrganizerEventEditDetailsFragment.html#onCreateView(LayoutInflater,ViewGroup,Bundle)>onCreateView</a>(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) </code>
                                             </th>
-                                            <td class="colLast">Inflates the layout for this fragment and initializes UI components</td>
+                                            <td class="colLast"></td>
+                                        </tr>
+                                        
+                                        <tr id="i2" class="altColor">
+                                            <td class="colFirst"><code>void</code>
+                                            </td>
+                                            <th class="colSecond" scope="row"><code><a href=OrganizerEventEditDetailsFragment.html#onRequestPermissionsResult(int,kotlin.Array,kotlin.Array)>onRequestPermissionsResult</a>(int requestCode, <a href=https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-array/index.html>Array</a>&lt;<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a>&gt; permissions, <a href=https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-array/index.html>Array</a>&lt;int&gt; grantResults) </code>
+                                            </th>
+                                            <td class="colLast"></td>
                                         </tr>
                                         
                                         </tbody>
@@ -298,12 +312,48 @@ public class <span class="typeNameLabel"><a href=OrganizerEventEditDetailsFragme
                             </a>
                                 <h3>Constructor Detail</h3>
                                 
-                                <a name="OrganizerEventEditDetailsFragment()"></a>
+                                <a name="OrganizerEventEditDetailsFragment(java.lang.String,com.example.syzygy_eventapp.NavigationStackFragment)"></a>
                                 <ul class="blockList">
                                     <li class="blockList">
                                         <h4>OrganizerEventEditDetailsFragment</h4>
-                                        <pre>OrganizerEventEditDetailsFragment()</pre>
-                                        <div class="block"></div>
+                                        <pre>OrganizerEventEditDetailsFragment(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> organizerID, <a href=NavigationStackFragment.html>NavigationStackFragment</a> navStack)</pre>
+                                        <div class="block">Creates a new instance of OrganizerEventEditDetailsFragment in create mode</div>
+                                        
+                                        <dl>
+                                            <dt><span class="paramLabel">Parameters:</span></dt>
+                                            
+                                            
+                                            <dd><code>organizerID</code> - The organizer creating or editing the event</dd>
+                                            
+                                            
+                                            
+                                            <dd><code>navStack</code> - The nav stack for screen management</dd>
+                                            
+                                            
+                                        </dl>
+                                        
+                                    </li>
+                                </ul>
+                                
+                                <a name="OrganizerEventEditDetailsFragment(com.example.syzygy_eventapp.Event,com.example.syzygy_eventapp.NavigationStackFragment)"></a>
+                                <ul class="blockList">
+                                    <li class="blockList">
+                                        <h4>OrganizerEventEditDetailsFragment</h4>
+                                        <pre>OrganizerEventEditDetailsFragment(<a href=Event.html>Event</a> event, <a href=NavigationStackFragment.html>NavigationStackFragment</a> navStack)</pre>
+                                        <div class="block">Creates a new instance of OrganizerEventEditDetailsFragment in edit mode</div>
+                                        
+                                        <dl>
+                                            <dt><span class="paramLabel">Parameters:</span></dt>
+                                            
+                                            
+                                            <dd><code>event</code> - The event to edit</dd>
+                                            
+                                            
+                                            
+                                            <dd><code>navStack</code> - The nav stack for screen management</dd>
+                                            
+                                            
+                                        </dl>
                                         
                                     </li>
                                 </ul>
@@ -321,35 +371,21 @@ public class <span class="typeNameLabel"><a href=OrganizerEventEditDetailsFragme
                             </a>
                                 <h3>Method Detail</h3>
                                 
-                                <a id="newInstance(com.example.syzygy_eventapp.Event,com.example.syzygy_eventapp.Organizer)">
+                                <a id="onCreate(Bundle)">
                                     <!--   -->
                                 </a>
                                 <ul class=
                                               "blockList"
                                           >
                                     <li class="blockList">
-                                        <h4>newInstance</h4>
-                                        <pre class="methodSignature"> static <a href=OrganizerEventEditDetailsFragment.html>OrganizerEventEditDetailsFragment</a> <a href=OrganizerEventEditDetailsFragment.html#newInstance(com.example.syzygy_eventapp.Event,com.example.syzygy_eventapp.Organizer)>newInstance</a>(<a href=Event.html>Event</a> existingEvent, <a href=Organizer.html>Organizer</a> organizer)</pre>
-                                        <div class="block"><p>Factory method for creating a new instance of this fragment</p></div>
+                                        <h4>onCreate</h4>
+                                        <pre class="methodSignature"> void <a href=OrganizerEventEditDetailsFragment.html#onCreate(Bundle)>onCreate</a>(Bundle savedInstanceState)</pre>
+                                        <div class="block"></div>
 
                                         <dl>
 
                                         
-                                            <dt><span class="paramLabel">Parameters:</span></dt>
-                                            
-                                            
-                                            <dd><code>existingEvent</code> - The event to edit (if any).</dd>
-                                            
-                                            
-                                            
-                                            <dd><code>organizer</code> - The organizer creating or editing the event</dd>
-                                            
-                                            
-                                        
 
-                                        
-                                            <dt><span class="returnLabel">Returns:</span></dt>
-                                            <dd><p>A new instance of <a href=OrganizerEventEditDetailsFragment.html>OrganizerEventEditDetailsFragment</a>.</p></dd>
                                         
 
                                         
@@ -362,20 +398,40 @@ public class <span class="typeNameLabel"><a href=OrganizerEventEditDetailsFragme
                                     <!--   -->
                                 </a>
                                 <ul class=
-                                              "blockListLast"
+                                              "blockList"
                                           >
                                     <li class="blockList">
                                         <h4>onCreateView</h4>
                                         <pre class="methodSignature"> View <a href=OrganizerEventEditDetailsFragment.html#onCreateView(LayoutInflater,ViewGroup,Bundle)>onCreateView</a>(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)</pre>
-                                        <div class="block"><p>Inflates the layout for this fragment and initializes UI components</p></div>
+                                        <div class="block"></div>
 
                                         <dl>
 
                                         
 
                                         
-                                            <dt><span class="returnLabel">Returns:</span></dt>
-                                            <dd><p>The root view of the fragment</p></dd>
+
+                                        
+
+                                        </dl>
+                                    </li>
+                                </ul>
+                                
+                                <a id="onRequestPermissionsResult(int,kotlin.Array,kotlin.Array)">
+                                    <!--   -->
+                                </a>
+                                <ul class=
+                                              "blockListLast"
+                                          >
+                                    <li class="blockList">
+                                        <h4>onRequestPermissionsResult</h4>
+                                        <pre class="methodSignature"> void <a href=OrganizerEventEditDetailsFragment.html#onRequestPermissionsResult(int,kotlin.Array,kotlin.Array)>onRequestPermissionsResult</a>(int requestCode, <a href=https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-array/index.html>Array</a>&lt;<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a>&gt; permissions, <a href=https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-array/index.html>Array</a>&lt;int&gt; grantResults)</pre>
+                                        <div class="block"></div>
+
+                                        <dl>
+
+                                        
+
                                         
 
                                         
