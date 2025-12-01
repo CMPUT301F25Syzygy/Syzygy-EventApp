@@ -105,7 +105,7 @@ public class JoinedEventsFragment extends Fragment {
                 }
 
                 // An event will be considered as "past" if the lottery is complete OR if the registration end time is before now
-                boolean isPast = event.isLotteryComplete() || (event.getRegistrationEnd() != null && event.getRegistrationEnd().toDate().before(now));
+                boolean isPast = (event.getRegistrationEnd() != null && event.getRegistrationEnd().toDate().before(now));
 
                 if (isPast) {
                     past.add(event);

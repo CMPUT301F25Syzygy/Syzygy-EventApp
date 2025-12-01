@@ -337,9 +337,11 @@ public class InvitationController {
             String recipientId,
             java.util.function.Consumer<Invitation> onChange
     ) {
+        // 🔹 Only look at non-cancelled invites for this event + user
         Filter filter = Filter.and(
                 Filter.equalTo("event", eventId),
-                Filter.equalTo("recipientID", recipientId)
+                Filter.equalTo("recipientID", recipientId),
+                Filter.equalTo("cancelled", false)
         );
 
         return observeInvites(filter, invites -> {
@@ -349,31 +351,23 @@ public class InvitationController {
             }
 
             Invitation bestPending = null;
-            Invitation newestNonCancelled = null;
+            Invitation newest = null;
 
             for (Invitation inv : invites) {
                 if (inv == null) {
                     continue;
                 }
 
-                Boolean cancelled = inv.getCancelled();
-                com.google.firebase.Timestamp responseTime = inv.getResponseTime();
                 com.google.firebase.Timestamp sendTime = inv.getSendTime();
-
-                boolean isCancelled = Boolean.TRUE.equals(cancelled);
+                com.google.firebase.Timestamp responseTime = inv.getResponseTime();
                 boolean hasResponded = (responseTime != null);
 
-                // Skip cancelled invites entirely
-                if (isCancelled) {
-                    continue;
+                // Track newest non-cancelled invite overall
+                if (newest == null || isAfter(sendTime, newest.getSendTime())) {
+                    newest = inv;
                 }
 
-                // Track newest non-cancelled invite
-                if (newestNonCancelled == null || isAfter(sendTime, newestNonCancelled.getSendTime())) {
-                    newestNonCancelled = inv;
-                }
-
-                // Pending = not cancelled + no response
+                // Pending = non-cancelled + no response
                 if (!hasResponded) {
                     if (bestPending == null || isAfter(sendTime, bestPending.getSendTime())) {
                         bestPending = inv;
@@ -381,7 +375,8 @@ public class InvitationController {
                 }
             }
 
-            Invitation chosen = (bestPending != null) ? bestPending : newestNonCancelled;
+            // Prefer the newest pending invite; otherwise fallback to newest non-cancelled invite
+            Invitation chosen = (bestPending != null) ? bestPending : newest;
             onChange.accept(chosen);
         });
     }
@@ -395,6 +390,5 @@ public class InvitationController {
         }
         return a.compareTo(b) > 0;
     }
-
 
 }
