@@ -127,19 +127,19 @@ public class EventOrganizerDetailsView extends Fragment {
         });
 
         sendInvitesButton.setOnClickListener(v -> {
-            Toast.makeText(getContext(), "Starting lottery...", Toast.LENGTH_SHORT).show();
+            showToast("Starting lottery...");
             eventController.drawLotteryEarly(event.getEventID())
                     .addOnSuccessListener((result) -> {
-                        Toast.makeText(getContext(), "Lottery drawn", Toast.LENGTH_SHORT).show();
+                        showToast("Lottery drawn");
                     })
                     .addOnFailureListener((result) -> {
-                        Toast.makeText(getContext(), "Failed to draw lottery", Toast.LENGTH_SHORT).show();
+                        showToast("Failed to draw lottery");
                     });
         });
 
         sendNotificationButton.setOnClickListener(v -> {
             // TODO
-            Toast.makeText(getContext(), "Not implemented", Toast.LENGTH_SHORT).show();
+            showToast("Not implemented");
         });
     }
 
@@ -204,7 +204,7 @@ public class EventOrganizerDetailsView extends Fragment {
                     waitingListView.setUsers(users);
                 })
                 .addOnFailureListener(error -> {
-                    Toast.makeText(getContext(), "Failed to load waitlist", Toast.LENGTH_SHORT).show();
+                    showToast("Failed to load waitlist");
                 });
     }
 
@@ -222,12 +222,25 @@ public class EventOrganizerDetailsView extends Fragment {
 
                     // sort user invites into two groups
                     for (Invitation invite : invites) {
-                        if (invite.getCancelled()) continue;
+                        Boolean cancelled = invite.getCancelled();
+                        Boolean accepted = invite.getAccepted();
+                        com.google.firebase.Timestamp responseTime = invite.getResponseTime();
 
-                        if (invite.getAccepted()) {
+                        // Skip invites the organizer has cancelled
+                        if (Boolean.TRUE.equals(cancelled)) {
+                            continue;
+                        }
+
+                        // Accepted list
+                        if (Boolean.TRUE.equals(accepted)) {
                             acceptedUserIds.add(invite.getRecipientID());
-                        } else {
+                            continue;
+                        }
+
+                        // Pending = no response yet (responseTime still null)
+                        if (responseTime == null) {
                             pendingUserIds.add(invite.getRecipientID());
+                            // declined = responded + not accepted, ignored
                         }
                     }
 
@@ -238,7 +251,7 @@ public class EventOrganizerDetailsView extends Fragment {
                                 eventEntrantsText.setText(users.size() + " / " + event.getMaxAttendees());
                             })
                             .addOnFailureListener(error -> {
-                                Toast.makeText(getContext(), "Failed to load accepted users", Toast.LENGTH_SHORT).show();
+                                showToast("Failed to load accepted users");
                             });
 
                     Task<List<User>> loadPendingUsersTask = userController.getUsers(pendingUserIds);
@@ -247,13 +260,13 @@ public class EventOrganizerDetailsView extends Fragment {
                                 pendingListView.setUsers(users);
                             })
                             .addOnFailureListener(error -> {
-                                Toast.makeText(getContext(), "Failed to load pending users", Toast.LENGTH_SHORT).show();
+                                showToast("Failed to load pending users");
                             });
 
                     return Tasks.whenAllComplete(loadAcceptedUsersTask, loadPendingUsersTask);
                 })
                 .addOnFailureListener(error -> {
-                    Toast.makeText(getContext(), "Failed to load invites", Toast.LENGTH_SHORT).show();
+                    showToast("Failed to load invites");
                 });
     }
 
@@ -261,7 +274,7 @@ public class EventOrganizerDetailsView extends Fragment {
         List<String> inviteIds = event.getInvites();
 
         if (pendingListView.getUsers().size() == 0) {
-            Toast.makeText(getContext(), "There are pending invites", Toast.LENGTH_SHORT).show();
+            showToast("There are no pending invites");
             return Tasks.forResult(null);
         }
 
@@ -287,15 +300,15 @@ public class EventOrganizerDetailsView extends Fragment {
 
                     if (someSucceded) {
                         if (someFailed) {
-                            Toast.makeText(getContext(), "Cancelled some invites, others failed", Toast.LENGTH_SHORT).show();
+                            showToast("Cancelled some invites, others failed");
                         } else {
-                            Toast.makeText(getContext(), "Cancelled all invites", Toast.LENGTH_SHORT).show();
+                            showToast("Cancelled all invites");
                         }
                     } else {
                         if (someFailed) {
-                            Toast.makeText(getContext(), "Failed to cancel all invites", Toast.LENGTH_SHORT).show();
+                            showToast("Failed to cancel all invites");
                         } else {
-                            Toast.makeText(getContext(), "There are pending invites", Toast.LENGTH_SHORT).show();
+                            showToast("There are no pending invites");
                         }
                     }
 
@@ -309,4 +322,18 @@ public class EventOrganizerDetailsView extends Fragment {
         eventListener.remove();
         inviteListener.remove();
     }
+
+    private void showToast(String message) {
+        if (!isAdded()) {
+            return;
+        }
+
+        android.content.Context ctx = getContext();
+        if (ctx == null) {
+            return;
+        }
+
+        Toast.makeText(ctx, message, Toast.LENGTH_SHORT).show();
+    }
+
 }
