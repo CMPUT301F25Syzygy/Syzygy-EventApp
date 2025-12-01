@@ -252,7 +252,7 @@ public class Event {
         if (registrationEnd == null) {
             return false;
         }
-        return !lotteryComplete && registrationEnd.toDate().after(new Date());
+        return registrationEnd.toDate().after(new Date());
     }
 
     public Timestamp getCreatedAt() {
