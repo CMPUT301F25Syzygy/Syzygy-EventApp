@@ -211,11 +211,6 @@ public class QRScanFragment extends Fragment {
                     // Get event from firestore
                     EventController.getInstance().getEvent(eventID)
                             .addOnSuccessListener(event -> {
-                                if (event == null) {
-                                    Toast.makeText(requireContext(), "Event not found", Toast.LENGTH_SHORT).show();
-                                    return;
-                                }
-
                                 // Check if event is within the registration period
                                 Timestamp registrationStart = event.getRegistrationStart();
                                 Timestamp registrationEnd = event.getRegistrationEnd();
@@ -239,8 +234,8 @@ public class QRScanFragment extends Fragment {
                                     navStack.replaceScreen(new EventFragment(navStack, eventID));
                                 }
                             })
-                            .addOnFailureListener(e -> {
-                                Toast.makeText(requireContext(), "Error loading event: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                            .addOnFailureListener(error -> {
+                                Toast.makeText(requireContext(), "Event not found", Toast.LENGTH_SHORT).show();
                             });
 
                     // Stop after first valid QR is scanned

@@ -314,4 +314,13 @@ public class InvitationController {
             return Tasks.forResult(matchingInvites);
         });
     }
+
+    public Task<Void> deleteInvite(String invitationId) {
+        if (invitationId == null || invitationId.isEmpty()) {
+            return Tasks.forException(
+                    new IllegalArgumentException("invitationId is required"));
+        }
+
+        return invitationsRef.document(invitationId).delete();
+    }
 }
