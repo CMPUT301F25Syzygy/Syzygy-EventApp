@@ -11,29 +11,26 @@ public class Notification {
     // max safe integer that can be stored in a double, thanks javascript <3
     private static final long MAX_SAFE_DOUBLE_INTEGER = 9007199254740991L; // 2 ^ 53 - 1
 
-    private long id;
+    private long id = ThreadLocalRandom.current().nextLong(MAX_SAFE_DOUBLE_INTEGER);;
     private String title;
     private String description;
     private String eventId;
     private String organizerId;
-    private Timestamp creationDate;
-    private boolean sent;
-    private boolean deleted;
+    private Timestamp creationDate = Timestamp.now();
+    private boolean sent = false;
+    private boolean deleted = false;
 
     public Notification(String title, String description, String eventId, String organizerId) {
-        this.id = ThreadLocalRandom.current().nextLong(MAX_SAFE_DOUBLE_INTEGER);
         this.title = title;
         this.description = description;
         this.eventId = eventId;
         this.organizerId = organizerId;
-        this.creationDate = Timestamp.now();
     }
 
     /**
      * Default constructor for frameworks requiring this.
      */
     public Notification() {
-
     }
 
     public long getId() {
@@ -82,5 +79,21 @@ public class Notification {
 
     public void setCreationDate(Timestamp creationDate) {
         this.creationDate = creationDate;
+    }
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
+    }
+
+    public boolean isSent() {
+        return sent;
+    }
+
+    public void setSent(boolean sent) {
+        this.sent = sent;
     }
 }

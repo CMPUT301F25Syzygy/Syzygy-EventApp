@@ -90,6 +90,11 @@ public class Invitation {
         return responseTime;
     }
 
+    public boolean hasResponse() {
+        return responseTime != null;
+    }
+
+
     public void setResponseTime(Timestamp responseTime) {
         this.responseTime = responseTime;
     }

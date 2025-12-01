@@ -4,6 +4,7 @@ package com.example.syzygy_eventapp;
 import android.app.AlertDialog;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.text.Layout;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,22 +12,27 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RadioGroup;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
+import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.google.firebase.firestore.ListenerRegistration;
 
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Fragment class that allows an organizer to create or edit an event's details.
@@ -45,6 +51,7 @@ public class EventOrganizerDetailsView extends Fragment {
     private EventController eventController;
     private UserControllerInterface userController;
     private InvitationController invitationController;
+    private NotificationController notificationController;
 
     // Current user and event data
     private Event event;
@@ -102,6 +109,7 @@ public class EventOrganizerDetailsView extends Fragment {
         eventController = EventController.getInstance();
         userController = UserController.getInstance();
         invitationController = new InvitationController();
+        notificationController = NotificationController.getInstance();
 
         eventListener = eventController.observeEvent(event.getEventID(), this::setEvent, navStack::popScreen);
         inviteListener = invitationController.observeEventInvites(event.getEventID(),
@@ -337,4 +345,92 @@ public class EventOrganizerDetailsView extends Fragment {
         Toast.makeText(ctx, message, Toast.LENGTH_SHORT).show();
     }
 
+    private void openSendNotificationDialog() {
+        // inflate the layout
+        View dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.send_notification_dialog, null);
+
+        // make an alert dialog for sending notifications
+        AlertDialog dialog = new android.app.AlertDialog.Builder(requireContext())
+                .setTitle("Send Notification")
+                .setView(dialogView)
+                .setPositiveButton("Send", null)
+                .setNegativeButton("Cancel", null)
+                .show();
+
+        // set button separately to stop dialog from closing
+        Button positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+
+        EditText titleEditText = dialogView.findViewById(R.id.title_edit_text);
+        EditText descriptionEditText = dialogView.findViewById(R.id.description_edit_text);
+
+        SwitchMaterial acceptedUsersSwitch = dialogView.findViewById(R.id.acceptedUsersSwitch);
+        SwitchMaterial pendingUsersSwitch = dialogView.findViewById(R.id.pendingUsersSwitch);
+        SwitchMaterial waitingUsersSwitch = dialogView.findViewById(R.id.waitingUsersSwitch);
+
+        positiveButton.setOnClickListener((view) -> {
+            boolean isValid = true;
+
+            if (titleEditText.getText().toString().trim().isEmpty()) {
+                titleEditText.setError("Title is required");
+                isValid = false;
+            }
+
+            if (descriptionEditText.getText().toString().trim().isEmpty()) {
+                descriptionEditText.setError("Description is required");
+                isValid = false;
+            }
+
+            if (!acceptedUsersSwitch.isChecked() && !pendingUsersSwitch.isChecked() && !waitingUsersSwitch.isChecked()) {
+                if (isValid) {
+                    showToast("At least one group must be checked");
+                }
+                isValid = false;
+            }
+
+            if (isValid) {
+                sendNotification(
+                        titleEditText.getText().toString().trim(),
+                        descriptionEditText.getText().toString().trim(),
+                        acceptedUsersSwitch.isChecked(),
+                        pendingUsersSwitch.isChecked(),
+                        waitingUsersSwitch.isChecked());
+                dialog.dismiss();
+            }
+        });
+    }
+
+    public Task<Void> sendNotification(String title, String description, boolean toAccepted, boolean toPending, boolean toWaiting) {
+        List<String> recipientIds = new ArrayList<>();
+        List<Task<?>> tasks = new ArrayList<>();
+
+        if (toWaiting) {
+            recipientIds.addAll(event.getWaitingList());
+        }
+
+        if (toAccepted || toPending) {
+            tasks.add(invitationController.getEventInvites(event.getEventID())
+                    .addOnSuccessListener((invites) -> {
+                        for (Invitation invite : invites) {
+                            if (invite.getAccepted() && toAccepted) {
+                                recipientIds.add(invite.getRecipientID());
+                            } else if (!invite.hasResponse() && !invite.getCancelled() && toPending) {
+                                recipientIds.add(invite.getRecipientID());
+                            }
+                        }
+                    }));
+        }
+
+        Notification notif = new Notification(title, description, event.getEventID(), event.getOrganizerID());
+
+        showToast("Sending notification...");
+        return Tasks.whenAllSuccess(tasks).continueWithTask((_tasks) -> {
+            return notificationController.postNotification(notif, recipientIds);
+        }).addOnSuccessListener((nothing) -> {
+            if (recipientIds.isEmpty()) {
+                showToast("Selected group(s) were empty");
+            } else {
+                showToast("Notification sent");
+                }
+        });
+    }
 }

@@ -188,6 +188,10 @@ public class NotificationController {
      * @return a Firestore Task showing completion status
      */
     public Task<Void> postNotification(Notification notification, List<String> recipientIds) {
+        if (recipientIds.isEmpty()) {
+            return Tasks.forResult(null);
+        }
+
         DocumentReference notifRef = notifsRef.document(Long.toString(notification.getId()));
 
         List<Task<Void>> tasks = new ArrayList<>();
