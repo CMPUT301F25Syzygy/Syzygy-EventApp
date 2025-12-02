@@ -48,7 +48,7 @@ public class EventOrganizerDetailsView extends Fragment {
     // declare UI components
     private TextView eventNameText, eventDescriptionText;
     private TextView locationText, eventTimeText, eventEntrantsText;
-    private Button openMapButton;
+    private Button openMapButton, viewWaitlistMapButton;
     private UserListView acceptedListView, pendingListView, waitingListView;
     private ImageView posterImage;
     private Button cancelInvitesButton, sendInvitesButton, sendNotificationButton, exportBtn;
@@ -107,6 +107,7 @@ public class EventOrganizerDetailsView extends Fragment {
         waitingListView.setListVisibility(false);
 
         openMapButton = view.findViewById(R.id.open_map_button);
+        viewWaitlistMapButton = view.findViewById(R.id.view_waitlist_map_button);
         cancelInvitesButton = view.findViewById(R.id.cancel_invites_button);
         sendInvitesButton = view.findViewById(R.id.send_invites_button);
         sendNotificationButton = view.findViewById(R.id.send_notification_button);
@@ -160,6 +161,11 @@ public class EventOrganizerDetailsView extends Fragment {
 
         exportBtn.setOnClickListener(v -> {
             exportFinalEntrantsToCSV(event.getEventID(), event.getName());
+        });
+
+        viewWaitlistMapButton.setOnClickListener(v -> {
+            WaitlistMapFragment mapFragment = new WaitlistMapFragment(event, navStack);
+            navStack.pushScreen(mapFragment);
         });
     }
 
@@ -327,6 +333,12 @@ public class EventOrganizerDetailsView extends Fragment {
             posterImage.setImageResource(R.drawable.image_placeholder);
         } else {
             posterImage.setImageBitmap(bitmap);
+        }
+
+        if (event.isGeolocationRequired()) {
+            viewWaitlistMapButton.setVisibility(View.VISIBLE);
+        } else {
+            viewWaitlistMapButton.setVisibility(View.GONE);
         }
 
         refreshInvitedUsers();
