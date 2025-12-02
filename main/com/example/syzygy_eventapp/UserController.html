@@ -336,6 +336,14 @@ public class <span class="typeNameLabel"><a href=UserController.html>UserControl
                                             <td class="colLast">Permanently delete this user.</td>
                                         </tr>
                                         
+                                        <tr id="i11" class="rowColor">
+                                            <td class="colFirst"><code>Task&lt;Void&gt;</code>
+                                            </td>
+                                            <th class="colSecond" scope="row"><code><a href=UserController.html#deleteUserWithCleanup(java.lang.String)>deleteUserWithCleanup</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> userID) </code>
+                                            </th>
+                                            <td class="colLast">Removes a user from all waiting lists, cancels all their invitations, deletes all events they organized, and deletes their profile.</td>
+                                        </tr>
+                                        
                                         </tbody>
                                     </table>
                                 </div>
@@ -688,7 +696,7 @@ public class <span class="typeNameLabel"><a href=UserController.html>UserControl
                                     <!--   -->
                                 </a>
                                 <ul class=
-                                              "blockListLast"
+                                              "blockList"
                                           >
                                     <li class="blockList">
                                         <h4>deleteUser</h4>
@@ -709,6 +717,39 @@ public class <span class="typeNameLabel"><a href=UserController.html>UserControl
                                         
                                             <dt><span class="returnLabel">Returns:</span></dt>
                                             <dd><p>Task that completes when the document is deleted</p></dd>
+                                        
+
+                                        
+
+                                        </dl>
+                                    </li>
+                                </ul>
+                                
+                                <a id="deleteUserWithCleanup(java.lang.String)">
+                                    <!--   -->
+                                </a>
+                                <ul class=
+                                              "blockListLast"
+                                          >
+                                    <li class="blockList">
+                                        <h4>deleteUserWithCleanup</h4>
+                                        <pre class="methodSignature"> Task&lt;Void&gt; <a href=UserController.html#deleteUserWithCleanup(java.lang.String)>deleteUserWithCleanup</a>(<a href=https://developer.android.com/reference/kotlin/java/lang/String.html>String</a> userID)</pre>
+                                        <div class="block"><p>Removes a user from all waiting lists, cancels all their invitations, deletes all events they organized, and deletes their profile.</p></div>
+
+                                        <dl>
+
+                                        
+                                            <dt><span class="paramLabel">Parameters:</span></dt>
+                                            
+                                            
+                                            <dd><code>userID</code> - The ID of the user to delete</dd>
+                                            
+                                            
+                                        
+
+                                        
+                                            <dt><span class="returnLabel">Returns:</span></dt>
+                                            <dd><p>A Task that completes when all cleanup is done</p></dd>
                                         
 
                                         
