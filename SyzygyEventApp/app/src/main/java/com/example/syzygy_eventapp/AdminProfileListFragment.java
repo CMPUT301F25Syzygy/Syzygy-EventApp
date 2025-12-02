@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.google.firebase.firestore.ListenerRegistration;
 
@@ -178,10 +179,17 @@ public class AdminProfileListFragment extends Fragment {
     private void showConfirmDeleteDialog(User user) {
         new AlertDialog.Builder(requireContext())
                 .setTitle("Confirm Delete")
-                .setMessage("Are you sure you want to delete " + user.getName() + "?")
-                .setPositiveButton("Delete", (dialog, which) ->
-                        UserController.getInstance().deleteUser(user.getUserID())
-                )
+                .setMessage("Are you sure you want to delete " + user.getName() + "? This will remove them from all events and delete their organized events.")
+                .setPositiveButton("Delete", (dialog, which) -> {
+                    Toast.makeText(getContext(), "Deleting user...", Toast.LENGTH_SHORT).show();
+                    UserController.getInstance().deleteUserWithCleanup(user.getUserID())
+                            .addOnSuccessListener(aVoid -> {
+                                Toast.makeText(getContext(), "User deleted successfully", Toast.LENGTH_SHORT).show();
+                            })
+                            .addOnFailureListener(err -> {
+                                Toast.makeText(getContext(), "Failed to delete user: " + err.getMessage(), Toast.LENGTH_LONG).show();
+                            });
+                })
                 .setNegativeButton("Cancel", null)
                 .show();
     }

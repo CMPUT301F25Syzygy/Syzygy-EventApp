@@ -319,4 +319,97 @@ public class UserController implements UserControllerInterface {
             return snap.toObject(Admin.class);
         }
     }
+
+    /**
+     * Removes a user from all waiting lists, cancels all their invitations,
+     * deletes all events they organized, and deletes their profile.
+     *
+     * @param userID The ID of the user to delete
+     * @return A Task that completes when all cleanup is done
+     */
+    public Task<Void> deleteUserWithCleanup(String userID) {
+        List<Task<?>> cleanupTasks = new ArrayList<>();
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        // Remove user from all event waiting lists
+        cleanupTasks.add(
+                db.collection("events")
+                        .whereArrayContains("waitingList", userID)
+                        .get()
+                        .continueWithTask(task -> {
+                            if (task.isSuccessful()) {
+                                List<Task<?>> removeTasks = new ArrayList<>();
+                                for (DocumentSnapshot doc : task.getResult()) {
+                                    removeTasks.add(
+                                            doc.getReference().update("waitingList", FieldValue.arrayRemove(userID))
+                                    );
+                                }
+                                return Tasks.whenAll(removeTasks);
+                            }
+                            return Tasks.forResult(null);
+                        })
+        );
+
+        // Delete all invitations for this user
+        cleanupTasks.add(
+                db.collection("invitations")
+                        .whereEqualTo("recipientID", userID)
+                        .get()
+                        .continueWithTask(task -> {
+                            if (task.isSuccessful()) {
+                                List<Task<?>> deleteTasks = new ArrayList<>();
+                                for (DocumentSnapshot doc : task.getResult()) {
+                                    deleteTasks.add(doc.getReference().delete());
+                                }
+                                return Tasks.whenAll(deleteTasks);
+                            }
+                            return Tasks.forResult(null);
+                        })
+        );
+
+        // Delete all events organized by this user
+        cleanupTasks.add(
+                db.collection("events")
+                        .whereEqualTo("organizerID", userID)
+                        .get()
+                        .continueWithTask(task -> {
+                            if (task.isSuccessful()) {
+                                List<Task<?>> deleteEventTasks = new ArrayList<>();
+                                EventController eventController = EventController.getInstance();
+
+                                for (DocumentSnapshot doc : task.getResult()) {
+                                    String eventId = doc.getId();
+                                    deleteEventTasks.add(eventController.deleteEvent(eventId));
+                                }
+                                return Tasks.whenAll(deleteEventTasks);
+                            }
+                            return Tasks.forResult(null);
+                        })
+        );
+
+        // Remove user from notification recipient lists
+        cleanupTasks.add(
+                db.collection("notifications")
+                        .whereArrayContains("recipientIDs", userID)
+                        .get()
+                        .continueWithTask(task -> {
+                            if (task.isSuccessful()) {
+                                List<Task<?>> notifTasks = new ArrayList<>();
+                                for (DocumentSnapshot doc : task.getResult()) {
+                                    notifTasks.add(
+                                            doc.getReference().update("recipientIDs", FieldValue.arrayRemove(userID))
+                                    );
+                                }
+                                return Tasks.whenAll(notifTasks);
+                            }
+                            return Tasks.forResult(null);
+                        })
+        );
+
+        // AFTER ALL CLEANUP, delete the user profile
+        return Tasks.whenAll(cleanupTasks)
+                .continueWithTask(task -> {
+                    return usersRef.document(userID).delete();
+                });
+    }
 }

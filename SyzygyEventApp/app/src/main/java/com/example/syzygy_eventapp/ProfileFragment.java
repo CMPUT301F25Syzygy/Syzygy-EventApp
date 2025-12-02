@@ -378,8 +378,14 @@ public class ProfileFragment extends Fragment {
             userListener = null;
         }
 
-        userController.deleteUser(userID)
+        // Show a loading message
+        Toast.makeText(getContext(), "Deleting profile and cleaning up data...", Toast.LENGTH_LONG).show();
+
+        userController.deleteUserWithCleanup(userID)
                 .addOnSuccessListener(aVoid -> {
+                    Toast.makeText(getContext(), "Profile deleted successfully", Toast.LENGTH_SHORT).show();
+                    // Return to welcome screen or login
+                    requireActivity().finish();
                 })
                 .addOnFailureListener(err -> {
                     showError("Failed to delete profile: " +

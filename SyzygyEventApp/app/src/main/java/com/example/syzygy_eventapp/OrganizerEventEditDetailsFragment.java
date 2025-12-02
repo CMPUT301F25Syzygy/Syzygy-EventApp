@@ -224,18 +224,19 @@ public class OrganizerEventEditDetailsFragment extends Fragment {
         if (!isEditMode) {
             geolocationToggle.setOnClickListener((view) -> {
                 if (geolocationToggle.isChecked()) {
-                    viewMapButton.setVisibility(View.VISIBLE);
+                    viewMapButton.setVisibility(View.GONE);
                 } else {
                     viewMapButton.setVisibility(View.GONE);
                 }
             });
-
-            // View map button
-            viewMapButton.setOnClickListener(v -> {
-                WaitlistMapFragment mapFragment = new WaitlistMapFragment(event, navStack);
-                navStack.pushScreen(mapFragment);
-            });
         }
+
+        // View map button (works in both modes but only for preview during creation)
+        viewMapButton.setOnClickListener(v -> {
+            WaitlistMapFragment mapFragment = new WaitlistMapFragment(event, navStack);
+            navStack.pushScreen(mapFragment);
+        });
+
     }
 
     /**

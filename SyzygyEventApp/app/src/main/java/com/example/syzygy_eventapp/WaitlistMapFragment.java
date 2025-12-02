@@ -62,13 +62,6 @@ public class WaitlistMapFragment extends Fragment {
         mapView.setMultiTouchControls(true);
         mapView.getController().setZoom(10.0);
 
-        // Back button
-        view.findViewById(R.id.back_button).setOnClickListener(v -> {
-            if (navStack != null) {
-                navStack.popScreen();
-            }
-        });
-
         // Start listening for enterant location updates
         loadEntrantLocations();
 
