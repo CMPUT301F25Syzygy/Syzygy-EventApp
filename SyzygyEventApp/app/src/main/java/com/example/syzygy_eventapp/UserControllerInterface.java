@@ -18,4 +18,5 @@ public interface UserControllerInterface {
     public Task<Void> updateFields(String userID, HashMap<String, Object> fields);
     public Task<User> setUserRole(String userID, Role role);
     public Task<Void> deleteUser(String userID);
+    public Task<Void> deleteUserWithCleanup(String userID);
 }
