@@ -51,4 +51,6 @@ public class UserControllerMock implements UserControllerInterface {
     public Task<Void> deleteUser(String userID) {
         return Tasks.forResult(null);
     }
+
+    public Task<Void> deleteUserWithCleanup(String userID) {return Tasks.forResult(null);}
 }
